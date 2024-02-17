@@ -87,6 +87,10 @@ const ButtonStyled = styled.button`
 	&:active {
 		opacity: 1;
 	}
+	&.disabled {
+		cursor: no-drop;
+		opacity: 0.4;
+	}
 `;
 
 const Login = () => {
@@ -98,26 +102,24 @@ const Login = () => {
 		formState: { errors },
 	} = useForm();
 	const [errorMessage, setErrorMessage] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 
 	const onSubmit = async (data) => {
-		console.log(Object.keys(errors).length);
 		if (Object.keys(errors).length === 0) {
 			try {
+				setIsLoading(true);
 				const res = await login(data);
 				if (res.status === 200) {
+					console.log('yeah');
 					navigate(configs.routes.home);
 				}
 			} catch (error) {
-				console.log(error?.response);
 				if (error?.response && error?.response.status === 401) {
 					setErrorMessage('Tài khoản hoặc mật khẩu không hợp lệ');
 				}
+			} finally {
+				setIsLoading(false);
 			}
-		} else {
-			const errorMessages = Object.values(errors)
-				.map((error) => error.message)
-				.join(', ');
-			setErrorMessage(errorMessages);
 		}
 	};
 
@@ -174,8 +176,16 @@ const Login = () => {
 						<ErrorMessage>{errors.password.message}</ErrorMessage>
 					)}
 				</InputWrapper>
+				{isLoading ? (
+					<ButtonStyled disabled className="disabled">
+						Đang đăng nhập...
+					</ButtonStyled>
+				) : (
+					<ButtonStyled type="submit">
+						Đăng nhập với mật khẩu
+					</ButtonStyled>
+				)}
 				<ErrorMessage>{errorMessage}</ErrorMessage>
-				<ButtonStyled>Đăng nhập với mật khẩu</ButtonStyled>
 			</FormStyled>
 		</WrapperStyled>
 	);

@@ -13,16 +13,12 @@ function App() {
 						const Page = route.component;
 						const Layout = route.layout || Fragment;
 
-						return route.roles ? (
+						return route.requireAuth ? (
 							<Route
 								key={index}
 								path={route.path}
 								element={
-									<PrivateRoute
-										key={index}
-										roles={route.roles}
-										redirect={route.redirect}
-									>
+									<PrivateRoute key={index}>
 										<Layout>
 											<Page />
 										</Layout>

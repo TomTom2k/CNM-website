@@ -10,28 +10,27 @@ const routing = [
 	{
 		path: configs.routes.home,
 		component: Home,
-		roles: [configs.role.client],
-		redirect: configs.routes.login,
+		requireAuth: true,
 	},
 	{
 		path: configs.routes.login,
 		component: Login,
+		requireAuth: false,
 	},
 	{
 		path: configs.routes.register,
 		component: Register,
+		requireAuth: false,
 	},
 	{
 		path: configs.routes.profile,
 		component: Profile,
-		roles: [configs.role.client],
-		redirect: configs.routes.login,
+		requireAuth: true,
 	},
 	{
 		path: configs.routes.contacts,
 		component: Contacts,
-		roles: [configs.role.client],
-		redirect: configs.routes.login,
+		requireAuth: true,
 	},
 ];
 

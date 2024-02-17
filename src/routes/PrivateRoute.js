@@ -1,20 +1,20 @@
 import React, { useContext } from 'react';
-
 import { Navigate } from 'react-router-dom';
 import { AuthToken } from '../authToken/AuthToken';
+import configs from '../configs';
 
-const PrivateRoute = ({ roles, redirect, children }) => {
+const PrivateRoute = ({ children }) => {
 	const { user } = useContext(AuthToken);
-	console.log(user);
-	const role = user?.Role;
-	console.log(role);
-
-	if (!role) {
-		return <Navigate to={redirect} />;
-	} else if (!roles.includes(role)) {
-		console.log('navigate');
-		return <Navigate to="/403" />;
+	const { isFetchingUser } = useContext(AuthToken);
+	if (isFetchingUser) {
+		return <div>Loading...</div>;
 	}
+	console.log(user);
+
+	if (!user) {
+		return <Navigate to={configs.routes.login} />;
+	}
+
 	return <>{children}</>;
 };
 

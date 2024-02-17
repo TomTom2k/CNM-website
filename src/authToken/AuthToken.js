@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
 import authApi from '../api/authApi';
@@ -7,47 +7,58 @@ export let AuthToken = createContext();
 
 const AuthProvide = ({ children }) => {
 	const [user, setUser] = useState(null);
+	const [isFetchingUser, setIsFetchingUser] = useState(true);
 
 	const login = async (data) => {
 		try {
 			const res = await authApi.signInWithPhone(data);
 			if (res?.headers.authorization) {
 				Cookies.set('authorization', res.headers.authorization);
+				const response = await authApi.secret();
+				if (response.user) {
+					setUser(response.user);
+				}
 			}
 			return res;
 		} catch (error) {
 			throw error;
 		}
 	};
-
-	let secret = async () => {
-		const res = await authApi.secret();
-		if (res.user) {
-			setUser(res.user);
+	const secret = async () => {
+		try {
+			const res = await authApi.secret();
+			if (res.user) {
+				setUser(res.user);
+			}
+		} catch (error) {
+			console.log('Error fetching user: ', error);
 		}
-	};
-
-	let authData = {
-		user,
-		login,
-		secret,
 	};
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
 				const res = await authApi.secret();
-				setUser(res?.user);
-				console.log(res);
+				setUser(res.user);
 			} catch (error) {
 				console.error('Error fetching user:', error);
+			} finally {
+				setIsFetchingUser(false);
 			}
 		};
 
-		fetchUser();
+		if (Cookies.get('authorization')) {
+			fetchUser();
+		} else {
+			setIsFetchingUser(false);
+		}
 	}, []);
 
-	return <AuthToken.Provider value={authData}>{children}</AuthToken.Provider>;
+	return (
+		<AuthToken.Provider value={{ user, isFetchingUser, login, secret }}>
+			{children}
+		</AuthToken.Provider>
+	);
 };
 
 export default AuthProvide;
