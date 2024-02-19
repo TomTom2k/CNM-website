@@ -9,7 +9,6 @@ const PrivateRoute = ({ children }) => {
 	if (isFetchingUser) {
 		return <div>Loading...</div>;
 	}
-	console.log(user);
 
 	if (!user) {
 		return <Navigate to={configs.routes.login} />;

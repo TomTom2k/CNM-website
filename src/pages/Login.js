@@ -15,10 +15,10 @@ const WrapperStyled = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background-color: var(--secondary);
+	background-color: var(--color-60);
 `;
 const LogoStyled = styled.h1`
-	color: var(--primary);
+	color: var(--color-10);
 	font-size: 3.5rem;
 	margin-bottom: 1rem;
 `;
@@ -79,7 +79,7 @@ const ButtonStyled = styled.button`
 
 	color: white;
 	font-size: 0.875rem;
-	background-color: var(--primary);
+	background-color: var(--color-10);
 
 	&:hover {
 		opacity: 0.9;

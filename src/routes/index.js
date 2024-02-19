@@ -11,26 +11,31 @@ const routing = [
 		path: configs.routes.home,
 		component: Home,
 		requireAuth: true,
+		layout: true,
 	},
 	{
 		path: configs.routes.login,
 		component: Login,
 		requireAuth: false,
+		layout: false,
 	},
 	{
 		path: configs.routes.register,
 		component: Register,
 		requireAuth: false,
+		layout: false,
 	},
 	{
 		path: configs.routes.profile,
 		component: Profile,
 		requireAuth: true,
+		layout: true,
 	},
 	{
 		path: configs.routes.contacts,
 		component: Contacts,
 		requireAuth: true,
+		layout: true,
 	},
 ];
 

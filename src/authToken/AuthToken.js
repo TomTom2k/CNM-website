@@ -24,6 +24,10 @@ const AuthProvide = ({ children }) => {
 			throw error;
 		}
 	};
+	const logout = () => {
+		Cookies.set('authorization', null);
+		setUser(null);
+	};
 	const secret = async () => {
 		try {
 			const res = await authApi.secret();
@@ -55,7 +59,9 @@ const AuthProvide = ({ children }) => {
 	}, []);
 
 	return (
-		<AuthToken.Provider value={{ user, isFetchingUser, login, secret }}>
+		<AuthToken.Provider
+			value={{ user, isFetchingUser, login, logout, secret }}
+		>
 			{children}
 		</AuthToken.Provider>
 	);

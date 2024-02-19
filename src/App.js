@@ -3,6 +3,7 @@ import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import routing from './routes';
 import PrivateRoute from './routes/PrivateRoute';
+import DefaultLayout from './layout/DefaultLayout';
 
 function App() {
 	return (
@@ -11,7 +12,7 @@ function App() {
 				<Routes>
 					{routing.map((route, index) => {
 						const Page = route.component;
-						const Layout = route.layout || Fragment;
+						const Layout = route.layout ? DefaultLayout : Fragment;
 
 						return route.requireAuth ? (
 							<Route
