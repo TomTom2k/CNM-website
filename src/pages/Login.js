@@ -5,7 +5,7 @@ import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import styled from 'styled-components';
 
-import { AuthToken } from '../authToken/AuthToken';
+import { AuthToken } from '../context/AuthToken';
 import configs from '../configs';
 
 const WrapperStyled = styled.div`
@@ -110,7 +110,6 @@ const Login = () => {
 				setIsLoading(true);
 				const res = await login(data);
 				if (res.status === 200) {
-					console.log('yeah');
 					navigate(configs.routes.home);
 				}
 			} catch (error) {

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AuthToken } from '../authToken/AuthToken';
+import { AuthToken } from '../context/AuthToken';
 import { Modal } from 'react-bootstrap';
 
 const ProfileModel = ({ show, handleClose }) => {

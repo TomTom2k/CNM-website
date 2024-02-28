@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Tooltip, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import Navbar from './Navbar';
-import { AuthToken } from '../../authToken/AuthToken';
+import { AuthToken } from '../../context/AuthToken';
 import { useNavigate } from 'react-router-dom';
 import configs from '../../configs';
 import ProfileModel from '../../components/ProfileModel';

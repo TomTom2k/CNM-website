@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthToken } from '../authToken/AuthToken';
+import { AuthToken } from '../context/AuthToken';
 import configs from '../configs';
 
 const PrivateRoute = ({ children }) => {
