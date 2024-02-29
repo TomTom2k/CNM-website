@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { AuthToken } from '../context/AuthToken';
 import { Modal } from 'react-bootstrap';
+import { AuthToken } from '../../context/AuthToken';
 
 const ProfileModel = ({ show, handleClose }) => {
 	const { user } = useContext(AuthToken);

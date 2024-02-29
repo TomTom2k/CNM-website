@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { AuthToken } from '../context/AuthToken';
-import { ConversationToken } from '../context/ConversationToken';
+import { AuthToken } from '../../context/AuthToken';
+import { ConversationToken } from '../../context/ConversationToken';
 
 const WrapperStyled = styled.div`
 	padding: 0.5rem 1rem;
