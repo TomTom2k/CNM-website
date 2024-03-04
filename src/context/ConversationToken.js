@@ -8,7 +8,7 @@ const ConversationProvide = ({ children }) => {
 	const [conversationSelected, setConversationSelected] = useState(null);
 	const [conversations, setConversations] = useState([]);
 
-	const [messages, setMessages] = useState([]);
+	const [messages, setMessages] = useState(null);
 
 	useEffect(() => {
 		const fetchConversations = async () => {

@@ -110,13 +110,14 @@ const ChatBox = () => {
 			});
 			setMessages((prevMessages) => [...prevMessages, res.message]);
 		} catch (error) {
+			console.log(error);
 		} finally {
 			inputMessageRef.current.value = null;
 		}
 	};
 	return (
 		<>
-			{messages.length > 0 ? (
+			{messages ? (
 				<ChatBoxStyled>
 					<HeaderChatStyled>
 						{conversationSelected?.name ||
