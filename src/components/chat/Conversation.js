@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
+import { useSocketContext } from '../../context/SocketContext';
 
 const WrapperStyled = styled.div`
 	padding: 0.5rem 1rem;
@@ -22,10 +23,23 @@ const AvatarStyled = styled.div`
 	border-radius: 50%;
 	background-color: white;
 	box-shadow: 0 0 4px 0.5px rgba(0, 0, 0, 0.05);
-	overflow: hidden img {
+	position: relative;
+	img {
 		width: 100%;
 		height: 100%;
+		border-radius: 50%;
+
 		object-fit: cover;
+	}
+
+	&.online::after {
+		content: '';
+		position: absolute;
+		right: 1px;
+		width: 0.675rem;
+		height: 0.675rem;
+		background-color: #7de07d;
+		border-radius: 50%;
 	}
 `;
 const InfoStyled = styled.div`
@@ -53,17 +67,23 @@ const InfoStyled = styled.div`
 `;
 const Conversation = ({ conversation }) => {
 	const { user } = useContext(AuthToken);
+	const { onlineUsers } = useSocketContext();
 	const { conversationSelected, setConversationSelected } =
 		useContext(ConversationToken);
-	let title =
+
+	const title =
 		conversation?.name ||
 		conversation?.membersInfo?.find(
 			(member) => member.userID !== user?.userID
 		)?.fullName;
+	const isOnline = conversation.participantIds.some((id) =>
+		onlineUsers.includes(id)
+	);
 
 	const handlerConversation = () => {
 		setConversationSelected(conversation);
 	};
+
 	return (
 		<WrapperStyled
 			onClick={handlerConversation}
@@ -74,7 +94,7 @@ const Conversation = ({ conversation }) => {
 					: ''
 			}
 		>
-			<AvatarStyled>
+			<AvatarStyled className={isOnline ? 'online' : ''}>
 				<img src="" alt="" />
 			</AvatarStyled>
 			<InfoStyled>

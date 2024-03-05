@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Conversation from './Conversation';
 import { ConversationToken } from '../../context/ConversationToken';
 import SearchBox from '../SearchBox';
+import { useSocketContext } from '../../context/SocketContext';
 
 const AsideStyled = styled.aside`
 	width: 30rem;

@@ -6,11 +6,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthProvide from './context/AuthToken';
 import GlobalStyle from './components/GlobalStyle';
+import { SocketProvider } from './context/SocketContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<AuthProvide>
-		<GlobalStyle />
-		<App />
+		<SocketProvider>
+			<GlobalStyle />
+			<App />
+		</SocketProvider>
 	</AuthProvide>
 );
