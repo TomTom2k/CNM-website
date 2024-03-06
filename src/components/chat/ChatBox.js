@@ -10,6 +10,7 @@ import messageApi from '../../api/messageApi';
 import Button from '../common/Button';
 
 import ChatImage from '../../assets/images/chat_image.jpg';
+import useListenMessage from '../../hooks/useListenMessage';
 
 const ChatBoxStyled = styled.div`
 	width: 100%;
@@ -97,6 +98,7 @@ const NoneConversationStyled = styled.div`
 
 const ChatBox = () => {
 	const inputMessageRef = useRef(null);
+	useListenMessage();
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, messages, setMessages } =
 		useContext(ConversationToken);
@@ -108,7 +110,9 @@ const ChatBox = () => {
 				content: message,
 				conversationId: conversationSelected.conversationId,
 			});
-			setMessages((prevMessages) => [...prevMessages, res.message]);
+			setMessages((prevMessages) =>
+				prevMessages ? [...prevMessages, res.message] : [res.message]
+			);
 		} catch (error) {
 			console.log(error);
 		} finally {

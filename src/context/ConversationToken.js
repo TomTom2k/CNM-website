@@ -1,8 +1,12 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import messageApi from '../api/messageApi';
 import conversationApi from '../api/conversationApi';
 
-export let ConversationToken = createContext();
+export const ConversationToken = createContext();
+
+export const useConversation = () => {
+	return useContext(ConversationToken);
+};
 
 const ConversationProvide = ({ children }) => {
 	const [conversationSelected, setConversationSelected] = useState(null);
