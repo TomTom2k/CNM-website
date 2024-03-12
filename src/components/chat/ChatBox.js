@@ -1,6 +1,7 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import styled from 'styled-components';
+import InputEmoji from 'react-input-emoji'
 
 import { FaRegImage, FaRegFile } from 'react-icons/fa6';
 
@@ -97,17 +98,20 @@ const NoneConversationStyled = styled.div`
 `;
 
 const ChatBox = () => {
-	const inputMessageRef = useRef(null);
+	const [newMessage, setNewMessage] = useState("");
 	useListenMessage();
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, messages, setMessages } =
 		useContext(ConversationToken);
 
+	const handleChangeMessage = (newMessage)=> {
+		setNewMessage(newMessage)
+	}
+
 	const handlerSendButton = async () => {
 		try {
-			const message = inputMessageRef.current.value;
 			const res = await messageApi.sendMessage({
-				content: message,
+				content: newMessage,
 				conversationId: conversationSelected.conversationId,
 			});
 			setMessages((prevMessages) =>
@@ -116,7 +120,7 @@ const ChatBox = () => {
 		} catch (error) {
 			console.log(error);
 		} finally {
-			inputMessageRef.current.value = null;
+			setNewMessage("")
 		}
 	};
 	return (
@@ -150,9 +154,9 @@ const ChatBox = () => {
 						</SendMediaStyled>
 						<InputMessageStyled className="p-0 g-0">
 							<Col md={11}>
-								<input
-									ref={inputMessageRef}
-									type="text"
+								<InputEmoji
+									value={newMessage}
+									onChange={handleChangeMessage}
 									placeholder="Nhập tin nhắn để gửi"
 								/>
 							</Col>
