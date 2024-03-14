@@ -8,7 +8,12 @@ const messageApi = {
 		//     conversationId: String || null
 		// }
 		const url = '/message';
-		return axiosClient.post(url, data);
+		const config = {
+			headers: {
+				'content-type': 'multipart/form-data'
+			}
+		}
+		return axiosClient.post(url, data, config);
 	},
 	getMessages: (conversationId) => {
 		// data = {
