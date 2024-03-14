@@ -49,15 +49,25 @@ const ContentChatStyled = styled.div`
 		}
 	}
 
-	img {
-		max-width: 50%;
-		border-radius: 1rem;
-		margin-bottom: 1rem;
-
+	.image-block {
 		&.self {
-			background-color: var(--color-30);
-			color: white;
 			align-self: flex-end;
+		}
+	}
+`;
+const ImageBlock = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 50%;
+	margin-bottom: 1rem;
+
+	img {
+		max-width: 100%;
+		border-radius: 1rem;
+		cursor: pointer;
+
+		&.block {
+			max-width: 50%;
 		}
 	}
 `;
@@ -124,15 +134,21 @@ const ChatBox = () => {
 	const handleChooseImage = () => {
 		let input = document.createElement('input');
 		input.type = 'file';
+		input.accept = "image/*"
+		input.multiple = true
 		input.click();
 		input.onchange = async e => { 
-			let file = e.target.files[0]; 
+			let files = e.target.files;
+			let data = new FormData()
+			if (files.length !== 0) {
+				for (const single_file of files) {
+					data.append('image', single_file)
+				}
+				data.append('conversationId', conversationSelected.conversationId)
+				data.append('type', "image")
+			}
 			try {
-				const res = await messageApi.sendMessage({
-					image: file,
-					conversationId: conversationSelected.conversationId,
-					type: "image"
-				});
+				const res = await messageApi.sendMessage(data);
 				setMessages((prevMessages) =>
 					prevMessages ? [...prevMessages, res.message] : [res.message]
 				);
@@ -172,6 +188,7 @@ const ChatBox = () => {
 					</HeaderChatStyled>
 					<ContentChatStyled>
 						{messages.map((message) => {
+
 							if(message.type === "text") {
 								return (
 									<p
@@ -186,17 +203,27 @@ const ChatBox = () => {
 									</p>
 								)
 							} else if(message.type === "image") {
+								const images = message.content.split(" ")
 								return (
-									<img 
-										className={
-											user.userID === message?.senderId
-												? 'self'
-												: ''
-										}
+									<ImageBlock 
 										key={message.messageId} 
-										src={message.content}
-										alt={`img_${message.messageId}`}
-									/>
+										className={user.userID === message?.senderId ? 'image-block self': 'image-block'}
+									>
+										{images.map((image, index) => {
+											return (
+												<img 
+													id={index}
+													className={
+														images.length > 1 ? 'block' : ''
+													}
+													key={index} 
+													src={image}
+													alt={`img_${index}`}
+													onClick={(e) => window.open(e.target.currentSrc)}
+												/>
+											)
+										})}
+									</ImageBlock>
 								)
 							}
 						})}
