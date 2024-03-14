@@ -63,12 +63,14 @@ const ImageBlock = styled.div`
 
 	img {
 		max-width: 100%;
-		border-radius: 1rem;
 		cursor: pointer;
+		border-radius: 0.6rem;
+		border: 2px solid transparent;
 
 		&.block {
-			max-width: 50%;
+			width: 50%;
 		}
+		flex: 1;
 	}
 `;
 const SendMessageInputStyled = styled.div`
