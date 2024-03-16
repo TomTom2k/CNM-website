@@ -1,6 +1,8 @@
-import React, { useContext, useRef } from 'react';
+/* eslint-disable array-callback-return */
+import React, { useContext, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import styled from 'styled-components';
+import InputEmoji from 'react-input-emoji'
 
 import { FaRegImage, FaRegFile } from 'react-icons/fa6';
 
@@ -45,6 +47,30 @@ const ContentChatStyled = styled.div`
 			color: white;
 			align-self: flex-end;
 		}
+	}
+
+	.image-block {
+		&.self {
+			align-self: flex-end;
+		}
+	}
+`;
+const ImageBlock = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+	max-width: 50%;
+	margin-bottom: 1rem;
+
+	img {
+		max-width: 100%;
+		cursor: pointer;
+		border-radius: 0.6rem;
+		border: 2px solid transparent;
+
+		&.block {
+			width: 50%;
+		}
+		flex: 1;
 	}
 `;
 const SendMessageInputStyled = styled.div`
@@ -97,18 +123,51 @@ const NoneConversationStyled = styled.div`
 `;
 
 const ChatBox = () => {
-	const inputMessageRef = useRef(null);
+	const [newMessage, setNewMessage] = useState("");
 	useListenMessage();
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, messages, setMessages } =
 		useContext(ConversationToken);
 
+	const handleChangeMessage = (newMessage)=> {
+		setNewMessage(newMessage)
+	}
+
+	const handleChooseImage = () => {
+		let input = document.createElement('input');
+		input.type = 'file';
+		input.accept = "image/*"
+		input.multiple = true
+		input.click();
+		input.onchange = async e => { 
+			let files = e.target.files;
+			let data = new FormData()
+			if (files.length !== 0) {
+				for (const single_file of files) {
+					data.append('image', single_file)
+				}
+				data.append('conversationId', conversationSelected.conversationId)
+				data.append('type', "image")
+			}
+			try {
+				const res = await messageApi.sendMessage(data);
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.message] : [res.message]
+				);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setNewMessage("")
+			}
+		}
+	}
+
 	const handlerSendButton = async () => {
 		try {
-			const message = inputMessageRef.current.value;
 			const res = await messageApi.sendMessage({
-				content: message,
+				content: newMessage,
 				conversationId: conversationSelected.conversationId,
+				type: "text"
 			});
 			setMessages((prevMessages) =>
 				prevMessages ? [...prevMessages, res.message] : [res.message]
@@ -116,7 +175,7 @@ const ChatBox = () => {
 		} catch (error) {
 			console.log(error);
 		} finally {
-			inputMessageRef.current.value = null;
+			setNewMessage("")
 		}
 	};
 	return (
@@ -130,29 +189,57 @@ const ChatBox = () => {
 							)?.fullName}
 					</HeaderChatStyled>
 					<ContentChatStyled>
-						{messages.map((message) => (
-							<p
-								key={message.messageId}
-								className={
-									user.userID === message?.senderId
-										? 'self'
-										: ''
-								}
-							>
-								{message.content}
-							</p>
-						))}
+						{messages.map((message) => {
+
+							if(message.type === "text") {
+								return (
+									<p
+										key={message.messageId}
+										className={
+											user.userID === message?.senderId
+												? 'self'
+												: ''
+										}
+									>
+										{message.content}
+									</p>
+								)
+							} else if(message.type === "image") {
+								const images = message.content.split(" ")
+								return (
+									<ImageBlock 
+										key={message.messageId} 
+										className={user.userID === message?.senderId ? 'image-block self': 'image-block'}
+									>
+										{images.map((image, index) => {
+											return (
+												<img 
+													id={index}
+													className={
+														images.length > 1 ? 'block' : ''
+													}
+													key={index} 
+													src={image}
+													alt={`img_${index}`}
+													onClick={(e) => window.open(e.target.currentSrc)}
+												/>
+											)
+										})}
+									</ImageBlock>
+								)
+							}
+						})}
 					</ContentChatStyled>
 					<SendMessageInputStyled>
 						<SendMediaStyled className="p-0 g-0">
-							<FaRegImage />
+							<FaRegImage onClick={() => handleChooseImage()}/>
 							<FaRegFile />
 						</SendMediaStyled>
 						<InputMessageStyled className="p-0 g-0">
 							<Col md={11}>
-								<input
-									ref={inputMessageRef}
-									type="text"
+								<InputEmoji
+									value={newMessage}
+									onChange={handleChangeMessage}
 									placeholder="Nhập tin nhắn để gửi"
 								/>
 							</Col>
