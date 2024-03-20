@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import styled from 'styled-components';
 import InputEmoji from 'react-input-emoji'
-
 import { FaRegImage, FaRegFile } from 'react-icons/fa6';
 
 import { AuthToken } from '../../context/AuthToken';
@@ -13,6 +12,7 @@ import Button from '../common/Button';
 
 import ChatImage from '../../assets/images/chat_image.jpg';
 import useListenMessage from '../../hooks/useListenMessage';
+import FileItem from './FileItem';
 
 const ChatBoxStyled = styled.div`
 	width: 100%;
@@ -51,6 +51,21 @@ const ContentChatStyled = styled.div`
 
 	.image-block {
 		&.self {
+			align-self: flex-end;
+		}
+	}
+
+	.file-item {
+		max-width: 50%;
+		border-radius: 1rem;
+		padding: 1rem;
+		background-color: var(--color-60);
+		margin-bottom: 1rem;
+		cursor: pointer;
+
+		&.self {
+			background-color: var(--color-30);
+			color: black;
 			align-self: flex-end;
 		}
 	}
@@ -129,7 +144,7 @@ const ChatBox = () => {
 	const { conversationSelected, messages, setMessages } =
 		useContext(ConversationToken);
 
-	const handleChangeMessage = (newMessage)=> {
+	const handleChangeMessage = (newMessage) => {
 		setNewMessage(newMessage)
 	}
 
@@ -144,7 +159,7 @@ const ChatBox = () => {
 			let data = new FormData()
 			if (files.length !== 0) {
 				for (const single_file of files) {
-					data.append('image', single_file)
+					data.append('file', single_file)
 				}
 				data.append('conversationId', conversationSelected.conversationId)
 				data.append('type', "image")
@@ -162,22 +177,58 @@ const ChatBox = () => {
 		}
 	}
 
+	const handleChooseFile = () => {
+		let input = document.createElement('input');
+		input.type = 'file';
+		input.accept = "application/*, text/*"
+		input.multiple = true
+		input.click();
+		input.onchange = async e => { 
+			let files = e.target.files;
+			let data = new FormData()
+			if (files.length !== 0) {
+				for (const single_file of files) {
+					data.append('file', single_file)
+				}
+				data.append('conversationId', conversationSelected.conversationId)
+				data.append('type', "file")
+			}
+			try {
+				const res = await messageApi.sendMessage(data);
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.message] : [res.message]
+				);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setNewMessage("")
+			}
+		}
+	}
+
 	const handlerSendButton = async () => {
-		try {
-			const res = await messageApi.sendMessage({
-				content: newMessage,
-				conversationId: conversationSelected.conversationId,
-				type: "text"
-			});
-			setMessages((prevMessages) =>
-				prevMessages ? [...prevMessages, res.message] : [res.message]
-			);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setNewMessage("")
+		if(newMessage.trim() !== ""){
+			try {
+				const res = await messageApi.sendMessage({
+					content: newMessage,
+					conversationId: conversationSelected.conversationId,
+					type: "text"
+				});
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.message] : [res.message]
+				);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setNewMessage("")
+			}
 		}
 	};
+
+	const handleOnEnter = () => {
+		handlerSendButton()
+	}
+
 	return (
 		<>
 			{messages ? (
@@ -227,13 +278,28 @@ const ChatBox = () => {
 										})}
 									</ImageBlock>
 								)
+							} else if(message.type === "file") {
+								const files = message.content.split(" ")								
+								return files.map((file, index) => {
+									const fileNameS3 = file.split("/")
+									return (
+										<FileItem 
+											key={index} 
+											fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
+											fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
+											fileNameS3={fileNameS3[fileNameS3.length - 1]}
+											className={user.userID === message?.senderId ? 'self file-item': 'file-item'}
+											onClick={() => window.open(file)}
+										/>
+									)
+								})
 							}
 						})}
 					</ContentChatStyled>
 					<SendMessageInputStyled>
 						<SendMediaStyled className="p-0 g-0">
 							<FaRegImage onClick={() => handleChooseImage()}/>
-							<FaRegFile />
+							<FaRegFile onClick={() => handleChooseFile()}/>
 						</SendMediaStyled>
 						<InputMessageStyled className="p-0 g-0">
 							<Col md={11}>
@@ -241,6 +307,7 @@ const ChatBox = () => {
 									value={newMessage}
 									onChange={handleChangeMessage}
 									placeholder="Nhập tin nhắn để gửi"
+									onEnter={handleOnEnter}
 								/>
 							</Col>
 							<Col md={1}>
