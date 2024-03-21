@@ -22,9 +22,14 @@ const FileDetailStyled = styled.div`
     justify-content: space-between;
     width: 200px;
     padding-left: 0.6rem;
+    overflow: hidden;
 
     h5 {
         font-size: 1rem;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 `;
 

@@ -36,45 +36,39 @@ const ContentChatStyled = styled.div`
 	flex-direction: column;
 	align-items: flex-start;
 
-	p {
+	.message-item {
 		max-width: 50%;
+		margin: 0.6rem;
 		border-radius: 1rem;
-		padding: 1rem;
 		background-color: var(--color-60);
-
-		&.self {
-			background-color: var(--color-30);
-			color: white;
-			align-self: flex-end;
-		}
-	}
-
-	.image-block {
-		&.self {
-			align-self: flex-end;
-		}
-	}
-
-	.file-item {
-		max-width: 50%;
-		border-radius: 1rem;
-		padding: 1rem;
-		background-color: var(--color-60);
-		margin-bottom: 1rem;
-		cursor: pointer;
 
 		&.self {
 			background-color: var(--color-30);
 			color: black;
 			align-self: flex-end;
 		}
+
+		&.no-background-color{
+			background-color: transparent;
+		}
+		
+		p {
+			margin: 0;
+			padding: 1rem;
+			border-radius: 1rem;
+		}
+	
+		.file-item {
+			cursor: pointer;
+			padding: 1rem;
+			border-radius: 1rem;
+		}
 	}
 `;
 const ImageBlock = styled.div`
 	display: flex;
 	flex-wrap: wrap;
-	max-width: 50%;
-	margin-bottom: 1rem;
+	max-width: 100%;
 
 	img {
 		max-width: 100%;
@@ -167,7 +161,7 @@ const ChatBox = () => {
 			try {
 				const res = await messageApi.sendMessage(data);
 				setMessages((prevMessages) =>
-					prevMessages ? [...prevMessages, res.message] : [res.message]
+					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
 			} catch (error) {
 				console.log(error);
@@ -196,7 +190,7 @@ const ChatBox = () => {
 			try {
 				const res = await messageApi.sendMessage(data);
 				setMessages((prevMessages) =>
-					prevMessages ? [...prevMessages, res.message] : [res.message]
+					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
 			} catch (error) {
 				console.log(error);
@@ -215,7 +209,7 @@ const ChatBox = () => {
 					type: "text"
 				});
 				setMessages((prevMessages) =>
-					prevMessages ? [...prevMessages, res.message] : [res.message]
+					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
 			} catch (error) {
 				console.log(error);
@@ -240,61 +234,55 @@ const ChatBox = () => {
 							)?.fullName}
 					</HeaderChatStyled>
 					<ContentChatStyled>
-						{messages.map((message) => {
-
-							if(message.type === "text") {
-								return (
-									<p
-										key={message.messageId}
-										className={
-											user.userID === message?.senderId
-												? 'self'
-												: ''
-										}
-									>
-										{message.content}
-									</p>
-								)
-							} else if(message.type === "image") {
-								const images = message.content.split(" ")
-								return (
-									<ImageBlock 
-										key={message.messageId} 
-										className={user.userID === message?.senderId ? 'image-block self': 'image-block'}
-									>
-										{images.map((image, index) => {
+						{messages.map((message) => (
+							<div className={`${user.userID === message?.senderId ? 'message-item self' : 'message-item'} ${message.type === 'image' ? 'no-background-color' : ''}`}>
+								{(() => {
+									if (message.type === "text") {
+										return (
+											<p>
+												{message.content}
+											</p>
+										);
+									} else if (message.type === "image") {
+										const images = message.content.split(" ");
+										return (
+											<ImageBlock
+												key={message.messageId}
+												className='image-block'
+											>
+												{images.map((image, index) => {
+													return (
+														<img
+															id={index}
+															className={images.length > 1 ? 'block' : ''}
+															key={index}
+															src={image}
+															alt={`img_${index}`}
+															onClick={(e) => window.open(e.target.currentSrc)}
+														/>
+													);
+												})}
+											</ImageBlock>
+										);
+									} else if (message.type === "file") {
+										const files = message.content.split(" ");
+										return files.map((file, index) => {
+											const fileNameS3 = file.split("/");
 											return (
-												<img 
-													id={index}
-													className={
-														images.length > 1 ? 'block' : ''
-													}
-													key={index} 
-													src={image}
-													alt={`img_${index}`}
-													onClick={(e) => window.open(e.target.currentSrc)}
+												<FileItem
+													key={index}
+													fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
+													fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
+													fileNameS3={fileNameS3[fileNameS3.length - 1]}
+													className='file-item'
+													onClick={() => window.open(file)}
 												/>
-											)
-										})}
-									</ImageBlock>
-								)
-							} else if(message.type === "file") {
-								const files = message.content.split(" ")								
-								return files.map((file, index) => {
-									const fileNameS3 = file.split("/")
-									return (
-										<FileItem 
-											key={index} 
-											fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
-											fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
-											fileNameS3={fileNameS3[fileNameS3.length - 1]}
-											className={user.userID === message?.senderId ? 'self file-item': 'file-item'}
-											onClick={() => window.open(file)}
-										/>
-									)
-								})
-							}
-						})}
+											);
+										});
+									}
+								})()}
+							</div>
+						))}
 					</ContentChatStyled>
 					<SendMessageInputStyled>
 						<SendMediaStyled className="p-0 g-0">
