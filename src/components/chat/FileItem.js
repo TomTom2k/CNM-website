@@ -21,7 +21,7 @@ const FileDetailStyled = styled.div`
 	display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 200px;
+    width: 280px;
     padding-left: 0.6rem;
     overflow: hidden;
 
@@ -40,6 +40,7 @@ const FileDetailBottomStyled = styled.div`
     align-items: center;
     span {
         font-size: 0.8rem;
+        color: #7589a3;
     }
 `;
 

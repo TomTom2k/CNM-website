@@ -5,6 +5,9 @@ const GlobalStyle = createGlobalStyle`
     --color-60: #e0e8ef;
     --color-30: #0091ff;
     --color-10: #1A73E8;
+    --blue-message: #e5efff;
+    --white-message: #fff;
+    --text-primary: #081c36;
   }
 
   * {
