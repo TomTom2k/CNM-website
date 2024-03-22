@@ -14,6 +14,7 @@ const FileIconStyled = styled.div`
 	font-size: 3rem;
 	display: flex;
     align-items: center;
+    margin-left: -0.4rem;
 `;
 
 const FileDetailStyled = styled.div`

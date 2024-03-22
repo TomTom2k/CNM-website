@@ -36,11 +36,32 @@ const ContentChatStyled = styled.div`
 	flex-direction: column;
 	align-items: flex-start;
 
+	.chat-time {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		span {
+			font-size: 0.8rem;
+			color: white;
+			background-color: rgba(0, 0, 0, 0.2);
+			padding: 0.2rem 0.8rem;
+			border-radius: 0.6rem;
+
+		}
+	}
+
 	.message-item {
+		min-width: 10%;
 		max-width: 50%;
 		margin: 0.6rem;
 		border-radius: 1rem;
 		background-color: var(--color-60);
+
+		&.short-time-message {
+			margin: 0.6rem 0.6rem -0.4rem;
+		}
 
 		&.self {
 			background-color: var(--color-30);
@@ -50,18 +71,41 @@ const ContentChatStyled = styled.div`
 
 		&.no-background-color{
 			background-color: transparent;
+
+			.message-time {
+				font-size: 0.8rem;
+				padding: 0.2rem 0.5rem;
+				margin-top: 0.2rem;
+				display: inline-block;
+				background-color: rgba(0, 0, 0, 0.2);
+				color: white;
+				border-radius: 1rem;
+			}
+
+			&.self {
+				.message-time {
+					float: right;
+				}
+			}
 		}
 		
 		p {
 			margin: 0;
-			padding: 1rem;
+			padding: 1rem 1rem;
 			border-radius: 1rem;
 		}
 	
 		.file-item {
 			cursor: pointer;
-			padding: 1rem;
+			padding: 1rem 1rem;
 			border-radius: 1rem;
+		}
+
+		.message-time {
+			font-size: 0.8rem;
+			padding: 0 1rem 0.6rem;
+			display: block;
+			margin-top: -0.4rem;
 		}
 	}
 `;
@@ -234,54 +278,88 @@ const ChatBox = () => {
 							)?.fullName}
 					</HeaderChatStyled>
 					<ContentChatStyled>
-						{messages.map((message) => (
-							<div className={`${user.userID === message?.senderId ? 'message-item self' : 'message-item'} ${message.type === 'image' ? 'no-background-color' : ''}`}>
-								{(() => {
-									if (message.type === "text") {
-										return (
-											<p>
-												{message.content}
-											</p>
-										);
-									} else if (message.type === "image") {
-										const images = message.content.split(" ");
-										return (
-											<ImageBlock
-												key={message.messageId}
-												className='image-block'
-											>
-												{images.map((image, index) => {
-													return (
-														<img
-															id={index}
-															className={images.length > 1 ? 'block' : ''}
-															key={index}
-															src={image}
-															alt={`img_${index}`}
-															onClick={(e) => window.open(e.target.currentSrc)}
-														/>
-													);
-												})}
-											</ImageBlock>
-										);
-									} else if (message.type === "file") {
-										const files = message.content.split(" ");
-										return files.map((file, index) => {
-											const fileNameS3 = file.split("/");
+						{messages.map((message, index, arr) => (
+							<>
+								{
+									(arr[index-1] && new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000) || !arr[index-1] 
+									? 
+									<div className='chat-time'>
+										<span>
+											{`
+												${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')} 
+												${new Date(message.createdAt).getDay().toString().padStart(2, '0')}/${new Date(message.createdAt).getMonth().toString().padStart(2, '0')}/${new Date(message.createdAt).getFullYear()}
+											`}
+										</span>
+									</div>
+									: null 
+								}
+								<div 
+									className={`
+										${user.userID === message?.senderId ? 'message-item self' : 'message-item'} 
+										${message.type === 'image' ? 'no-background-color' : ''}
+										${
+											arr[index+1] 
+											&& arr[index+1].senderId === message.senderId 
+											&& new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 300000
+											? 'short-time-message' : ''
+										}
+									`}
+								>
+									{(() => {
+										if (message.type === "text") {
+											return (
+												<p>
+													{message.content}
+												</p>
+											);
+										} else if (message.type === "image") {
+											const images = message.content.split(" ");
+											return (
+												<ImageBlock
+													key={message.messageId}
+													className='image-block'
+												>
+													{images.map((image, index) => {
+														return (
+															<img
+																id={index}
+																className={images.length > 1 ? 'block' : ''}
+																key={index}
+																src={image}
+																alt={`img_${index}`}
+																onClick={(e) => window.open(e.target.currentSrc)}
+															/>
+														);
+													})}
+												</ImageBlock>
+											);
+										} else if (message.type === "file") {
+											const fileNameS3 = message.content.split("/");
 											return (
 												<FileItem
-													key={index}
 													fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
 													fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
 													fileNameS3={fileNameS3[fileNameS3.length - 1]}
 													className='file-item'
-													onClick={() => window.open(file)}
+													onClick={() => window.open(message.content)}
 												/>
 											);
-										});
+										}
+									})()}
+									{/* Điều kiện hiển thị thời gian của tin nhắn
+										1. Nếu không có tin nhắn phía sau
+										2. Nếu tin nhắn phía sau là của người khác
+										3. Nếu tin nhắn phía sau cách tin nhắn hiện tại hơn 5 phút 
+									*/}
+									{
+										arr[index+1] 
+										&& arr[index+1].senderId === message.senderId 
+										&& new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
+										? null
+										: <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
 									}
-								})()}
-							</div>
+								</div>
+							</>
 						))}
 					</ContentChatStyled>
 					<SendMessageInputStyled>
