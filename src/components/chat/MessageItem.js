@@ -5,7 +5,9 @@ import Tippy from '@tippyjs/react/headless';
 import { SlReload } from "react-icons/sl";
 import { FiTrash } from "react-icons/fi";
 import { MdOutlineContentCopy } from "react-icons/md";
+import { PiShareFatLight } from "react-icons/pi";
 import { forwardRef, useImperativeHandle, useState } from 'react';
+import { copyImageToClipboard } from 'copy-image-clipboard'
 
 import FileItem from "./FileItem";
 
@@ -18,6 +20,22 @@ const MessageItemStyled = styled.div`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
     position: relative; 
+
+    .action-wrapper {
+        &.for-owner {
+            display: none;
+        }
+
+        &.for-file {
+            display: none;
+        }
+
+        &.for-image{
+            display: none;
+        }
+
+        display: inline-flex;
+    }
 
     &::after{
         content: "";
@@ -80,6 +98,12 @@ const MessageItemStyled = styled.div`
         &::after{
             left: -500px;
         }
+
+        .action-wrapper {
+            &.for-owner{
+                display: inline-flex;
+            }
+        }
     }
 
     &.no-background-color{
@@ -118,6 +142,42 @@ const MessageItemStyled = styled.div`
         cursor: pointer;
         padding: 1rem 1rem;
         border-radius: 1rem;
+
+        ~ div {
+            .action-wrapper {
+                &.not-for-file{
+                    display: none;
+                }
+
+                &.for-file{
+                    display: inline-flex;
+                }
+            }
+        }
+    }
+
+    .image-block {
+        ~ div {
+            .action-wrapper {
+                &.not-for-image{
+                    display: none;
+                }
+
+                &.for-image{
+                    display: inline-flex;
+                }
+            }
+        }
+    }
+
+    .image-block:has(> .block) {
+        ~ div {
+            .action-wrapper {
+                &.not-for-image-block{
+                    display: none;
+                }
+            }
+        }
     }
 
     .message-time {
@@ -152,14 +212,13 @@ const PopperWrapper = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100px;
+    min-height: 80px;
     border-radius: 6px;
     background: rgb(255, 255, 255);
     box-shadow: rgb(0 0 0 / 12%) 0px 2px 12px;
     overflow: hidden;
 
     .action-wrapper {
-        display: inline-flex;
         align-items: center;
         min-width: 180px;
         padding: 8px 16px;
@@ -179,7 +238,7 @@ const PopperWrapper = styled.div`
         }
 
         &.separate {
-            border-top: 1px solid rgba(22, 24, 35, 0.12);
+            border-bottom: 1px solid rgba(22, 24, 35, 0.12);
         }
     
         &:hover {
@@ -192,44 +251,46 @@ const PopperWrapper = styled.div`
     }
 `;
 
-const MENU_ITEMS = [
-    {
-        icon: <MdOutlineContentCopy />,
-        title: 'Copy tin nhắn',
-    },
-    {
-        icon: <SlReload />,
-        title: 'Thu hồi',
-        separate: true,
-        dangerous: true 
-    },
-    {
-        icon: <FiTrash />,
-        title: 'Xóa chỉ ở phía tôi',
-        dangerous: true 
-    },
-];
-
-const renderItems = () => {
-    return MENU_ITEMS.map((item, index) => (
-        <div  key={index} className={`action-wrapper ${item.separate ? 'separate' : ''} ${item.dangerous ? 'dangerous' : ''}`}>
-            <span className='icon'>{item.icon}</span>
-            <span className='title'>{item.title}</span>
-        </div>
-    ))
-}
-
-const renderMessageActions = (props) => {
-    return (
-        <div tabIndex="-1" {...props}>
-            <PopperWrapper>
-                {renderItems()}
-            </PopperWrapper>
-        </div>
-    );
-};
-
 const MessageItem = ({user, message, index, arr}, ref) => {
+    const MENU_ITEMS = [
+        {
+            icon: <MdOutlineContentCopy />,
+            title: 'Copy tin nhắn',
+            separate: true,
+            notForFile: true,
+            notForImage: true,
+            handleClick: () => handleCopyText()
+        },
+        {
+            icon: <MdOutlineContentCopy />,
+            title: 'Copy hình ảnh',
+            separate: true,
+            forImage: true,
+            notForImageBlock: true,
+            handleClick: () => handleCopyImage()
+        },
+        {
+            icon: <PiShareFatLight />,
+            title: 'Chia sẻ',
+            separate: true,
+            forFile: true,
+            handleClick: () => alert('a')
+        },
+        {
+            icon: <SlReload />,
+            title: 'Thu hồi',
+            dangerous: true,
+            forOwner: true,
+            handleClick: () => {alert('b')}
+        },
+        {
+            icon: <FiTrash />,
+            title: 'Xóa chỉ ở phía tôi',
+            dangerous: true ,
+            handleClick: () => {alert('c')}
+        },
+    ];
+
     const [isShowTippy, setIsShowTippy] = useState(false);
 
     useImperativeHandle(ref, () => ({
@@ -240,10 +301,6 @@ const MessageItem = ({user, message, index, arr}, ref) => {
         }
     }))
 
-    // $(window).click(function() {
-    //     //Hide the menus if visible
-    // });
-
     window.addEventListener("click", () => {
         if(isShowTippy === true) {
             setIsShowTippy(false)
@@ -252,11 +309,54 @@ const MessageItem = ({user, message, index, arr}, ref) => {
 
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
-        if(isShowTippy === true) {
-            setIsShowTippy(false)
-        } else {
-            setIsShowTippy(true)
-        }
+        setIsShowTippy(!isShowTippy)
+    }
+
+    const renderItems = () => {
+        return MENU_ITEMS.map((item, index) => (
+            <div  
+                key={index} 
+                className={`
+                    action-wrapper 
+                    ${item.separate ? 'separate' : ''} 
+                    ${item.dangerous ? 'dangerous' : ''} 
+                    ${item.forOwner ? 'for-owner' : ''} 
+                    ${item.notForFile ? 'not-for-file' : ''} 
+                    ${item.forFile ? 'for-file' : ''} 
+                    ${item.notForImage ? 'not-for-image' : ''} 
+                    ${item.forImage ? 'for-image' : ''}
+                    ${item.notForImageBlock ? 'not-for-image-block' : ''} 
+                `} 
+                onClick={item.handleClick}
+            >
+                <span className='icon'>{item.icon}</span>
+                <span className='title'>{item.title}</span>
+            </div>
+        ))
+    }
+    
+    const renderMessageActions = (props) => {
+        return (
+            <div tabIndex="-1" {...props}>
+                <PopperWrapper>
+                    {renderItems()}
+                </PopperWrapper>
+            </div>
+        );
+    };
+
+    const handleCopyText = () => {
+        navigator.clipboard.writeText(message.content)
+    }
+
+    const handleCopyImage = () => {
+        copyImageToClipboard(message.content)
+        .then(() => {
+            console.log('Image Copied')
+        })
+        .catch((e) => {
+            console.log('Error: ', e.message)
+        })
     }
 
     return (
