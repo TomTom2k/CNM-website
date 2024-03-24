@@ -6,7 +6,6 @@ import { SlReload } from "react-icons/sl";
 import { FiTrash } from "react-icons/fi";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { PiShareFatLight } from "react-icons/pi";
-import { forwardRef, useImperativeHandle, useState } from 'react';
 import { copyImageToClipboard } from 'copy-image-clipboard'
 
 import FileItem from "./FileItem";
@@ -251,7 +250,7 @@ const PopperWrapper = styled.div`
     }
 `;
 
-const MessageItem = ({user, message, index, arr}, ref) => {
+const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker}) => {
     const MENU_ITEMS = [
         {
             icon: <MdOutlineContentCopy />,
@@ -291,25 +290,12 @@ const MessageItem = ({user, message, index, arr}, ref) => {
         },
     ];
 
-    const [isShowTippy, setIsShowTippy] = useState(false);
-
-    useImperativeHandle(ref, () => ({
-        hideTippy() {
-            if(isShowTippy === true){
-                setIsShowTippy(false)
-            }
-        }
-    }))
-
-    window.addEventListener("click", () => {
-        if(isShowTippy === true) {
-            setIsShowTippy(false)
-        }
-    });
-
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
-        setIsShowTippy(!isShowTippy)
+        setElementShowTippy(message.messageId)
+        if(hideEmojiPicker){
+            hideEmojiPicker()
+        }
     }
 
     const renderItems = () => {
@@ -426,7 +412,7 @@ const MessageItem = ({user, message, index, arr}, ref) => {
                 : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
             }
             <Tippy
-                visible={isShowTippy}
+                visible={elementShowTippy === message.messageId}
                 interactive
                 delay={[0, 0]}
                 offset={[0, -4]}
@@ -442,4 +428,4 @@ const MessageItem = ({user, message, index, arr}, ref) => {
     )
 }
 
-export default forwardRef(MessageItem)
+export default MessageItem

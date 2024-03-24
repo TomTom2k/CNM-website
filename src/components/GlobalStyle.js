@@ -8,6 +8,11 @@ const GlobalStyle = createGlobalStyle`
     --blue-message: #e5efff;
     --white-message: #fff;
     --text-primary: #081c36;
+    --button-tertiary-neutral-hover: #dfe2e7;
+    --button-tertiary-primary-text: #0068ff;
+    --border: #d6dbe1;
+    --border-focused: #0068ff;
+    --button-neutral-text: #081c36;
   }
 
   * {

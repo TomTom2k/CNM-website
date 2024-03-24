@@ -1,14 +1,15 @@
 /* eslint-disable array-callback-return */
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import styled from 'styled-components';
-import InputEmoji from 'react-input-emoji'
-import { FaRegImage, FaRegFile } from 'react-icons/fa6';
+import EmojiPicker from 'emoji-picker-react';
+import { CiFileOn, CiImageOn } from "react-icons/ci";
+import { LuSendHorizonal } from "react-icons/lu";
+import { HiOutlineFaceSmile } from "react-icons/hi2";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
 import messageApi from '../../api/messageApi';
-import Button from '../common/Button';
 
 import ChatImage from '../../assets/images/chat_image.jpg';
 import useListenMessage from '../../hooks/useListenMessage';
@@ -29,7 +30,7 @@ const HeaderChatStyled = styled.h3`
 	user-select: none;
 `;
 const ContentChatStyled = styled.div`
-	height: calc(100vh - 10rem);
+	height: calc(100vh - 9.3rem);
 	overflow-y: scroll;
 	padding: 1rem;
 	display: flex;
@@ -54,36 +55,107 @@ const ContentChatStyled = styled.div`
 	}
 `;
 const SendMessageInputStyled = styled.div`
-	height: 6.5rem;
+	height: 5.8rem;
 	border-top: 1px solid var(--color-60);
 `;
 const SendMediaStyled = styled.div`
 	display: flex;
-	height: 3rem;
-	border-bottom: 1px solid var(--color-60);
+	align-items: center;
+	height: 44%;
+	padding: 0 0.5rem;
 
 	> * {
-		width: 3rem;
-		height: 3rem;
-		padding: 0.75rem;
+		width: 2rem;
+		height: 2rem;
+		padding: 0.3rem;
+		margin: 0 0.3rem;
+		border-radius: 0.2rem;
+		color: var(--button-neutral-text);
+
 		&:hover {
-			background-color: var(--color-60);
-			color: var(--color-10);
+			background-color: var(--button-tertiary-neutral-hover);
 			cursor: pointer;
 		}
 	}
 `;
 const InputMessageStyled = styled(Row)`
 	display: flex;
+	height: 56%;
+	align-items: center;
+	border-top: 1px solid var(--border);
+
+	&:has(input:focus) {
+		border-top: 1px solid var(--border-focused);
+	}
+
 	input {
-		padding: 0 2rem;
+		padding: 0 1rem;
 		width: 100%;
-		height: 100%;
+		height: 3rem;
 		border: none;
 		outline: none;
-		font-size: 1.15rem;
-		color: #555;
+		font-size: 0.96rem;
+		color: var(--text-primary);
 	}
+`;
+const SendIconStyled = styled.div`
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	
+	.send-icon {
+		border-radius: 0.2rem;
+		color: var(--button-tertiary-primary-text); 
+		width: 2rem;
+		height: 2rem;
+		padding: 0.3rem;
+
+		&:hover {
+			background-color: #e5efff;
+		}
+	}
+`;
+const ImojiIconStyled = styled.div`
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	margin-right: 0.3rem;
+
+	
+	.emoji-icon {
+		border-radius: 0.2rem;
+		color: var(--button-neutral-text);
+		width: 2rem;
+		height: 2rem;
+		padding: 0.2rem;
+
+		&:hover {
+			background-color: var(--button-tertiary-neutral-hover);
+		}
+
+		&.clicked {
+			background-color: #e5efff;
+			color: var(--button-tertiary-primary-text); 
+		}
+	}
+
+	.emoji-picker {
+		position: absolute; 
+		bottom: 2.6rem; 
+		right: 3rem;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+		border-radius: 0.3rem;
+	}
+`;
+const ActionStyled = styled.div`
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 const NoneConversationStyled = styled.div`
 	width: 100%;
@@ -104,14 +176,17 @@ const NoneConversationStyled = styled.div`
 
 const ChatBox = () => {
 	const [newMessage, setNewMessage] = useState("");
+	const [emojiPicker, setEmojiPicker] = useState(false)
+    const [elementShowTippy, setElementShowTippy] = useState('');
 	useListenMessage();
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, messages, setMessages } =
 	useContext(ConversationToken);
-	const messageItemRef = useRef()
 
-	const handleChangeMessage = (newMessage) => {
-		setNewMessage(newMessage)
+	const handleChangeMessage = (e) => {
+		if(!e.target.value.startsWith(' ')){
+			setNewMessage(e.target.value)
+		}
 	}
 
 	const handleChooseImage = () => {
@@ -191,12 +266,57 @@ const ChatBox = () => {
 		}
 	};
 
-	const handleOnEnter = () => {
-		handlerSendButton()
+	const handleOnScrollChatContent = () => {
+		if(elementShowTippy !== '') {
+            setElementShowTippy('')
+        }
 	}
 
-	const handleOnScrollChatContent = () => {
-		messageItemRef.current.hideTippy()
+	const showEmojiPicker = () => {
+		const emojiIcon = document.querySelector('.emoji-icon')
+		emojiIcon.classList.add('clicked');
+		setEmojiPicker(true)
+	}
+
+	const hideEmojiPicker = () => {
+		const emojiIcon = document.querySelector('.emoji-icon')
+		emojiIcon.classList.remove('clicked');
+		setEmojiPicker(false)
+	}
+
+	const handleClickEmojiIcon = (e) => {
+        e.stopPropagation();
+
+		if(emojiPicker === false) {
+			showEmojiPicker()
+		} else {
+			hideEmojiPicker()
+		}
+
+		if(elementShowTippy !== '') {
+            setElementShowTippy('')
+        }
+	}
+
+	window.addEventListener("click", (e) => {
+		if (!e.target.closest(".emoji-picker") && emojiPicker === true) {	
+			hideEmojiPicker()
+		} 
+		if(elementShowTippy !== '') {
+            setElementShowTippy('')
+        }
+    });
+
+	const handlePressEnter = (e) => {
+		if (e.charCode === 13 && e.code === 'Enter') {
+            handlerSendButton();
+        }
+	}
+
+	const handleClickEmojiItem = (e) => {
+		const sendMessageInput = document.querySelector(".send-message-input")
+		sendMessageInput.focus()
+		setNewMessage((newMessage) => newMessage + e.emoji)
 	}
 
 	return (
@@ -225,26 +345,51 @@ const ChatBox = () => {
 									</div>
 									: null 
 								}
-								<MessageItem ref={messageItemRef} user={user} message={message} index={index} arr={arr}/>
+								<MessageItem elementShowTippy={elementShowTippy} setElementShowTippy={setElementShowTippy} hideEmojiPicker={emojiPicker ? hideEmojiPicker : null} user={user} message={message} index={index} arr={arr}/>
 							</>
 						))}
 					</ContentChatStyled>
 					<SendMessageInputStyled>
-						<SendMediaStyled className="p-0 g-0">
-							<FaRegImage onClick={() => handleChooseImage()}/>
-							<FaRegFile onClick={() => handleChooseFile()}/>
+						<SendMediaStyled className="g-0">
+							<CiImageOn onClick={() => handleChooseImage()}/>
+							<CiFileOn onClick={() => handleChooseFile()}/>
 						</SendMediaStyled>
 						<InputMessageStyled className="p-0 g-0">
 							<Col md={11}>
-								<InputEmoji
+								<input
+									className='send-message-input'
 									value={newMessage}
-									onChange={handleChangeMessage}
+									onChange={(e) => handleChangeMessage(e)}
 									placeholder="Nhập tin nhắn để gửi"
-									onEnter={handleOnEnter}
+									onKeyPress={(e) => handlePressEnter(e)}
 								/>
 							</Col>
 							<Col md={1}>
-								<Button onClick={handlerSendButton}>Gửi</Button>
+								<ActionStyled>									
+									<ImojiIconStyled>
+										{!emojiPicker ? (
+												<HiOutlineFaceSmile className='emoji-icon' onClick={(e) => handleClickEmojiIcon(e)} />
+											) : (
+												<>
+													<HiOutlineFaceSmile 
+														className='emoji-icon'
+														onClick={(e) => handleClickEmojiIcon(e)}
+													/>
+													<EmojiPicker
+														searchDisabled="true"
+														previewConfig={{ showPreview: false }}
+														emojiStyle="google"
+														onEmojiClick={(e) => handleClickEmojiItem(e)}
+														className='emoji-picker'
+													/>
+												</>
+											)
+										}
+									</ImojiIconStyled>
+									<SendIconStyled>
+										<LuSendHorizonal className='send-icon' onClick={handlerSendButton}/>
+									</SendIconStyled>
+								</ActionStyled>
 							</Col>
 						</InputMessageStyled>
 					</SendMessageInputStyled>
