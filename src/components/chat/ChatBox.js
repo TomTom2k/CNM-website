@@ -310,6 +310,9 @@ const ChatBox = () => {
 	const handlePressEnter = (e) => {
 		if (e.charCode === 13 && e.code === 'Enter') {
             handlerSendButton();
+			if(emojiPicker === true) {
+				hideEmojiPicker()
+			}
         }
 	}
 
