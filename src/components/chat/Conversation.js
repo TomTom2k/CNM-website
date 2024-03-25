@@ -63,6 +63,11 @@ const InfoStyled = styled.div`
 		margin: 0;
 		font-size: 0.75rem;
 		color: gray;
+
+		img {
+			width: 1.2rem;
+			height: 1.2rem;
+		}
 	}
 `;
 const Conversation = ({ conversation }) => {
@@ -99,7 +104,11 @@ const Conversation = ({ conversation }) => {
 			</AvatarStyled>
 			<InfoStyled>
 				<h6>{title}</h6>
-				<p>{conversation?.lastMessage || 'Chưa có tin nhắn'}</p>
+				{conversation?.lastMessageType === "like" ? (
+					<p><img src={conversation.lastMessage} alt=''/></p>
+				) : (
+					<p>{conversation?.lastMessage || 'Chưa có tin nhắn'}</p>
+				)}
 			</InfoStyled>
 		</WrapperStyled>
 	);

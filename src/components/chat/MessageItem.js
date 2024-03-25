@@ -11,7 +11,7 @@ import { copyImageToClipboard } from 'copy-image-clipboard'
 import FileItem from "./FileItem";
 
 const MessageItemStyled = styled.div`
-    min-width: 10%;
+    min-width: 6%;
     max-width: 50%;
     margin: 0.6rem;
     border-radius: 0.6rem;
@@ -131,10 +131,21 @@ const MessageItemStyled = styled.div`
         }
     }
     
-    p {
+    .text-message-item {
         margin: 0;
         padding: 1rem 1rem;
         border-radius: 1rem;
+    }
+
+    .like-message-item {
+        margin: 0;
+        padding: 0.8rem 0.6rem;
+        border-radius: 1rem;
+        
+        img {
+            width: 2.6rem;
+            height: 2.6rem;
+        }
     }
 
     .file-item {
@@ -361,7 +372,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             {(() => {
                 if (message.type === "text") {
                     return (
-                        <p>
+                        <p className='text-message-item'>
                             {message.content}
                         </p>
                     );
@@ -396,6 +407,13 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                             className='file-item'
                             onClick={() => window.open(message.content)}
                         />
+                    );
+                } else if (message.type === "like") {
+
+                    return (
+                        <p className='like-message-item'>
+                            <img src={message.content} alt=''/>
+                        </p>
                     );
                 }
             })()}

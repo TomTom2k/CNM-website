@@ -12,6 +12,7 @@ import { ConversationToken } from '../../context/ConversationToken';
 import messageApi from '../../api/messageApi';
 
 import ChatImage from '../../assets/images/chat_image.jpg';
+import LikeEmoji from '../../assets/images/like_emoji.svg';
 import useListenMessage from '../../hooks/useListenMessage';
 import MessageItem from './MessageItem';
 
@@ -114,6 +115,21 @@ const SendIconStyled = styled.div`
 
 		&:hover {
 			background-color: #e5efff;
+		}
+	}
+
+	.like-icon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 0.2rem;
+		color: var(--button-tertiary-primary-text); 
+		width: 2rem;
+		height: 2rem;
+		padding: 0.3rem;
+
+		&:hover {
+			background-color: var(--button-tertiary-neutral-hover);
 		}
 	}
 `;
@@ -322,6 +338,33 @@ const ChatBox = () => {
 		setNewMessage((newMessage) => newMessage + e.emoji)
 	}
 
+	const handleClickLike = async () => {
+		let blob = null;
+		let xhr = new XMLHttpRequest(); 
+		xhr.open("GET", './assets/like_emoji.svg'); 
+		xhr.responseType = "blob";//force the HTTP response, response-type header to be blob
+		xhr.onload = async () => {
+			blob = xhr.response;//xhr.response is now a blob object
+			let file = new File([blob], 'like_emoji.svg', {type: 'image/svg+xml', lastModified: Date.now()});
+			let data = new FormData()
+			data.append('file', file)
+			data.append('conversationId', conversationSelected.conversationId)
+			data.append('type', "like")
+		
+			try {
+				const res = await messageApi.sendMessage(data);
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
+				);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setNewMessage("")
+			}
+		}
+		xhr.send()
+	}
+
 	return (
 		<>
 			{messages ? (
@@ -381,7 +424,6 @@ const ChatBox = () => {
 													<EmojiPicker
 														searchDisabled="true"
 														previewConfig={{ showPreview: false }}
-														emojiStyle="google"
 														onEmojiClick={(e) => handleClickEmojiItem(e)}
 														className='emoji-picker'
 													/>
@@ -389,8 +431,15 @@ const ChatBox = () => {
 											)
 										}
 									</ImojiIconStyled>
+
 									<SendIconStyled>
-										<LuSendHorizonal className='send-icon' onClick={handlerSendButton}/>
+										{newMessage === '' ? (
+											<div className='like-icon' onClick={handleClickLike}>
+												<img src={LikeEmoji} alt=''/>
+											</div>
+										): (
+											<LuSendHorizonal className='send-icon' onClick={handlerSendButton}/>
+										)}
 									</SendIconStyled>
 								</ActionStyled>
 							</Col>
