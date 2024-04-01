@@ -14,6 +14,9 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { toast, Toaster } from "react-hot-toast";
 import userApi from '../api/userApi';
 import authApi from '../api/authApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 
 import { AuthToken } from '../context/AuthToken';
 import configs from '../configs';
@@ -250,8 +253,11 @@ const Login = () => {
 		form_data.append('phoneNumber', data.phoneNumber);
 		form_data.append('password', data.password);
 		form_data.append('fullName', data.fullName);
+		const formattedDOB = format(data.dateOfBirth, 'dd/MM/yyyy');
+		form_data.append('dateOfBirth', formattedDOB);
 		form_data.append('gender', data.gender);
 		form_data.append('profilePic', data.profilePic[0]);
+		console.log(form_data);
 		try {
 			const response = await authApi.signUpWithPhone(form_data);
 			// Xử lý response từ server ở đây (nếu cần)
@@ -413,131 +419,154 @@ const Login = () => {
 						<Toaster toastOptions={{ duration: 4000 }} />
 						<div id="recaptcha-container"></div>
 						{user ? (
-							<FormStyled onSubmit={handleSubmit(handleSignUp)} enctype="multipart/form-data">
-								<ParagraphStyledHeader>Điền thông tin tài khoản</ParagraphStyledHeader>
+						<FormStyled onSubmit={handleSubmit(handleSignUp)} enctype="multipart/form-data">
+							<ParagraphStyledHeader>Điền thông tin tài khoản</ParagraphStyledHeader>
 
-								<InputWrapper>
-									<Controller
-										name="phoneNumber"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống số điện thoại',
-										}}
-										render={({ field }) => (
-											<PhoneInputStyled
-												placeholder="Số điện thoại"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										)}
-									/>
-									{errors.phoneNumber && (
-										<ErrorMessage>
-											{errors.phoneNumber.message}
-										</ErrorMessage>
+							<InputWrapper>
+								<Controller
+									name="phoneNumber"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống số điện thoại',
+									}}
+									render={({ field }) => (
+										<PhoneInputStyled
+											placeholder="Số điện thoại"
+											value={field.value}
+											onChange={field.onChange}
+										/>
 									)}
-								</InputWrapper>
+								/>
+								{errors.phoneNumber && (
+									<ErrorMessage>
+										{errors.phoneNumber.message}
+									</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<InputWrapper>
-									<Controller
-										name="password"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống mật khẩu',
-											minLength: {
-												value: 6,
-												message: 'Mật khẩu phải tối thiểu 6 ký tự',
-											},
-										}}
-										render={({ field }) => (
-											<InputStyled
-												placeholder="Password"
-												{...field}
-											/>
-										)}
-									/>
-									{errors.password && (
-										<ErrorMessage>{errors.password.message}</ErrorMessage>
+							<InputWrapper>
+								<Controller
+									name="password"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống mật khẩu',
+										minLength: {
+											value: 6,
+											message: 'Mật khẩu phải tối thiểu 6 ký tự',
+										},
+									}}
+									render={({ field }) => (
+										<InputStyled
+											placeholder="Password"
+											{...field}
+										/>
 									)}
-								</InputWrapper>
+								/>
+								{errors.password && (
+									<ErrorMessage>{errors.password.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<InputWrapper>
-									<Controller
-										name="fullName"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống full name',
+							<InputWrapper>
+								<Controller
+									name="fullName"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống full name',
 
-										}}
-										render={({ field }) => (
-											<InputStyled
-												type="text"
-												placeholder="Full Name"
-												{...field}
-											/>
-										)}
-									/>
-									{errors.password && (
-										<ErrorMessage>{errors.password.message}</ErrorMessage>
+									}}
+									render={({ field }) => (
+										<InputStyled
+											type="text"
+											placeholder="Full Name"
+											{...field}
+										/>
 									)}
-								</InputWrapper>
-								{/* Tạo ra phần select chọn giới tính */}
-								<InputWrapper>
-									<label htmlFor="gender">Gender: </label>
-									<input
-										type="radio"
-										id="male"
-										name="gender"
-										value="male"
-										{...register("gender", { required: "Vui lòng chọn giới tính" })}
-									/>
-									<label htmlFor="male" style={{ fontSize: '0.8rem' }}>Nam</label>
+								/>
+								{errors.password && (
+									<ErrorMessage>{errors.password.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-									<input
-										type="radio"
-										id="female"
-										name="gender"
-										value="female"
-										{...register("gender", { required: "Vui lòng chọn giới tính" })}
-									/>
-									<label htmlFor="female" style={{ fontSize: '0.8rem' }}>Nữ</label>
-
-									{errors.gender && (
-										<ErrorMessage>{errors.gender.message}</ErrorMessage>
+							<InputWrapper>
+								<label htmlFor="dateOfBirth">Ngày sinh:</label>
+								<Controller
+									name="dateOfBirth"
+									control={control}
+									defaultValue={null}
+									render={({ field }) => (
+										<DatePicker
+											selected={field.value}
+											onChange={(date) => field.onChange(date)}
+											dateFormat="dd/MM/yyyy"
+											showYearDropdown
+											scrollableYearDropdown
+											yearDropdownItemNumber={15}
+											placeholderText="Chọn ngày sinh"
+											maxDate={new Date()} // Ngày hiện tại là ngày tối đa
+											{...field}
+										/>
 									)}
-								</InputWrapper>
+								/>
+							</InputWrapper>
+							{errors.dateOfBirth && (
+								<ErrorMessage>{errors.dateOfBirth.message}</ErrorMessage>
+							)}
 
-								<InputWrapper>
-									<label htmlFor="profilePic">Ảnh đại diện:</label>
-									<input
-										type="file"
-										id="profilePic"
-										name="profilePic"
-										accept="image/*"
-										style={{ fontSize: '0.8rem' }}
-										multiple={false}
-										onChange={async (e) => {
-											let file = e.target.files[0].name;
-											console.log("File đã chọn:", file);
-											// setProfilePic(file);
+							{/* Tạo ra phần select chọn giới tính */}
+							<InputWrapper>
+								<label htmlFor="gender">Gender: </label>
+								<input
+									type="radio"
+									id="male"
+									name="gender"
+									value="male"
+									{...register("gender", { required: "Vui lòng chọn giới tính" })}
+								/>
+								<label htmlFor="male" style={{ fontSize: '0.8rem' }}>Nam</label>
 
-										}}
-										{...register("profilePic", { required: "Vui lòng chọn hình" })}
-									/>
-								</InputWrapper>
+								<input
+									type="radio"
+									id="female"
+									name="gender"
+									value="female"
+									{...register("gender", { required: "Vui lòng chọn giới tính" })}
+								/>
+								<label htmlFor="female" style={{ fontSize: '0.8rem' }}>Nữ</label>
 
-								<ButtonStyled type="submit" >Đăng kí</ButtonStyled>
+								{errors.gender && (
+									<ErrorMessage>{errors.gender.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<ButtonStyledSubscription type="button" onClick={handleShowLoginForm}>Hủy đăng kí</ButtonStyledSubscription>
-							</FormStyled>
-						) : (
+							<InputWrapper>
+								<label htmlFor="profilePic">Ảnh đại diện:</label>
+								<input
+									type="file"
+									id="profilePic"
+									name="profilePic"
+									accept="image/*"
+									style={{ fontSize: '0.8rem' }}
+									multiple={false}
+									onChange={async (e) => {
+										let file = e.target.files[0].name;
+										console.log("File đã chọn:", file);
+										// setProfilePic(file);
+
+									}}
+									{...register("profilePic", { required: "Vui lòng chọn hình" })}
+								/>
+							</InputWrapper>
+
+							<ButtonStyled type="submit" >Đăng kí</ButtonStyled>
+
+							<ButtonStyledSubscription type="button" onClick={handleShowLoginForm}>Hủy đăng kí</ButtonStyledSubscription>
+						</FormStyled>
+						) : ( 
 							<WrapperStyledOTP >
-								{/* <h1 className="text-center leading-normal text-black font-medium text-3xl mb-2">
-									Xác thực OTP
-								</h1> */}
 								{showOTP ? (
 									<>
 										<DivPhoneFill>
@@ -678,7 +707,7 @@ const Login = () => {
 							<section className="flex items-center justify-center h-screen">
 								<div>
 									<Toaster toastOptions={{ duration: 4000 }} />
-									<div id="recaptcha-container"></div>						
+									<div id="recaptcha-container"></div>
 									{user ? (
 										<WrapperStyledForgotPass>
 											{/* Thêm icon reset password */}
