@@ -100,7 +100,14 @@ const Conversation = ({ conversation }) => {
 			}
 		>
 			<AvatarStyled className={isOnline ? 'online' : ''}>
-				<img src="" alt="" />
+				<img
+					src={
+						conversation?.membersInfo?.find(
+							(member) => member.userID !== user?.userID
+						)?.profilePic
+					}
+					alt=""
+				/>
 			</AvatarStyled>
 			<InfoStyled>
 				<h6>{title}</h6>

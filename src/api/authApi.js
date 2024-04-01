@@ -7,7 +7,12 @@ const authApi = {
 	},
 	signUpWithPhone: (data) => {
 		const url = '/auth/sign-up-with-phone';
-		return axiosClient.post(url, data);
+		const config = {
+			headers: {
+				'content-type': 'multipart/form-data'
+			}
+		}
+		return axiosClient.post(url, data, config);
 	},
 	secret: () => {
 		const url = '/auth/secret';

@@ -13,6 +13,8 @@ const GlobalStyle = createGlobalStyle`
     --border: #d6dbe1;
     --border-focused: #0068ff;
     --button-neutral-text: #081c36;
+    --color-10: #91caee;
+    --color-11: #dce1e8;
   }
 
   * {

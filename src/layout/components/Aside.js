@@ -100,7 +100,7 @@ const Aside = () => {
 				}
 			>
 				<ProfilePicStyled>
-					<img src="" alt="Ảnh đại diện" />
+					<img src={user.profilePic} alt="Ảnh đại diện" />
 				</ProfilePicStyled>
 			</OverlayTrigger>
 			<Navbar />

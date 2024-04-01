@@ -16,9 +16,6 @@ const messageApi = {
 		return axiosClient.post(url, data, config);
 	},
 	getMessages: (conversationId) => {
-		// data = {
-		//     conversationId: String
-		// }
 		const url = `/message/${conversationId}`;
 		return axiosClient.get(url);
 	},
