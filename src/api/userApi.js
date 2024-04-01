@@ -15,6 +15,10 @@ const userApi = {
 		return axiosClient.put(url, data);
 	},
 
+	updateInfo: ({ file }) => {
+		const url = '/user/profile-pic';
+		const formData = new FormData();
+	},
 };
 
 export default userApi;
