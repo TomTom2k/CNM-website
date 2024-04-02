@@ -60,7 +60,7 @@ const AuthProvide = ({ children }) => {
 
 	return (
 		<AuthToken.Provider
-			value={{ user, isFetchingUser, login, logout, secret }}
+			value={{ user, isFetchingUser, login, logout, secret, setUser }}
 		>
 			{children}
 		</AuthToken.Provider>

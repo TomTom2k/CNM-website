@@ -290,13 +290,17 @@ const ChatBox = () => {
 
 	const showEmojiPicker = () => {
 		const emojiIcon = document.querySelector('.emoji-icon')
-		emojiIcon.classList.add('clicked');
+		if(emojiIcon){
+			emojiIcon.classList.add('clicked');
+		}
 		setEmojiPicker(true)
 	}
 
 	const hideEmojiPicker = () => {
 		const emojiIcon = document.querySelector('.emoji-icon')
-		emojiIcon.classList.remove('clicked');
+		if(emojiIcon){
+			emojiIcon.classList.remove('clicked');
+		}
 		setEmojiPicker(false)
 	}
 
