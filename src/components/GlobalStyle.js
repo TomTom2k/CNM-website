@@ -8,8 +8,13 @@ const GlobalStyle = createGlobalStyle`
     --blue-message: #e5efff;
     --white-message: #fff;
     --text-primary: #081c36;
+    --text-secondary: #7589a3;
     --button-tertiary-neutral-hover: #dfe2e7;
     --button-tertiary-primary-text: #0068ff;
+    --button-primary-normal: #0068ff;
+    --button-primary-hover: #004bb9;
+    --button-neutral-normal: #eaedf0;
+    --button-neutral-hover: #dfe2e7;
     --border: #d6dbe1;
     --border-focused: #0068ff;
     --button-neutral-text: #081c36;

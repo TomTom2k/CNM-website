@@ -15,9 +15,13 @@ const userApi = {
 		return axiosClient.put(url, data);
 	},
 
-	updateInfo: ({ file }) => {
+	updateAvatar: ({ file }) => {
 		const url = '/user/profile-pic';
 		const formData = new FormData();
+	},
+	updateInfo: (data) => {
+		const url = '/user/update-info';
+		return axiosClient.put(url, data);
 	},
 };
 

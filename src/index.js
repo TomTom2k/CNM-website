@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './output.css'
 
 import 'react-toastify/dist/ReactToastify.css';
 import AuthProvide from './context/AuthToken';
