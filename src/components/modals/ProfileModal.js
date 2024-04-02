@@ -359,7 +359,7 @@ const ProfileModel = ({ show, handleClose }) => {
 								className='update-btn' 
 								variant="primary" 
 								onClick={handleUpdateUserInfo}
-								disabled={userForUpdate.fullName === user.fullName && userForUpdate.gender === user.gender && userForUpdate.dateOfBirth === user.dateOfBirth}
+								disabled={userForUpdate.fullName === '' || (userForUpdate.fullName === user.fullName && userForUpdate.gender === user.gender && userForUpdate.dateOfBirth === user.dateOfBirth)}
 							>
 								Cập nhật
 							</Button>
