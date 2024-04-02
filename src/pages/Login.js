@@ -14,6 +14,9 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { toast, Toaster } from "react-hot-toast";
 import userApi from '../api/userApi';
 import authApi from '../api/authApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 
 import { AuthToken } from '../context/AuthToken';
 import configs from '../configs';
@@ -31,7 +34,7 @@ const WrapperStyled = styled.div`
 const WrapperStyledOTP = styled.div`
 		width: 25rem;
 		height: auto;
-		background-color: #ffffff47;
+		background-color: #fff;
 
 		display: flex;
 		flex-direction: column;
@@ -122,6 +125,40 @@ const ButtonStyled = styled.button`
 		}
 	`;
 
+const DivPhoneFill = styled.div`
+	background-color: rgb(177 243 196) !important;
+	color: white;
+
+	margin-left: auto;
+	margin-right: auto;
+	gap: 1rem;
+	border-radius: 9999px;
+	width: fit-content;
+	padding: 1rem;
+`;
+
+const LabelPhoneFill = styled.label`
+	width: 100%;
+	font-weight: bold; /* Makes the text bold */
+	font-size: 1.25rem; /* Sets the font size to XL (assuming 1rem base size) */
+	color: gray; /* Sets the text color to gray */
+	text-align: center; /* Aligns the text to the center */
+	margin-bottom: 4rem; /* Adds 10px margin at the bottom */
+	margin-top: 1px; /* Adds 1px margin at the top */
+`;
+
+const DivRestPassword = styled.div`
+	background-color: rgb(177 243 196) !important;
+	color: white;
+
+	margin-left: auto;
+	margin-right: auto;
+	gap: 1rem;
+	border-radius: 9999px;
+	width: fit-content;
+	padding: 1rem;
+`;
+
 const ButtonStyledSubscription = styled.button`
 		user-select: none;
 		width: 100%;
@@ -132,7 +169,7 @@ const ButtonStyledSubscription = styled.button`
 
 		cursor: pointer;
 		color: #91caee;
-		font-size: 0.75rem;
+		font-size: 0.875rem;
 		border: 2px solid #eae3e3;
 
 		&:hover {
@@ -157,17 +194,18 @@ const ModalStyled = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	
 `;
 
 const ModalContent = styled.div`
-	background-color: #e9f0e9;
+	background-color: #fff;
 	padding: 2rem;
 	border-radius: 0.25rem;
 	margin-top:20px;
+	
 	`;
 const WrapperStyledForgotPass = styled.div`
-
-		background-color: #e9f0e9;
+		background-color: #fff;
 		padding: 6rem;
 `;
 const Login = () => {
@@ -215,8 +253,11 @@ const Login = () => {
 		form_data.append('phoneNumber', data.phoneNumber);
 		form_data.append('password', data.password);
 		form_data.append('fullName', data.fullName);
+		const formattedDOB = format(data.dateOfBirth, 'dd/MM/yyyy');
+		form_data.append('dateOfBirth', formattedDOB);
 		form_data.append('gender', data.gender);
 		form_data.append('profilePic', data.profilePic[0]);
+		console.log(form_data);
 		try {
 			const response = await authApi.signUpWithPhone(form_data);
 			// Xử lý response từ server ở đây (nếu cần)
@@ -378,142 +419,164 @@ const Login = () => {
 						<Toaster toastOptions={{ duration: 4000 }} />
 						<div id="recaptcha-container"></div>
 						{user ? (
-							<FormStyled onSubmit={handleSubmit(handleSignUp)} enctype="multipart/form-data">
-								<ParagraphStyledHeader>Điền thông tin tài khoản</ParagraphStyledHeader>
+						<FormStyled onSubmit={handleSubmit(handleSignUp)} enctype="multipart/form-data">
+							<ParagraphStyledHeader>Điền thông tin tài khoản</ParagraphStyledHeader>
 
-								<InputWrapper>
-									<Controller
-										name="phoneNumber"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống số điện thoại',
-										}}
-										render={({ field }) => (
-											<PhoneInputStyled
-												placeholder="Số điện thoại"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										)}
-									/>
-									{errors.phoneNumber && (
-										<ErrorMessage>
-											{errors.phoneNumber.message}
-										</ErrorMessage>
+							<InputWrapper>
+								<Controller
+									name="phoneNumber"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống số điện thoại',
+									}}
+									render={({ field }) => (
+										<PhoneInputStyled
+											placeholder="Số điện thoại"
+											value={field.value}
+											onChange={field.onChange}
+										/>
 									)}
-								</InputWrapper>
+								/>
+								{errors.phoneNumber && (
+									<ErrorMessage>
+										{errors.phoneNumber.message}
+									</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<InputWrapper>
-									<Controller
-										name="password"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống mật khẩu',
-											minLength: {
-												value: 6,
-												message: 'Mật khẩu phải tối thiểu 6 ký tự',
-											},
-										}}
-										render={({ field }) => (
-											<InputStyled
-												placeholder="Password"
-												{...field}
-											/>
-										)}
-									/>
-									{errors.password && (
-										<ErrorMessage>{errors.password.message}</ErrorMessage>
+							<InputWrapper>
+								<Controller
+									name="password"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống mật khẩu',
+										minLength: {
+											value: 6,
+											message: 'Mật khẩu phải tối thiểu 6 ký tự',
+										},
+									}}
+									render={({ field }) => (
+										<InputStyled
+											placeholder="Password"
+											{...field}
+										/>
 									)}
-								</InputWrapper>
+								/>
+								{errors.password && (
+									<ErrorMessage>{errors.password.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<InputWrapper>
-									<Controller
-										name="fullName"
-										control={control}
-										defaultValue=""
-										rules={{
-											required: 'Không được bỏ trống full name',
+							<InputWrapper>
+								<Controller
+									name="fullName"
+									control={control}
+									defaultValue=""
+									rules={{
+										required: 'Không được bỏ trống full name',
 
-										}}
-										render={({ field }) => (
-											<InputStyled
-												type="text"
-												placeholder="Full Name"
-												{...field}
-											/>
-										)}
-									/>
-									{errors.password && (
-										<ErrorMessage>{errors.password.message}</ErrorMessage>
+									}}
+									render={({ field }) => (
+										<InputStyled
+											type="text"
+											placeholder="Full Name"
+											{...field}
+										/>
 									)}
-								</InputWrapper>
-								{/* Tạo ra phần select chọn giới tính */}
-								<InputWrapper>
-									<label htmlFor="gender">Gender: </label>
-									<input
-										type="radio"
-										id="male"
-										name="gender"
-										value="male"
-										{...register("gender", { required: "Vui lòng chọn giới tính" })}
-									/>
-									<label htmlFor="male" style={{ fontSize: '0.8rem' }}>Nam</label>
+								/>
+								{errors.password && (
+									<ErrorMessage>{errors.password.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-									<input
-										type="radio"
-										id="female"
-										name="gender"
-										value="female"
-										{...register("gender", { required: "Vui lòng chọn giới tính" })}
-									/>
-									<label htmlFor="female" style={{ fontSize: '0.8rem' }}>Nữ</label>
-
-									{errors.gender && (
-										<ErrorMessage>{errors.gender.message}</ErrorMessage>
+							<InputWrapper>
+								<label htmlFor="dateOfBirth">Ngày sinh:</label>
+								<Controller
+									name="dateOfBirth"
+									control={control}
+									defaultValue={null}
+									render={({ field }) => (
+										<DatePicker
+											selected={field.value}
+											onChange={(date) => field.onChange(date)}
+											dateFormat="dd/MM/yyyy"
+											showYearDropdown
+											scrollableYearDropdown
+											yearDropdownItemNumber={15}
+											placeholderText="Chọn ngày sinh"
+											maxDate={new Date()} // Ngày hiện tại là ngày tối đa
+											{...field}
+										/>
 									)}
-								</InputWrapper>
+								/>
+							</InputWrapper>
+							{errors.dateOfBirth && (
+								<ErrorMessage>{errors.dateOfBirth.message}</ErrorMessage>
+							)}
 
-								<InputWrapper>
-									<label htmlFor="profilePic">Ảnh đại diện:</label>
-									<input
-										type="file"
-										id="profilePic"
-										name="profilePic"
-										accept="image/*"
-										style={{ fontSize: '0.8rem' }}
-										multiple={false}
-										onChange={async (e) => {
-											let file = e.target.files[0].name;
-											console.log("File đã chọn:", file);
-											// setProfilePic(file);
+							{/* Tạo ra phần select chọn giới tính */}
+							<InputWrapper>
+								<label htmlFor="gender">Gender: </label>
+								<input
+									type="radio"
+									id="male"
+									name="gender"
+									value="male"
+									{...register("gender", { required: "Vui lòng chọn giới tính" })}
+								/>
+								<label htmlFor="male" style={{ fontSize: '0.8rem' }}>Nam</label>
 
-										}}
-										{...register("profilePic", { required: "Vui lòng chọn hình" })}
-									/>
-								</InputWrapper>
+								<input
+									type="radio"
+									id="female"
+									name="gender"
+									value="female"
+									{...register("gender", { required: "Vui lòng chọn giới tính" })}
+								/>
+								<label htmlFor="female" style={{ fontSize: '0.8rem' }}>Nữ</label>
 
-								<ButtonStyled type="submit" >Đăng kí</ButtonStyled>
+								{errors.gender && (
+									<ErrorMessage>{errors.gender.message}</ErrorMessage>
+								)}
+							</InputWrapper>
 
-								<ButtonStyledSubscription type="button" onClick={handleShowLoginForm}>Hủy đăng kí</ButtonStyledSubscription>
-							</FormStyled>
-						) : (
+							<InputWrapper>
+								<label htmlFor="profilePic">Ảnh đại diện:</label>
+								<input
+									type="file"
+									id="profilePic"
+									name="profilePic"
+									accept="image/*"
+									style={{ fontSize: '0.8rem' }}
+									multiple={false}
+									onChange={async (e) => {
+										let file = e.target.files[0].name;
+										console.log("File đã chọn:", file);
+										// setProfilePic(file);
+
+									}}
+									{...register("profilePic", { required: "Vui lòng chọn hình" })}
+								/>
+							</InputWrapper>
+
+							<ButtonStyled type="submit" >Đăng kí</ButtonStyled>
+
+							<ButtonStyledSubscription type="button" onClick={handleShowLoginForm}>Hủy đăng kí</ButtonStyledSubscription>
+						</FormStyled>
+						) : ( 
 							<WrapperStyledOTP >
-								{/* <h1 className="text-center leading-normal text-black font-medium text-3xl mb-2">
-									Xác thực OTP
-								</h1> */}
 								{showOTP ? (
 									<>
-										<div className="btn-icon-phone w-fit mx-auto p-4 rounded-full">
+										<DivPhoneFill>
 											<BsFillShieldLockFill size={30} />
-										</div>
-										<label
+										</DivPhoneFill>
+										<LabelPhoneFill
 											htmlFor="otp"
-											className="font-bold text-xl text-black text-center color-gr mb-10 mt-1"
 										>
 											Nhập mã OTP
-										</label>
+										</LabelPhoneFill>
 										<OtpInput
 											value={otp}
 											onChange={setOtp}
@@ -521,7 +584,7 @@ const Login = () => {
 											otpType="number"
 											disabled={false}
 											autoFocus
-											className="opt-container mb-6 "
+											style={{ marginBottom: '1.5rem' }}
 										>
 										</OtpInput>
 										<ButtonStyled
@@ -534,21 +597,20 @@ const Login = () => {
 									</>
 								) : (
 									<>
-										<div className="btn-icon-phone w-fit mx-auto p-4 rounded-full">
+										<DivPhoneFill >
 											<BsTelephoneFill size={30} />
-										</div>
-										<label
+										</DivPhoneFill>
+										<LabelPhoneFill
 											htmlFor=""
-											className="font-bold text-xl color-gr text-black text-center mb-10 mt-1"
 										>
 											Xác nhận số điện thoại của bạn
-										</label>
+										</LabelPhoneFill>
 										<PhoneInput className='mb-2 text-black out-line-otp' country={"in"} value={ph} onChange={setPh} />
 										<ButtonStyled
 											type="button"
 											onClick={onSignup}
 											style={{ fontSize: '0.8rem', margin: '0.5rem' }}
-											className="btn-bg text-white rounded "
+
 										>
 											{isLoading && (
 												<CgSpinner size={20} className="mt-1 animate-spin" />
@@ -649,14 +711,13 @@ const Login = () => {
 									{user ? (
 										<WrapperStyledForgotPass>
 											{/* Thêm icon reset password */}
-											<div className="btn-icon-phone w-fit mx-auto p-4 rounded-full mb-10">
-
+											<DivRestPassword>
 												<MdLockReset size={30} />
-											</div>
+											</DivRestPassword>
 
 											<InputWrapper>
-												<p>Đổi mật khẩu cho tài khoản</p>
-												<p className="text-center text-black font-medium text-2xl mb-2">{user.phoneNumber}</p>
+												<LabelPhoneFill>Đổi mật khẩu cho tài khoản</LabelPhoneFill>
+												<p>{user.phoneNumber}</p>
 											</InputWrapper>
 
 											<InputWrapper>
@@ -680,21 +741,17 @@ const Login = () => {
 											<ButtonStyledSubscription type="button" onClick={closeModal}>Hủy</ButtonStyledSubscription>
 										</WrapperStyledForgotPass>
 									) : (
-										<div className="w-100 flex flex-col gap-4 rounded-lg p-4" >
-											{/* <h1 className="text-center leading-normal text-black font-medium text-3xl mb-2">
-												Xác thực OTP
-											</h1> */}
+										<div>
 											{showOTP ? (
 												<>
-													<div className="btn-icon-phone w-fit mx-auto p-4 rounded-full">
+													<DivPhoneFill>
 														<BsFillShieldLockFill size={30} />
-													</div>
-													<label
+													</DivPhoneFill>
+													<LabelPhoneFill
 														htmlFor="otp"
-														className="font-bold color-gr text-xl mb-6 text-black text-center"
 													>
 														Nhập mã OTP
-													</label>
+													</LabelPhoneFill>
 													<OtpInput
 														value={otp}
 														onChange={setOtp}
@@ -702,35 +759,35 @@ const Login = () => {
 														otpType="number"
 														disabled={false}
 														autoFocus
-														className="opt-container"
+
 													>
 													</OtpInput>
 													<ButtonStyled
 														type="button"
 														onClick={onOTPVerify}
-														className="btn-bg text-white rounded ">
+														style={{ marginTop: "1rem" }}
+													>
 														{isLoading && <CgSpinner size={20} className="mt-1 animate-spin" />}
 														<span>Xác nhận OTP</span>
 													</ButtonStyled>
 												</>
 											) : (
 												<>
-													<div className="btn-icon-phone w-fit mx-auto p-4 rounded-full">
+													<DivPhoneFill >
 														<BsTelephoneFill size={30} />
-													</div>
+													</DivPhoneFill>
 													{/* đỏi */}
-													<label
+													<LabelPhoneFill
 														htmlFor=""
-														className="font-bold text-xl color-gr text-black text-center mb-10 mt-1"
 													>
 														Xác nhận số điện thoại của bạn
-													</label>
+													</LabelPhoneFill>
 
-													<PhoneInput className='mb-1 text-black out-line-otp' country={"in"} value={ph} onChange={setPh} />
+													<PhoneInput country={"in"} value={ph} onChange={setPh} />
 													<ButtonStyled
 														type="button"
 														onClick={onSignup}
-														className="btn-bg text-white rounded "
+														style={{ marginTop: "1rem" }}
 
 													>
 														{isLoading && (

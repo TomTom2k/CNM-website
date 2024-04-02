@@ -10,6 +10,7 @@
     "axios": "^1.6.5",
     "bootstrap": "^5.3.2",
     "copy-image-clipboard": "^2.1.2",
+    "date-fns": "^3.6.0",
     "emoji-picker-react": "^4.9.2",
     "firebase": "^10.9.0",
     "js-cookie": "^3.0.5",
@@ -19,6 +20,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.2",
     "react-bootstrap-icons": "^1.10.3",
+    "react-datepicker": "^6.6.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.1",
     "react-hot-toast": "^2.4.1",
@@ -55,8 +57,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "tailwindcss": "^3.4.1"
   }
 }
