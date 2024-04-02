@@ -15,9 +15,16 @@ const userApi = {
 		return axiosClient.put(url, data);
 	},
 
-	updateAvatar: ({ file }) => {
-		const url = '/user/profile-pic';
-		const formData = new FormData();
+	updateAvatar: (file) => {
+		const url = '/user/update-profile-pic';
+		const config = {
+			headers: {
+				'content-type': 'multipart/form-data'
+			}
+		}
+		let formData = new FormData();
+		formData.append('profilePic', file)
+		return axiosClient.patch(url, formData, config);
 	},
 	updateInfo: (data) => {
 		const url = '/user/update-info';

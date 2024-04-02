@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useContext, useState } from 'react';
 import { Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
@@ -163,10 +164,12 @@ const ProfileModel = ({ show, handleClose }) => {
 	const [indexBody, setIndexBody] = useState(0);
 	const [imagePreview, setImagePreview] = useState('');
 	const [userForUpdate, setUserForUpdate] = useState(userForUpdateDefault);
+	const [imageForUpdate, setImageForUpdate] = useState(null)
 
 	const handleImageChange = (e) => {
 		const selectedImage = e.target.files[0];
 		setImagePreview(URL.createObjectURL(selectedImage));
+		setImageForUpdate(selectedImage)
 	};
 
 	const handleUpdateUserInfo = async () => {
@@ -178,6 +181,30 @@ const ProfileModel = ({ show, handleClose }) => {
 		} catch (error) {
 			console.log(error)
 		}
+	}
+
+	const handleCancelUpdateUserInfo = () => {
+		setIndexBody(0)
+		setUserForUpdate(userForUpdateDefault)
+	}
+
+	const handleUpdateUserAvatar = async () => {
+		try {
+			const res = await userApi.updateAvatar(imageForUpdate);
+			setUser(res.updatedUser[0])
+			setIndexBody(0)
+			setImagePreview('');
+			setImageForUpdate(null)
+			toast.success("Cập nhật avatar thành công");
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const handleCancelUpdateUserAvatar = () => {
+		setIndexBody(0)
+		setImagePreview('');
+		setImageForUpdate(null)
 	}
 
 	const items = [
@@ -233,7 +260,7 @@ const ProfileModel = ({ show, handleClose }) => {
 			title: 'Cập nhật ảnh đại diện',
 			body: (
 				<>
-					<div className="mb-3">
+					<div>
 						<label htmlFor="photo" className="form-label">
 							Room Photo
 						</label>
@@ -241,21 +268,33 @@ const ProfileModel = ({ show, handleClose }) => {
 							type="file"
 							id="photo"
 							name="photo"
-							className="form-control"
+							className="form-control mb-3"
 							onChange={handleImageChange}
 						/>
 						{imagePreview && (
-							// eslint-disable-next-line jsx-a11y/img-redundant-alt
-							<img
-								src={imagePreview}
-								alt="Preview Room Photo"
-								style={{
-									maxWidth: '100%',
-								}}
-								className="mb-3"
-							/>
+							<div className='d-flex justify-content-center align-items-center'>
+								<img
+									src={imagePreview}
+									alt="Preview Room Photo"
+									style={{
+										maxWidth: '80%'
+									}}
+								/>
+							</div>
 						)}
 					</div>
+					{imageForUpdate !== null && (
+						<FormFooterStyled className='mt-5'>
+							<Button className='cancel-btn mx-2' variant="secondary" onClick={handleCancelUpdateUserAvatar}>Hủy</Button>
+							<Button 
+								className='update-btn' 
+								variant="primary" 
+								onClick={handleUpdateUserAvatar}
+							>
+								Cập nhật
+							</Button>
+						</FormFooterStyled>
+					)}
 				</>
 			),
 		},
@@ -315,8 +354,15 @@ const ProfileModel = ({ show, handleClose }) => {
 							</Form.Group>
 						</Form>
 						<FormFooterStyled>
-     						<Button className='cancel-btn mx-2' variant="secondary">Hủy</Button>
-							<Button className='update-btn' variant="primary" onClick={handleUpdateUserInfo}>Cập nhật</Button>
+     						<Button className='cancel-btn mx-2' variant="secondary" onClick={handleCancelUpdateUserInfo}>Hủy</Button>
+							<Button 
+								className='update-btn' 
+								variant="primary" 
+								onClick={handleUpdateUserInfo}
+								disabled={userForUpdate.fullName === user.fullName && userForUpdate.gender === user.gender && userForUpdate.dateOfBirth === user.dateOfBirth}
+							>
+								Cập nhật
+							</Button>
 						</FormFooterStyled>
 					</Container>
 				</>
