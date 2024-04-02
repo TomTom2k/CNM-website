@@ -26,7 +26,7 @@ const ProfilePicStyled = styled.div`
 	border-radius: 50%;
 	margin: 1rem 0;
 	margin-top: 2rem;
-	padding: 0.5rem;
+	padding: 0.05rem;
 	overflow: hidden;
 	background-color: white;
 	cursor: pointer;
@@ -42,25 +42,60 @@ const ProfilePicStyled = styled.div`
 const PopoverStyled = styled(Popover)`
 	user-select: none;
 	width: 25rem;
+	border-radius: 0.2rem;
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+	border: 1px solid var(--border);
+	overflow: hidden;
+	padding-bottom: 0.4rem;
 	.popover-header {
-		font-weight: bold;
+		font-weight: 600;
+		font-size: 1.1rem;
+		background-color: white;
+		padding-top: 0.8rem;
+		padding-bottom: 0.8rem;
+		border-bottom: none;
+	}
+
+	.popover-body{
+		padding: 0;
+		hr {
+			margin: 0.2rem 1rem;
+			color: var(--border);
+			opacity: 1;
+		}
+		hr:first-of-type{
+			margin-top: 0;
+		}
+	}
+
+	.popover-arrow::after,
+	.popover-arrow::before {
+		display: none;
 	}
 `;
 const ProfileButton = styled.button`
+	display: block;
+	width: 100%;
 	background-color: white;
 	border: none;
+	text-align: left;
+	padding: 0.5rem 1rem;
 
 	&:hover {
-		opacity: 0.8;
+		background: #f3f5f6;
 	}
 `;
 const LogoutStyled = styled.button`
-	color: red;
+	display: block;
+	width: 100%;
 	background-color: white;
 	border: none;
+	text-align: left;
+	padding: 0.5rem 1rem;
+
 
 	&:hover {
-		opacity: 0.8;
+		background: #f3f5f6;
 	}
 `;
 
@@ -69,6 +104,7 @@ const Aside = () => {
 	const navigate = useNavigate();
 	const { user, logout } = useContext(AuthToken);
 	const [showProfile, setShowProfile] = useState(false);
+	const [showPopover, setShowPopover] = useState(false);
 
 	const handleCloseProfile = () => setShowProfile(false);
 	const handleShowProfile = () => setShowProfile(true);
@@ -78,20 +114,30 @@ const Aside = () => {
 		navigate(configs.routes.login);
 	};
 
+	const handleClickAvatar = (e) => {
+		e.stopPropagation();
+		setShowPopover(true)
+	}
+
+	window.addEventListener("click", (e) => {
+		setShowPopover(false)
+    });
+
 	return (
 		<WrapperStyled ref={profileRef}>
 			<OverlayTrigger
-				trigger="click"
-				placement="right"
+				show={showPopover}
+				placement="right-start"
 				rootClose
 				overlay={
 					<PopoverStyled>
 						<Popover.Header as="h3">{user.fullName}</Popover.Header>
 						<Popover.Body>
+							<hr/>
 							<ProfileButton onClick={handleShowProfile}>
-								Thông tin cá nhân
+								Hồ sơ của bạn
 							</ProfileButton>
-							<hr />
+							<hr/>
 							<LogoutStyled onClick={handleLogoutButton}>
 								Đăng xuất
 							</LogoutStyled>
@@ -99,7 +145,7 @@ const Aside = () => {
 					</PopoverStyled>
 				}
 			>
-				<ProfilePicStyled>
+				<ProfilePicStyled onClick={(e) => handleClickAvatar(e)}>
 					<img src={user.profilePic} alt="Ảnh đại diện" />
 				</ProfilePicStyled>
 			</OverlayTrigger>
