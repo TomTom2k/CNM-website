@@ -197,7 +197,9 @@ const ProfileModel = ({ show, handleClose }) => {
 			setImageForUpdate(null)
 			toast.success("Cập nhật avatar thành công");
 		} catch (error) {
-			console.log(error)
+			if(error?.response && error?.response.status === 500){
+				toast.error("Vui lòng chọn ảnh có kích thước không quá 200MB.")
+			}
 		}
 	}
 
@@ -359,7 +361,7 @@ const ProfileModel = ({ show, handleClose }) => {
 								className='update-btn' 
 								variant="primary" 
 								onClick={handleUpdateUserInfo}
-								disabled={userForUpdate.fullName === user.fullName && userForUpdate.gender === user.gender && userForUpdate.dateOfBirth === user.dateOfBirth}
+								disabled={userForUpdate.fullName === '' || (userForUpdate.fullName === user.fullName && userForUpdate.gender === user.gender && userForUpdate.dateOfBirth === user.dateOfBirth)}
 							>
 								Cập nhật
 							</Button>

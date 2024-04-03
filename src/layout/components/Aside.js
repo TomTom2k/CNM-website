@@ -7,6 +7,7 @@ import { AuthToken } from '../../context/AuthToken';
 import { useNavigate } from 'react-router-dom';
 import configs from '../../configs';
 import ProfileModal from '../../components/modals/ProfileModal';
+import ChangePasswordModal from '../../components/modals/ChangePasswordModal';
 
 const WrapperStyled = styled.aside`
 	width: 4rem;
@@ -104,10 +105,14 @@ const Aside = () => {
 	const navigate = useNavigate();
 	const { user, logout } = useContext(AuthToken);
 	const [showProfile, setShowProfile] = useState(false);
+	const [showChangePassword, setShowChangePassword] = useState(false);
 	const [showPopover, setShowPopover] = useState(false);
 
 	const handleCloseProfile = () => setShowProfile(false);
 	const handleShowProfile = () => setShowProfile(true);
+
+	const handleCloseChangePassword = () => setShowChangePassword(false);
+	const handleShowChagePassword = () => setShowChangePassword(true);
 
 	const handleLogoutButton = () => {
 		logout();
@@ -137,6 +142,9 @@ const Aside = () => {
 							<ProfileButton onClick={handleShowProfile}>
 								Hồ sơ của bạn
 							</ProfileButton>
+							<ProfileButton onClick={handleShowChagePassword}>
+								Đổi mật khẩu
+							</ProfileButton>
 							<hr/>
 							<LogoutStyled onClick={handleLogoutButton}>
 								Đăng xuất
@@ -151,6 +159,7 @@ const Aside = () => {
 			</OverlayTrigger>
 			<Navbar />
 			<ProfileModal show={showProfile} handleClose={handleCloseProfile} />
+			<ChangePasswordModal show={showChangePassword} handleClose={handleCloseChangePassword} />
 		</WrapperStyled>
 	);
 };

@@ -30,6 +30,11 @@ const userApi = {
 		const url = '/user/update-info';
 		return axiosClient.put(url, data);
 	},
+	updatePassword: (currentPassword, newPassword) => {
+		const data = {currentPassword, newPassword}
+		const url = '/user/update-password';
+		return axiosClient.patch(url, data);
+	},
 };
 
 export default userApi;
