@@ -111,10 +111,10 @@ const ChangePasswordModal = ({ show, handleClose }) => {
     }
 
     const handleChangePassword = async () => {
-        if(newPassword.length < 8){
-            toast.error("Mật khẩu quá ngắn. Mật khẩu hợp lệ phải gồm 8-32 ký tự.")
+        if(newPassword.length < 6){
+            toast.error("Mật khẩu quá ngắn. Mật khẩu hợp lệ phải gồm 6-32 ký tự.")
         } else if(newPassword.length > 32){
-            toast.error("Mật khẩu quá dài. Mật khẩu hợp lệ phải gồm 8-32 ký tự.")
+            toast.error("Mật khẩu quá dài. Mật khẩu hợp lệ phải gồm 6-32 ký tự.")
         } else {
             try {
                 await userApi.updatePassword(currentPassword, newPassword)
