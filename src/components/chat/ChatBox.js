@@ -395,7 +395,7 @@ const ChatBox = () => {
 									</div>
 									: null 
 								}
-								<MessageItem elementShowTippy={elementShowTippy} setElementShowTippy={setElementShowTippy} hideEmojiPicker={emojiPicker ? hideEmojiPicker : null} user={user} message={message} index={index} arr={arr}/>
+								<MessageItem messages={messages} setMessages={setMessages} elementShowTippy={elementShowTippy} setElementShowTippy={setElementShowTippy} hideEmojiPicker={emojiPicker ? hideEmojiPicker : null} user={user} message={message} index={index} arr={arr}/>
 							</>
 						))}
 					</ContentChatStyled>

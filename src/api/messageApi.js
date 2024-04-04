@@ -19,6 +19,14 @@ const messageApi = {
 		const url = `/message/${conversationId}`;
 		return axiosClient.get(url);
 	},
+	recallMessage: (messageId) => {
+		const url = `/message/recall-message/${messageId}`;
+		return axiosClient.patch(url);
+	},
+	deleteMessageForMeOnly: (messageId) => {
+		const url = `/message/delete-message-for-me-only/${messageId}`;
+		return axiosClient.patch(url);
+	},
 };
 
 export default messageApi;

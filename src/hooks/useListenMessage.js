@@ -12,7 +12,23 @@ const useListenMessage = () => {
 			setMessages((prevMessages) => [...prevMessages, newMessage]);
 		});
 
-		return () => socket?.off('newMessage');
+		socket?.on('recallMessage', (updatedMessage) => {
+			const updatedMessages = messages.map(message => {
+				if (message.messageId === updatedMessage.messageId) {
+					// Cập nhật trạng thái của message
+					message.isRecalled = true;
+				}
+				return message;
+			});
+			
+			// Cập nhật state của messages
+			setMessages(updatedMessages);
+		});
+
+		return () => {
+			socket?.off('newMessage');
+			socket?.off('recallMessage');
+		}
 	}, [socket, setMessages, messages]);
 };
 

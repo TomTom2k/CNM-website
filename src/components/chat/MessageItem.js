@@ -9,6 +9,8 @@ import { PiShareFatLight } from "react-icons/pi";
 import { copyImageToClipboard } from 'copy-image-clipboard'
 
 import FileItem from "./FileItem";
+import messageApi from '../../api/messageApi';
+import { useState } from 'react';
 
 const MessageItemStyled = styled.div`
     min-width: 6%;
@@ -135,6 +137,13 @@ const MessageItemStyled = styled.div`
         margin: 0;
         padding: 1rem 1rem;
         border-radius: 1rem;
+
+        &.recalled-message-item{
+            color: rgba(0, 0, 0, 0.3);
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
     }
 
     .like-message-item {
@@ -196,6 +205,9 @@ const MessageItemStyled = styled.div`
         display: block;
         margin-top: -0.4rem;
         color: #476285;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
     }
 `;
 
@@ -261,7 +273,7 @@ const PopperWrapper = styled.div`
     }
 `;
 
-const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker}) => {
+const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages}) => {
     const MENU_ITEMS = [
         {
             icon: <MdOutlineContentCopy />,
@@ -291,15 +303,16 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             title: 'Thu hồi',
             dangerous: true,
             forOwner: true,
-            handleClick: () => {alert('b')}
+            handleClick: () => handleRecall()
         },
         {
             icon: <FiTrash />,
             title: 'Xóa chỉ ở phía tôi',
             dangerous: true ,
-            handleClick: () => {alert('c')}
+            handleClick: () => handleDeleteForMeOnly()
         },
     ];
+    const [deletedUserIds, setDeletedUserIds] = useState(message.deletedUserIds)
 
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
@@ -356,93 +369,150 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
         })
     }
 
-    return (
-        <MessageItemStyled 
-            className={`
-                ${user.userID === message?.senderId ? 'self' : ''} 
-                ${message.type === 'image' ? 'no-background-color' : ''}
-                ${
-                    arr[index+1] 
-                    && arr[index+1].senderId === message.senderId 
-                    && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 300000
-                    ? 'short-time-message' : ''
-                }
-            `}
-        >
-            {(() => {
-                if (message.type === "text") {
-                    return (
-                        <p className='text-message-item'>
-                            {message.content}
-                        </p>
-                    );
-                } else if (message.type === "image") {
-                    const images = message.content.split(" ");
-                    return (
-                        <ImageBlock
-                            key={message.messageId}
-                            className='image-block'
-                        >
-                            {images.map((image, index) => {
-                                return (
-                                    <img
-                                        id={index}
-                                        className={images.length > 1 ? 'block' : ''}
-                                        key={index}
-                                        src={image}
-                                        alt={`img_${index}`}
-                                        onClick={(e) => window.open(e.target.currentSrc)}
-                                    />
-                                );
-                            })}
-                        </ImageBlock>
-                    );
-                } else if (message.type === "file") {
-                    const fileNameS3 = message.content.split("/");
-                    return (
-                        <FileItem
-                            fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
-                            fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
-                            fileNameS3={fileNameS3[fileNameS3.length - 1]}
-                            className='file-item'
-                            onClick={() => window.open(message.content)}
-                        />
-                    );
-                } else if (message.type === "like") {
+    const handleRecall = async () => {
+        try {
+            await messageApi.recallMessage(message.messageId);
+            const updatedMessages = messages.map(messageItem => {
+				if (messageItem.messageId === message.messageId) {
+					messageItem.isRecalled = true;
+				}
+				return messageItem;
+			});
+            setMessages(updatedMessages)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-                    return (
-                        <p className='like-message-item'>
-                            <img src={message.content} alt=''/>
-                        </p>
-                    );
-                }
-            })()}
-            {/* Điều kiện hiển thị thời gian của tin nhắn
-                1. Nếu không có tin nhắn phía sau
-                2. Nếu tin nhắn phía sau là của người khác
-                3. Nếu tin nhắn phía sau cách tin nhắn hiện tại hơn 5 phút 
-            */}
-            {
-                arr[index+1] 
-                && arr[index+1].senderId === message.senderId 
-                && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
-                ? null
-                : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
-            }
-            <Tippy
-                visible={elementShowTippy === message.messageId}
-                interactive
-                delay={[0, 0]}
-                offset={[0, -4]}
-                placement="top-end"
-                render={renderMessageActions}
-            >
-                <div className='message-action'>
-                    <IoMdShareAlt className='share-icon'/>
-                    <FaEllipsisH className='more-action-icon' onClick={(e) => handleClickMoreAction(e)}/>
-                </div>
-            </Tippy>
-        </MessageItemStyled>
+    const handleDeleteForMeOnly = async () => {
+        try {
+            const res = await messageApi.deleteMessageForMeOnly(message.messageId);
+            setDeletedUserIds(res.updatedMessage.deletedUserIds)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    return (
+        <>
+            {!deletedUserIds?.includes(user.userID) ? (
+                <>
+                    {message.isRecalled ? (
+                        <MessageItemStyled 
+                            className={`
+                                ${user.userID === message?.senderId ? 'self' : ''} 
+                                ${
+                                    arr[index+1] 
+                                    && arr[index+1].senderId === message.senderId 
+                                    && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 300000
+                                    ? 'short-time-message' : ''
+                                }
+                            `}
+                        >
+                            <p className='text-message-item recalled-message-item'>
+                                Tin nhắn đã được thu hồi
+                            </p>
+                            {
+                                arr[index+1] 
+                                && arr[index+1].senderId === message.senderId 
+                                && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
+                                ? null
+                                : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
+                            }
+                        </MessageItemStyled>
+                    ) : (
+                        <MessageItemStyled 
+                            className={`
+                                ${user.userID === message?.senderId ? 'self' : ''} 
+                                ${message.type === 'image' ? 'no-background-color' : ''}
+                                ${
+                                    arr[index+1] 
+                                    && arr[index+1].senderId === message.senderId 
+                                    && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 300000
+                                    ? 'short-time-message' : ''
+                                }
+                            `}
+                        >
+                            {(() => {
+                                if (message.type === "text") {
+                                    return (
+                                        <p className='text-message-item'>
+                                            {message.content}
+                                        </p>
+                                    );
+                                } else if (message.type === "image") {
+                                    const images = message.content.split(" ");
+                                    return (
+                                        <ImageBlock
+                                            key={message.messageId}
+                                            className='image-block'
+                                        >
+                                            {images.map((image, index) => {
+                                                return (
+                                                    <img
+                                                        id={index}
+                                                        className={images.length > 1 ? 'block' : ''}
+                                                        key={index}
+                                                        src={image}
+                                                        alt={`img_${index}`}
+                                                        onClick={(e) => window.open(e.target.currentSrc)}
+                                                    />
+                                                );
+                                            })}
+                                        </ImageBlock>
+                                    );
+                                } else if (message.type === "file") {
+                                    const fileNameS3 = message.content.split("/");
+                                    return (
+                                        <FileItem
+                                            fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
+                                            fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
+                                            fileNameS3={fileNameS3[fileNameS3.length - 1]}
+                                            className='file-item'
+                                            onClick={() => window.open(message.content)}
+                                        />
+                                    );
+                                } else if (message.type === "like") {
+                
+                                    return (
+                                        <p className='like-message-item'>
+                                            <img src={message.content} alt=''/>
+                                        </p>
+                                    );
+                                }
+                            })()}
+                            {/* Điều kiện hiển thị thời gian của tin nhắn
+                                1. Nếu không có tin nhắn phía sau
+                                2. Nếu tin nhắn phía sau là của người khác
+                                3. Nếu tin nhắn phía sau cách tin nhắn hiện tại hơn 5 phút 
+                            */}
+                            {
+                                arr[index+1] 
+                                && arr[index+1].senderId === message.senderId 
+                                && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
+                                ? null
+                                : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
+                            }
+                            <Tippy
+                                visible={elementShowTippy === message.messageId}
+                                interactive
+                                delay={[0, 0]}
+                                offset={[0, -4]}
+                                placement="top-end"
+                                render={renderMessageActions}
+                            >
+                                <div className='message-action'>
+                                    <IoMdShareAlt className='share-icon'/>
+                                    <FaEllipsisH className='more-action-icon' onClick={(e) => handleClickMoreAction(e)}/>
+                                </div>
+                            </Tippy>
+                        </MessageItemStyled>
+                    )}
+                </>
+            ) : (
+                <></>
+            )}
+        </>
     )
 }
 
