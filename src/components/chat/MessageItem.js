@@ -273,7 +273,7 @@ const PopperWrapper = styled.div`
     }
 `;
 
-const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker}) => {
+const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages}) => {
     const MENU_ITEMS = [
         {
             icon: <MdOutlineContentCopy />,
@@ -312,7 +312,6 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             handleClick: () => handleDeleteForMeOnly()
         },
     ];
-    const [isRecalledMessage, setIsRecalledMessage] = useState(message.isRecalled)
     const [deletedUserIds, setDeletedUserIds] = useState(message.deletedUserIds)
 
     const handleClickMoreAction = (e) => {
@@ -373,7 +372,13 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
     const handleRecall = async () => {
         try {
             await messageApi.recallMessage(message.messageId);
-            setIsRecalledMessage(true)
+            const updatedMessages = messages.map(messageItem => {
+				if (messageItem.messageId === message.messageId) {
+					messageItem.isRecalled = true;
+				}
+				return messageItem;
+			});
+            setMessages(updatedMessages)
         } catch (error) {
             console.log(error)
         }
@@ -392,7 +397,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
         <>
             {!deletedUserIds?.includes(user.userID) ? (
                 <>
-                    {isRecalledMessage ? (
+                    {message.isRecalled ? (
                         <MessageItemStyled 
                             className={`
                                 ${user.userID === message?.senderId ? 'self' : ''} 
