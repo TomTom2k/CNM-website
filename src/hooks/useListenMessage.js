@@ -12,7 +12,29 @@ const useListenMessage = () => {
 			setMessages((prevMessages) => [...prevMessages, newMessage]);
 		});
 
-		return () => socket?.off('newMessage');
+		socket?.on('recallMessage', (updatedMessage) => {
+			console.log(messages);
+			    // Tìm và cập nhật message trong danh sách messages
+			const updatedMessages = messages.map(message => {
+				if (message.messageId === updatedMessage.messageId) {
+					// Cập nhật trạng thái của message
+					message.isRecalled = true;
+					// Trả về message đã được cập nhật
+					return updatedMessage;
+				}
+				return message;
+			});
+		
+			console.log(updatedMessages);
+			
+			// Cập nhật state của messages
+			setMessages((prevMessages) => [...prevMessages]);
+		});
+
+		return () => {
+			socket?.off('newMessage');
+			socket?.off('recallMessage');
+		}
 	}, [socket, setMessages, messages]);
 };
 

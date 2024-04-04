@@ -159,7 +159,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
                             <Form.Label className='mb-2'>
 								<NoteLabelStyled>
                                     <span className='fw-bold'>Lưu ý: </span>
-                                    Mật khẩu tối thiểu 8 ký tự trở lên & tối đa 32 ký tự.
+                                    Mật khẩu tối thiểu 6 ký tự trở lên & tối đa 32 ký tự.
                                 </NoteLabelStyled>
 							</Form.Label>
 							<Form.Group className="mb-3">
