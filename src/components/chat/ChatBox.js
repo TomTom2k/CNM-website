@@ -17,7 +17,7 @@ import useListenMessage from '../../hooks/useListenMessage';
 import MessageItem from './MessageItem';
 
 const ChatBoxStyled = styled.div`
-	width: 100%;
+	width: calc(100% - 21.5rem);
 `;
 const HeaderChatStyled = styled.h3`
 	box-shadow: 1px 1px 1rem rgba(0, 0, 0, 0.05);

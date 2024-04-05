@@ -137,6 +137,7 @@ const MessageItemStyled = styled.div`
         margin: 0;
         padding: 1rem 1rem;
         border-radius: 1rem;
+        word-wrap: break-word;
 
         &.recalled-message-item{
             color: rgba(0, 0, 0, 0.3);
@@ -386,8 +387,14 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     const handleDeleteForMeOnly = async () => {
         try {
-            const res = await messageApi.deleteMessageForMeOnly(message.messageId);
-            setDeletedUserIds(res.updatedMessage.deletedUserIds)
+            await messageApi.deleteMessageForMeOnly(message.messageId);
+            const updatedMessages = messages.map(messageItem => {
+				if (messageItem.messageId === message.messageId) {
+					messageItem.deletedUserIds.push(user.userID)
+				}
+				return messageItem;
+			});
+            setMessages(updatedMessages)
         } catch (error) {
             console.log(error)
         }
@@ -395,7 +402,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     return (
         <>
-            {!deletedUserIds?.includes(user.userID) ? (
+            {!message.deletedUserIds?.includes(user.userID) ? (
                 <>
                     {message.isRecalled ? (
                         <MessageItemStyled 

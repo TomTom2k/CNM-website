@@ -1,11 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { CiImageOn } from "react-icons/ci";
+import { MdAttachFile } from "react-icons/md";
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
 import { useSocketContext } from '../../context/SocketContext';
+import conversationApi from '../../api/conversationApi';
 
 const WrapperStyled = styled.div`
-	padding: 0.5rem 1rem;
+	padding: 0.7rem 1rem;
 	display: flex;
 	align-items: center;
 	justify-items: center;
@@ -35,7 +38,8 @@ const AvatarStyled = styled.div`
 	&.online::after {
 		content: '';
 		position: absolute;
-		right: 1px;
+		right: 3px;
+		bottom: 2px;
 		width: 0.675rem;
 		height: 0.675rem;
 		background-color: #7de07d;
@@ -43,12 +47,14 @@ const AvatarStyled = styled.div`
 	}
 `;
 const InfoStyled = styled.div`
-	padding: 0 0.5rem;
+	height: 3.2rem;
+	padding-left: 0.8rem;
 	width: 60%;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	align-items: start;
+	flex: 1;
+	justify-content: space-evenly;
 
 	h6 {
 		width: 100%;
@@ -58,23 +64,45 @@ const InfoStyled = styled.div`
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: var(--text-primary);
 	}
-	p {
-		margin: 0;
-		font-size: 0.75rem;
-		color: gray;
+	
+	.last-message-info{
+		max-width: 100%;
+		color: var(--text-secondary);
+		display: flex;
+		align-items: center;
 
-		img {
-			width: 1.2rem;
-			height: 1.2rem;
+		
+		.last-message-sender{
+			font-size: 0.85rem;
+			margin-right: 0.3rem;
+		}
+
+		.last-message-icon{
+			margin-right: 0.2rem;
+		}
+		
+		p {
+			font-size: 0.85rem;
+			margin: 0;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+	
+			img {
+				width: 1.2rem;
+				height: 1.2rem;
+			}
 		}
 	}
 `;
 const Conversation = ({ conversation }) => {
 	const { user } = useContext(AuthToken);
 	const { onlineUsers } = useSocketContext();
-	const { conversationSelected, setConversationSelected } =
+	const { conversationSelected, setConversationSelected, messages } =
 		useContext(ConversationToken);
+	const [lastMessage, setLastMessage] = useState({})
 
 	const title =
 		conversation?.name ||
@@ -88,6 +116,20 @@ const Conversation = ({ conversation }) => {
 	const handlerConversation = () => {
 		setConversationSelected(conversation);
 	};
+
+	useEffect(() => {
+		getLastMessage()
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	},[messages])
+
+	const getLastMessage = async () => {
+		try {
+            const res = await conversationApi.getLastMessage(conversation.conversationId);
+            setLastMessage(res.lastMessage)
+        } catch (error) {
+            console.log(error)
+        }
+	}
 
 	return (
 		<WrapperStyled
@@ -111,11 +153,16 @@ const Conversation = ({ conversation }) => {
 			</AvatarStyled>
 			<InfoStyled>
 				<h6>{title}</h6>
-				{conversation?.lastMessageType === "like" ? (
-					<p><img src={conversation.lastMessage} alt=''/></p>
-				) : (
-					<p>{conversation?.lastMessage || 'Chưa có tin nhắn'}</p>
-				)}
+				<div className='last-message-info'>
+					{lastMessage?.content && lastMessage?.senderId === user.userID && (<span className='last-message-sender'>Bạn:</span>)}
+					{
+						lastMessage?.isRecalled ? (<p>Tin nhắn đã được thu hồi</p>)
+						: lastMessage?.type === "like" ? (<p><img src={lastMessage?.content} alt=''/></p>) 
+						: lastMessage?.type === "image" ? (<div className='d-flex align-items-center'><CiImageOn className='last-message-icon'/><p>Hình ảnh</p></div>)
+						: lastMessage?.type === "file" ? (<div className='d-flex align-items-center'><MdAttachFile  className='last-message-icon'/><p>{lastMessage.content.split('.').slice(-2).join('.')}</p></div>)
+						: (<p>{lastMessage?.content || 'Chưa có tin nhắn'}</p>)
+					}
+				</div>
 			</InfoStyled>
 		</WrapperStyled>
 	);

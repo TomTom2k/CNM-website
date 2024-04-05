@@ -6,7 +6,8 @@ import SearchBox from '../SearchBox';
 import { useSocketContext } from '../../context/SocketContext';
 
 const AsideStyled = styled.aside`
-	width: 30rem;
+	min-width: 21.5rem;
+	max-width: 21.5rem;
 	height: 100vh;
 	position: sticky;
 	top: 0;
