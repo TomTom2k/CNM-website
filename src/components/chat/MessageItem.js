@@ -10,7 +10,6 @@ import { copyImageToClipboard } from 'copy-image-clipboard'
 
 import FileItem from "./FileItem";
 import messageApi from '../../api/messageApi';
-import { useState } from 'react';
 
 const MessageItemStyled = styled.div`
     min-width: 6%;
@@ -21,6 +20,10 @@ const MessageItemStyled = styled.div`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
     position: relative; 
+
+    &:has(.file-item) {
+		width: 40%;
+	}
 
     .action-wrapper {
         &.for-owner {
@@ -313,7 +316,6 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             handleClick: () => handleDeleteForMeOnly()
         },
     ];
-    const [deletedUserIds, setDeletedUserIds] = useState(message.deletedUserIds)
 
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
@@ -475,6 +477,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                             fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
                                             fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
                                             fileNameS3={fileNameS3[fileNameS3.length - 1]}
+                                            fileURL={message.content}
                                             className='file-item'
                                             onClick={() => window.open(message.content)}
                                         />

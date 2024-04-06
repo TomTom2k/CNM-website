@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { FaRegFileWord, FaRegFilePdf, FaRegFile } from "react-icons/fa";
-import { LuFileJson } from "react-icons/lu";
+import { LuFileJson, LuFileVideo } from "react-icons/lu";
 import { AiOutlineDownload } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
 import fileApi from '../../api/fileApi';
@@ -21,7 +21,7 @@ const FileDetailStyled = styled.div`
 	display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 280px;
+    flex: 1;
     padding-left: 0.6rem;
     overflow: hidden;
 
@@ -55,6 +55,21 @@ const DownloadFileIconStyled = styled.div`
     border-radius: 6px;
 `;
 
+const VideoItemStyled = styled.div`
+    background-color: black;
+    margin-bottom: 0.8rem;
+    border-radius: 0.5rem;
+    padding-bottom: 0;
+    height: 14rem;
+    overflow: hidden;
+
+
+    video{
+        width: 100%;
+        height: 100%;
+    }
+`;
+
 const hanldleDownloadFile = async (e, fileNameS3, fileName) => {
     e.stopPropagation();    
     try {
@@ -69,11 +84,16 @@ const hanldleDownloadFile = async (e, fileNameS3, fileName) => {
     }
 }
 
-const FileItem = ({fileName, fileSize, fileNameS3, className, onClick}) => {
+const FileItem = ({fileName, fileSize, fileNameS3, className, onClick, fileURL}) => {
     const file = fileName.split(".")
     const fileType = file[file.length - 1]
     return (
         <div className={className} onClick={onClick}>
+            {fileType === "mp4" && (
+                <VideoItemStyled>
+                    <video src={fileURL} controls></video>
+                </VideoItemStyled>
+            )}
             <FileItemStyled>
                 <FileIconStyled>
                     {
@@ -81,7 +101,8 @@ const FileItem = ({fileName, fileSize, fileNameS3, className, onClick}) => {
                         : (fileType === "json" ? <LuFileJson /> 
                         : (fileType === "pdf" ? <FaRegFilePdf /> 
                         : (fileType === "txt" ? <FiFileText />
-                        : <FaRegFile />)))
+                        : (fileType === "mp4" ? <LuFileVideo />
+                        : <FaRegFile />))))
                     }   
                 </FileIconStyled>
                 <FileDetailStyled>
