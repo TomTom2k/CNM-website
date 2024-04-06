@@ -100,9 +100,10 @@ const InfoStyled = styled.div`
 const Conversation = ({ conversation }) => {
 	const { user } = useContext(AuthToken);
 	const { onlineUsers } = useSocketContext();
-	const { conversationSelected, setConversationSelected, messages } =
+	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversation } =
 		useContext(ConversationToken);
 	const [lastMessage, setLastMessage] = useState({})
+	const [haveNewMessage, setHaveNewMessage] = useState({})
 
 	const title =
 		conversation?.name ||
@@ -118,9 +119,16 @@ const Conversation = ({ conversation }) => {
 	};
 
 	useEffect(() => {
+		if(haveNewMessageConversation.conversationId === conversation.conversationId){
+			setHaveNewMessage(haveNewMessageConversation.message)
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [haveNewMessageConversation])
+
+	useEffect(() => {
 		getLastMessage()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	},[messages])
+	},[haveNewMessage, messages])
 
 	const getLastMessage = async () => {
 		try {

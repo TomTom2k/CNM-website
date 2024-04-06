@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext';
 import { useConversation } from '../context/ConversationToken';
+import { ConversationToken } from '../context/ConversationToken';
 
 const useListenMessage = () => {
 	const { socket } = useSocketContext();
 	const { messages, setMessages } = useConversation();
+	const { setHaveNewMessageConversation } = useContext(ConversationToken);
 
 	useEffect(() => {
 		socket?.on('newMessage', (newMessage) => {
 			console.log(newMessage);
-			setMessages((prevMessages) => [...prevMessages, newMessage]);
+			if(messages){
+				setMessages((prevMessages) => [...prevMessages, newMessage]);
+				setHaveNewMessageConversation({conversationId: newMessage.conversationId, message: newMessage.messageId})
+			} else {
+				setHaveNewMessageConversation({conversationId: newMessage.conversationId, message: newMessage.messageId})
+			}
 		});
 
 		socket?.on('recallMessage', (updatedMessage) => {
