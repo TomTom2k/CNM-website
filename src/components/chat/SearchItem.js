@@ -4,6 +4,8 @@ import Button from '../common/Button';
 import { AuthToken } from '../../context/AuthToken';
 import conversationApi from '../../api/conversationApi';
 import { ConversationToken } from '../../context/ConversationToken';
+import userApi from '../../api/userApi';
+import { toast, Toaster } from "react-hot-toast";
 
 const ItemStyled = styled.div`
 	margin: 0 -1rem;
@@ -41,6 +43,17 @@ const InfoStyled = styled.div`
 const SearchItem = ({ userItem }) => {
 	const { user } = useContext(AuthToken);
 	const { setConversationSelected } = useContext(ConversationToken);
+
+	const handleFriendRequest = async () => {
+		try {
+			await userApi.sentRequestAddFriend(user.userID, userItem.userID);
+			toast.success("Đã gửi lời mời kết bạn");
+		} catch (error) {
+		  	console.log('Error:', error);    
+		}
+	};
+
+
 	const handlerItem = async () => {
 		try {
 			const res = await conversationApi.createConversation({
@@ -56,6 +69,7 @@ const SearchItem = ({ userItem }) => {
 			className="d-flex justify-content-between mb-1"
 			onClick={handlerItem}
 		>
+			<Toaster toastOptions={{ duration: 1500 }} />
 			<InfoStyled>
 				<img src={userItem?.profilePic} alt="" />
 				<div>
@@ -64,7 +78,7 @@ const SearchItem = ({ userItem }) => {
 				</div>
 			</InfoStyled>
 			<div className="d-flex align-items-center">
-				<Button className="py-2">Kết bạn</Button>
+				<Button className="py-2" onClick={handleFriendRequest}>Gửi kết bạn</Button>
 			</div>
 		</ItemStyled>
 	);

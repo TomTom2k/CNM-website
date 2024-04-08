@@ -35,6 +35,40 @@ const userApi = {
 		const url = '/user/update-password';
 		return axiosClient.patch(url, data);
 	},
+	addFriend: (userId, friendId) => {
+		const data = {userId, friendId};
+		console.log('userId', userId);
+		console.log('friendId', friendId);
+		const url = '/user/add-friend';
+		return axiosClient.put(url, data);
+	},
+	sentRequestAddFriend: (userId, friendId) => {
+		const data = {userId, friendId};
+		const url = '/user/sent-request-add-friend';
+		return axiosClient.put(url, data);
+	},
+
+	inFoUser: (userId) => {
+		const url = '/user/info-user';
+		return axiosClient.get(url, { params: { userId } });
+	},
+
+	findUserById: (userId) => {	
+		const url = '/user/find-user-by-id/'+userId;
+		return axiosClient.get(url, { params: { userId } });
+	},
+
+	cancelFriend: (userId, friendId) => {
+		const data = {userId, friendId};
+		console.log('data', data)
+		const url = '/user/cancel-friend';
+		return axiosClient.put(url, data);
+	},
+	deleteFriend: (userId, friendId) => {
+		const data = {userId, friendId};
+		const url = '/user/delete-friend';
+		return axiosClient.put(url, data);
+	},
 };
 
 export default userApi;
