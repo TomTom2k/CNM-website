@@ -15,9 +15,11 @@ const GlobalStyle = createGlobalStyle`
     --button-primary-hover: #004bb9;
     --button-neutral-normal: #eaedf0;
     --button-neutral-hover: #dfe2e7;
+    --button-neutral-text: #081c36;
     --border: #d6dbe1;
     --border-focused: #0068ff;
-    --button-neutral-text: #081c36;
+    --icon-secondary: #7589a3;
+    --layer-background-hover: #f3f5f6;
     --color-10: #91caee;
     --color-11: #dce1e8;
   }

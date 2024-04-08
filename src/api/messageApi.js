@@ -27,6 +27,10 @@ const messageApi = {
 		const url = `/message/delete-message-for-me-only/${messageId}`;
 		return axiosClient.patch(url);
 	},
+	shareMessage: (data) => {
+		const url = `/message/share-message`;
+		return axiosClient.post(url, data);
+	},
 };
 
 export default messageApi;

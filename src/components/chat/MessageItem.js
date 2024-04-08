@@ -7,10 +7,12 @@ import { FiTrash } from "react-icons/fi";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { PiShareFatLight } from "react-icons/pi";
 import { copyImageToClipboard } from 'copy-image-clipboard'
+import ShareMessageModal from '../modals/ShareMessageModal';
 
 import FileItem from "./FileItem";
 import messageApi from '../../api/messageApi';
-import { useState } from 'react';
+import conversationApi from '../../api/conversationApi';
+import { useEffect, useState } from 'react';
 
 const MessageItemStyled = styled.div`
     min-width: 6%;
@@ -21,6 +23,10 @@ const MessageItemStyled = styled.div`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
     position: relative; 
+
+    &:has(.file-item) {
+		width: 40%;
+	}
 
     .action-wrapper {
         &.for-owner {
@@ -137,6 +143,7 @@ const MessageItemStyled = styled.div`
         margin: 0;
         padding: 1rem 1rem;
         border-radius: 1rem;
+        word-wrap: break-word;
 
         &.recalled-message-item{
             color: rgba(0, 0, 0, 0.3);
@@ -312,7 +319,23 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             handleClick: () => handleDeleteForMeOnly()
         },
     ];
-    const [deletedUserIds, setDeletedUserIds] = useState(message.deletedUserIds)
+    const [isShowShareMessageModal, setIsShowShareMessageModal] = useState(false);
+    const [recentlyConversations, setRecentlyConversations] = useState([])
+
+    useEffect(() => {
+        if(isShowShareMessageModal){
+            getRecentlyConversations(5)
+        }
+    }, [isShowShareMessageModal])
+
+    const getRecentlyConversations = async (quantity) => {
+        try {
+            const res = await conversationApi.getRecentlyConversations(quantity);
+            setRecentlyConversations(res.conversations)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
@@ -320,6 +343,10 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
         if(hideEmojiPicker){
             hideEmojiPicker()
         }
+    }
+
+    const handleClickShareAction = () => {
+        setIsShowShareMessageModal(true)
     }
 
     const renderItems = () => {
@@ -386,8 +413,14 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     const handleDeleteForMeOnly = async () => {
         try {
-            const res = await messageApi.deleteMessageForMeOnly(message.messageId);
-            setDeletedUserIds(res.updatedMessage.deletedUserIds)
+            await messageApi.deleteMessageForMeOnly(message.messageId);
+            const updatedMessages = messages.map(messageItem => {
+				if (messageItem.messageId === message.messageId) {
+					messageItem.deletedUserIds.push(user.userID)
+				}
+				return messageItem;
+			});
+            setMessages(updatedMessages)
         } catch (error) {
             console.log(error)
         }
@@ -395,7 +428,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     return (
         <>
-            {!deletedUserIds?.includes(user.userID) ? (
+            {!message.deletedUserIds?.includes(user.userID) ? (
                 <>
                     {message.isRecalled ? (
                         <MessageItemStyled 
@@ -468,6 +501,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                             fileName={fileNameS3[fileNameS3.length - 1].split(".").slice(2).join(".")}
                                             fileSize={fileNameS3[fileNameS3.length - 1].split(".")[1]}
                                             fileNameS3={fileNameS3[fileNameS3.length - 1]}
+                                            fileURL={message.content}
                                             className='file-item'
                                             onClick={() => window.open(message.content)}
                                         />
@@ -502,10 +536,11 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 render={renderMessageActions}
                             >
                                 <div className='message-action'>
-                                    <IoMdShareAlt className='share-icon'/>
+                                    <IoMdShareAlt className='share-icon' onClick={() => handleClickShareAction()}/>
                                     <FaEllipsisH className='more-action-icon' onClick={(e) => handleClickMoreAction(e)}/>
                                 </div>
                             </Tippy>
+                            <ShareMessageModal show={isShowShareMessageModal} handleClose={() => setIsShowShareMessageModal(false)} recentlyConversations={recentlyConversations} message={message}/>
                         </MessageItemStyled>
                     )}
                 </>

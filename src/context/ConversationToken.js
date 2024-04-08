@@ -11,7 +11,7 @@ export const useConversation = () => {
 const ConversationProvide = ({ children }) => {
 	const [conversationSelected, setConversationSelected] = useState(null);
 	const [conversations, setConversations] = useState([]);
-
+	const [haveNewMessageConversations, setHaveNewMessageConversations] = useState([])
 	const [messages, setMessages] = useState(null);
 
 	useEffect(() => {
@@ -50,6 +50,8 @@ const ConversationProvide = ({ children }) => {
 				conversations,
 				messages,
 				setMessages,
+				haveNewMessageConversations,
+				setHaveNewMessageConversations
 			}}
 		>
 			{children}

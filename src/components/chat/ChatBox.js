@@ -6,6 +6,8 @@ import EmojiPicker from 'emoji-picker-react';
 import { CiFileOn, CiImageOn } from "react-icons/ci";
 import { LuSendHorizonal } from "react-icons/lu";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
+import { IoCallOutline } from "react-icons/io5";
+import { GoDeviceCameraVideo } from "react-icons/go";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -17,21 +19,55 @@ import useListenMessage from '../../hooks/useListenMessage';
 import MessageItem from './MessageItem';
 
 const ChatBoxStyled = styled.div`
-	width: 100%;
+	width: calc(100% - 21.5rem);
 `;
-const HeaderChatStyled = styled.h3`
-	box-shadow: 1px 1px 1rem rgba(0, 0, 0, 0.05);
-	height: 3.5rem;
-	margin: 0;
-	text-align: center;
-	line-height: 3.5rem;
-
-	font-size: 1.25rem;
-	font-weight: 500;
+const HeaderChatStyled = styled.div`
+	height: 68px;
 	user-select: none;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1.2rem;
+	border-bottom: 1px solid var(--border);
 `;
+
+const UserInfoHeaderChatStyled = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+
+	img {
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		object-fit: cover;
+		margin-right: 0.9rem
+	}
+
+	h5 {
+		margin-top: 0.2rem;
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+`;
+
+const ActionHeaderChatStyled = styled.div`
+	.action-header-chat-icon {
+		width: 2rem;
+		height: 2rem;
+		padding: 0.4rem;
+		margin-left: 0.3rem;
+		border-radius: 0.2rem;
+		cursor: pointer;
+
+		&:hover {
+			background-color: var(--button-tertiary-neutral-hover);
+		}
+	}
+`;
+
 const ContentChatStyled = styled.div`
-	height: calc(100vh - 9.3rem);
+	height: calc(100vh - 160.8px);
 	overflow-y: scroll;
 	padding: 1rem;
 	display: flex;
@@ -56,7 +92,7 @@ const ContentChatStyled = styled.div`
 	}
 `;
 const SendMessageInputStyled = styled.div`
-	height: 5.8rem;
+	height: 92.8px;
 	border-top: 1px solid var(--color-60);
 `;
 const SendMediaStyled = styled.div`
@@ -237,7 +273,7 @@ const ChatBox = () => {
 	const handleChooseFile = () => {
 		let input = document.createElement('input');
 		input.type = 'file';
-		input.accept = "application/*, text/*"
+		input.accept = "application/*, text/*, video/*"
 		input.multiple = true
 		input.click();
 		input.onchange = async e => { 
@@ -374,16 +410,30 @@ const ChatBox = () => {
 			{messages ? (
 				<ChatBoxStyled>
 					<HeaderChatStyled>
-						{conversationSelected?.name ||
-							conversationSelected?.membersInfo?.find(
-								(member) => member.userID !== user?.userID
-							)?.fullName}
+						<UserInfoHeaderChatStyled>
+							<img 
+								src={conversationSelected?.membersInfo?.find(
+									(member) => member.userID !== user?.userID
+								)?.profilePic} 
+								alt=''
+							/>
+							<h5>
+								{conversationSelected?.name ||
+									conversationSelected?.membersInfo?.find(
+										(member) => member.userID !== user?.userID
+									)?.fullName}
+							</h5>
+						</UserInfoHeaderChatStyled>
+						<ActionHeaderChatStyled>
+							<IoCallOutline className='action-header-chat-icon'/>
+							<GoDeviceCameraVideo className='action-header-chat-icon'/>
+						</ActionHeaderChatStyled>
 					</HeaderChatStyled>
 					<ContentChatStyled onScroll={() => handleOnScrollChatContent()}>
 						{messages.map((message, index, arr) => (
 							<>
 								{
-									(arr[index-1] && new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000) || !arr[index-1] 
+									!message.deletedUserIds?.includes(user.userID) && ((arr[index-1] && new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000) || !arr[index-1])
 									? 
 									<div className='chat-time'>
 										<span>
