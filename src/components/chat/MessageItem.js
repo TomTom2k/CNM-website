@@ -7,9 +7,12 @@ import { FiTrash } from "react-icons/fi";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { PiShareFatLight } from "react-icons/pi";
 import { copyImageToClipboard } from 'copy-image-clipboard'
+import ShareMessageModal from '../modals/ShareMessageModal';
 
 import FileItem from "./FileItem";
 import messageApi from '../../api/messageApi';
+import conversationApi from '../../api/conversationApi';
+import { useEffect, useState } from 'react';
 
 const MessageItemStyled = styled.div`
     min-width: 6%;
@@ -316,6 +319,23 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             handleClick: () => handleDeleteForMeOnly()
         },
     ];
+    const [isShowShareMessageModal, setIsShowShareMessageModal] = useState(false);
+    const [recentlyConversations, setRecentlyConversations] = useState([])
+
+    useEffect(() => {
+        if(isShowShareMessageModal){
+            getRecentlyConversations(5)
+        }
+    }, [isShowShareMessageModal])
+
+    const getRecentlyConversations = async (quantity) => {
+        try {
+            const res = await conversationApi.getRecentlyConversations(quantity);
+            setRecentlyConversations(res.conversations)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const handleClickMoreAction = (e) => {
         e.stopPropagation();
@@ -323,6 +343,10 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
         if(hideEmojiPicker){
             hideEmojiPicker()
         }
+    }
+
+    const handleClickShareAction = () => {
+        setIsShowShareMessageModal(true)
     }
 
     const renderItems = () => {
@@ -512,10 +536,11 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 render={renderMessageActions}
                             >
                                 <div className='message-action'>
-                                    <IoMdShareAlt className='share-icon'/>
+                                    <IoMdShareAlt className='share-icon' onClick={() => handleClickShareAction()}/>
                                     <FaEllipsisH className='more-action-icon' onClick={(e) => handleClickMoreAction(e)}/>
                                 </div>
                             </Tippy>
+                            <ShareMessageModal show={isShowShareMessageModal} handleClose={() => setIsShowShareMessageModal(false)} recentlyConversations={recentlyConversations} message={message}/>
                         </MessageItemStyled>
                     )}
                 </>
