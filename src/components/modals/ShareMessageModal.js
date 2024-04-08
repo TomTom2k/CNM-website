@@ -137,7 +137,7 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, message }
 	const { user } = useContext(AuthToken);
     const [conversationNameInput, setConversationNameInput] = useState('')
 	const [checkedConversations, setCheckedConversations] = useState([])
-	const { setHaveNewMessageConversation } = useContext(ConversationToken);
+	const { setHaveNewMessageConversations } = useContext(ConversationToken);
 
     const handleCancelShareMessage = () => {
         setConversationNameInput('')
@@ -149,9 +149,11 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, message }
 		if(checkedConversations.length !== 0 && message.content){
 			try {
 				const res = await messageApi.shareMessage({checkedConversations, messageContent: message.content, messageType: message.type});
+				let haveNewMessageConversations = []
 				res.data.forEach(item => {
-					setHaveNewMessageConversation({conversationId: item.conversation.conversationId, message: item.savedMessage.messageId})
+					haveNewMessageConversations.push({conversationId: item.conversation.conversationId, message: item.savedMessage.messageId})
 				})
+				setHaveNewMessageConversations(haveNewMessageConversations)
 				handleCancelShareMessage()
 			} catch (error) {
 				console.log(error)

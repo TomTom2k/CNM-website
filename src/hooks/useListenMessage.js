@@ -6,16 +6,16 @@ import { ConversationToken } from '../context/ConversationToken';
 const useListenMessage = () => {
 	const { socket } = useSocketContext();
 	const { messages, setMessages } = useConversation();
-	const { setHaveNewMessageConversation } = useContext(ConversationToken);
+	const { setHaveNewMessageConversations } = useContext(ConversationToken);
 
 	useEffect(() => {
 		socket?.on('newMessage', (newMessage) => {
 			console.log(newMessage);
 			if(messages){
 				setMessages((prevMessages) => [...prevMessages, newMessage]);
-				setHaveNewMessageConversation({conversationId: newMessage.conversationId, message: newMessage.messageId})
+				setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: newMessage.conversationId, message: newMessage.messageId}] : [{conversationId: newMessage.conversationId, message: newMessage.messageId}])
 			} else {
-				setHaveNewMessageConversation({conversationId: newMessage.conversationId, message: newMessage.messageId})
+				setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: newMessage.conversationId, message: newMessage.messageId}] : [{conversationId: newMessage.conversationId, message: newMessage.messageId}])
 			}
 		});
 
