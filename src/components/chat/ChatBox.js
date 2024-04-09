@@ -8,6 +8,7 @@ import { LuSendHorizonal } from "react-icons/lu";
 import { HiOutlineFaceSmile } from "react-icons/hi2";
 import { IoCallOutline } from "react-icons/io5";
 import { GoDeviceCameraVideo } from "react-icons/go";
+import { toast, Toaster } from "react-hot-toast";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -263,7 +264,9 @@ const ChatBox = () => {
 					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
 			} catch (error) {
-				console.log(error);
+				if(error?.response && error?.response.status === 500){
+					toast.error("Vui lòng chọn ảnh có kích thước không quá 4MB.")
+				}
 			} finally {
 				setNewMessage("")
 			}
@@ -292,7 +295,9 @@ const ChatBox = () => {
 					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
 			} catch (error) {
-				console.log(error);
+				if(error?.response && error?.response.status === 500){
+					toast.error("Vui lòng chọn file có kích thước không quá 4MB.")
+				}
 			} finally {
 				setNewMessage("")
 			}
@@ -409,6 +414,7 @@ const ChatBox = () => {
 		<>
 			{messages ? (
 				<ChatBoxStyled>
+					<Toaster toastOptions={{ duration: 4000 }}/>
 					<HeaderChatStyled>
 						<UserInfoHeaderChatStyled>
 							<img 

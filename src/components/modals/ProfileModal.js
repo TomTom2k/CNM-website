@@ -198,7 +198,7 @@ const ProfileModel = ({ show, handleClose }) => {
 			toast.success("Cập nhật avatar thành công");
 		} catch (error) {
 			if(error?.response && error?.response.status === 500){
-				toast.error("Vui lòng chọn ảnh có kích thước không quá 200MB.")
+				toast.error("Vui lòng chọn ảnh có kích thước không quá 4MB.")
 			}
 		}
 	}
