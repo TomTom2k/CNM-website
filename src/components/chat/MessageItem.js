@@ -12,6 +12,7 @@ import ShareMessageModal from '../modals/ShareMessageModal';
 import FileItem from "./FileItem";
 import messageApi from '../../api/messageApi';
 import conversationApi from '../../api/conversationApi';
+import userApi from '../../api/userApi';
 import { useEffect, useState } from 'react';
 
 const MessageItemStyled = styled.div`
@@ -303,7 +304,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
             title: 'Chia sẻ',
             separate: true,
             forFile: true,
-            handleClick: () => alert('a')
+            handleClick: () => handleClickShareAction()
         },
         {
             icon: <SlReload />,
@@ -321,10 +322,12 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
     ];
     const [isShowShareMessageModal, setIsShowShareMessageModal] = useState(false);
     const [recentlyConversations, setRecentlyConversations] = useState([])
+    const [friendsWithConversationId, setFriendsWithConversationId] = useState([])
 
     useEffect(() => {
         if(isShowShareMessageModal){
             getRecentlyConversations(5)
+            getAllFriendsWithConversationId()
         }
     }, [isShowShareMessageModal])
 
@@ -332,6 +335,15 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
         try {
             const res = await conversationApi.getRecentlyConversations(quantity);
             setRecentlyConversations(res.conversations)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const getAllFriendsWithConversationId = async () => {
+        try {
+            const res = await userApi.getAllFriendsWithConversationId();
+            setFriendsWithConversationId(res.friends)
         } catch (error) {
             console.log(error)
         }
@@ -540,7 +552,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                     <FaEllipsisH className='more-action-icon' onClick={(e) => handleClickMoreAction(e)}/>
                                 </div>
                             </Tippy>
-                            <ShareMessageModal show={isShowShareMessageModal} handleClose={() => setIsShowShareMessageModal(false)} recentlyConversations={recentlyConversations} message={message}/>
+                            <ShareMessageModal show={isShowShareMessageModal} handleClose={() => setIsShowShareMessageModal(false)} recentlyConversations={recentlyConversations} friendsWithConversationId={friendsWithConversationId} message={message}/>
                         </MessageItemStyled>
                     )}
                 </>

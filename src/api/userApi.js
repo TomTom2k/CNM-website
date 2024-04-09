@@ -69,6 +69,10 @@ const userApi = {
 		const url = '/user/delete-friend';
 		return axiosClient.put(url, data);
 	},
+	getAllFriendsWithConversationId: () => {
+		const url = '/user/get-all-friends-with-conversationid';
+		return axiosClient.get(url);
+	},
 };
 
 export default userApi;

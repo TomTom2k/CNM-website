@@ -133,11 +133,34 @@ const ConversationFormCheckStyled = styled.div`
 `
 
 
-const ShareMessageModal = ({ show, handleClose, recentlyConversations, message }) => {
+const ShareMessageModal = ({ show, handleClose, recentlyConversations, friendsWithConversationId, message }) => {
 	const { user } = useContext(AuthToken);
     const [conversationNameInput, setConversationNameInput] = useState('')
 	const [checkedConversations, setCheckedConversations] = useState([])
 	const { setHaveNewMessageConversations } = useContext(ConversationToken);
+	const [searchingConversations, setSearchingConversations] = useState([])
+
+	useEffect(() => {
+		const recentlyMatchingConversations = recentlyConversations.filter(conversation => {
+			if(conversation.name){
+				return conversation.name.includes(conversationNameInput.trim())
+			} else {
+				return conversation?.membersInfo?.find(
+					(member) => member.userID !== user?.userID
+				)?.fullName.includes(conversationNameInput.trim())
+			}
+		});
+		const recentlyConversationIDs = recentlyMatchingConversations.map(conversation => conversation.conversationId);
+
+		const friendsMatchingConversations = friendsWithConversationId.filter(conversation =>
+			conversation.fullName.includes(conversationNameInput.trim()) && !recentlyConversationIDs.includes(conversation.conversationId)
+		);
+
+		const combinedConversationIDs = [...recentlyMatchingConversations, ...friendsMatchingConversations];
+	
+		setSearchingConversations(combinedConversationIDs);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [conversationNameInput])
 
     const handleCancelShareMessage = () => {
         setConversationNameInput('')
@@ -209,38 +232,101 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, message }
 							</Form.Group>
                             <hr />
 							<Form.Group className="mb-3">
-                                <Form.Label className='d-block mb-2'>
-									<h6 className='fw-bold'>Trò chuyện gần đây</h6>
-								</Form.Label>
-                                {recentlyConversations.map(conversation => {
-                                    return (
-                                        <ConversationFormCheckStyled key={conversation.conversationId} onClick={() => handleConversationClick(conversation.conversationId)}>
-                                            <Form.Check
-                                                inline
-                                                value={conversation.conversationId}
-                                                type='checkbox'
-                                                id={`checkbox-${conversation.conversationId}`}
-												checked={checkedConversations.includes(conversation.conversationId)}
-                                            />
-                                            <Form.Label className="conversation-info-item">
-                                                <img 
-                                                    src={conversation?.membersInfo?.find(
-                                                        (member) => member.userID !== user?.userID
-                                                    )?.profilePic} 
-                                                    alt=''
-                                                />
-                                                <span>
-                                                    {
-                                                        conversation?.name ||
-									                    conversation?.membersInfo?.find(
-										                    (member) => member.userID !== user?.userID
-                                                        )?.fullName
-                                                    }
-                                                </span>
-                                            </Form.Label>
-                                        </ConversationFormCheckStyled>
-                                    )
-                                })}
+								{conversationNameInput.trim() === "" ? (
+									<>
+										<Form.Label className='d-block mb-2'>
+											<h6 className='fw-bold'>Trò chuyện gần đây</h6>
+										</Form.Label>
+										{recentlyConversations.map(conversation => {
+											return (
+												<ConversationFormCheckStyled key={conversation.conversationId} onClick={() => handleConversationClick(conversation.conversationId)}>
+													<Form.Check
+														inline
+														value={conversation.conversationId}
+														type='checkbox'
+														id={`checkbox-${conversation.conversationId}`}
+														checked={checkedConversations.includes(conversation.conversationId)}
+													/>
+													<Form.Label className="conversation-info-item">
+														<img 
+															src={conversation?.membersInfo?.find(
+																(member) => member.userID !== user?.userID
+															)?.profilePic} 
+															alt=''
+														/>
+														<span>
+															{
+																conversation?.name ||
+																conversation?.membersInfo?.find(
+																	(member) => member.userID !== user?.userID
+																)?.fullName
+															}
+														</span>
+													</Form.Label>
+												</ConversationFormCheckStyled>
+											)
+										})}
+										<Form.Label className='d-block my-2'>
+											<h6 className='fw-bold'>Bạn bè</h6>
+										</Form.Label>
+										{friendsWithConversationId.map(friend => {
+											return (
+												<ConversationFormCheckStyled key={friend.conversationId} onClick={() => handleConversationClick(friend.conversationId)}>
+													<Form.Check
+														inline
+														value={friend.conversationId}
+														type='checkbox'
+														id={`checkbox-${friend.conversationId}`}
+														checked={checkedConversations.includes(friend.conversationId)}
+													/>
+													<Form.Label className="conversation-info-item">
+														<img 
+															src={friend.profilePic} 
+															alt=''
+														/>
+														<span>
+															{
+																friend.fullName
+															}
+														</span>
+													</Form.Label>
+												</ConversationFormCheckStyled>
+											)
+										})}
+									</>
+								) : (
+									<>									
+										{searchingConversations.map(conversation => {
+											return (
+												<ConversationFormCheckStyled key={conversation?.conversationId} onClick={() => handleConversationClick(conversation.conversationId)}>
+													<Form.Check
+														inline
+														value={conversation?.conversationId}
+														type='checkbox'
+														id={`checkbox-${conversation?.conversationId}`}
+														checked={checkedConversations.includes(conversation?.conversationId)}
+													/>
+													<Form.Label className="conversation-info-item">
+														<img 
+															src={conversation?.profilePic ? conversation?.profilePic : conversation?.membersInfo?.find(
+																(member) => member.userID !== user?.userID
+															)?.profilePic} 
+															alt=''
+														/>
+														<span>
+															{
+																conversation?.fullName ? conversation?.fullName : (conversation?.name ||
+																conversation?.membersInfo?.find(
+																	(member) => member.userID !== user?.userID
+																)?.fullName)
+															}
+														</span>
+													</Form.Label>
+												</ConversationFormCheckStyled>
+											)
+										})}
+									</>
+								)}
 							</Form.Group>
 						</Form>
 						<FormFooterStyled>
