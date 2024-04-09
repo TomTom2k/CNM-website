@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import styled from 'styled-components';
 import EmojiPicker from 'emoji-picker-react';
@@ -235,6 +235,7 @@ const ChatBox = () => {
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, messages, setMessages } =
 	useContext(ConversationToken);
+	const contentChatRef = useRef()
 
 	const handleChangeMessage = (e) => {
 		if(!e.target.value.startsWith(' ')){
@@ -410,6 +411,12 @@ const ChatBox = () => {
 		xhr.send()
 	}
 
+	useEffect(() => {
+		if (contentChatRef.current) {
+			contentChatRef.current.scrollTop = contentChatRef.current.scrollHeight;
+		}
+	}, [messages]);
+
 	return (
 		<>
 			{messages ? (
@@ -435,7 +442,7 @@ const ChatBox = () => {
 							<GoDeviceCameraVideo className='action-header-chat-icon'/>
 						</ActionHeaderChatStyled>
 					</HeaderChatStyled>
-					<ContentChatStyled onScroll={() => handleOnScrollChatContent()}>
+					<ContentChatStyled ref={contentChatRef} onScroll={() => handleOnScrollChatContent()}>
 						{messages.map((message, index, arr) => (
 							<>
 								{

@@ -38,6 +38,7 @@ const ModalStyled = styled(Modal)`
 			.modal-body {
 				padding: 1rem 0.6rem;
 				form {
+					border-bottom: 1px solid var(--border);
                     .search-conversation-item{
                         display: flex;
                         align-items: center;
@@ -68,6 +69,10 @@ const ModalStyled = styled(Modal)`
                     h6{
                         font-size: 0.92rem;
                     }
+					.conversation-info-list{
+						height: 29rem; 
+						overflow-y: scroll;
+					}
 				}
 			}
 		}
@@ -81,7 +86,7 @@ const FormFooterStyled = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	margin-top: 5rem;
+	margin-top: 2rem;
 	
 	.cancel-btn, .update-btn {
 		border-radius: 0.2rem;
@@ -231,7 +236,7 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, friendsWi
 								</Form.Control>
 							</Form.Group>
                             <hr />
-							<Form.Group className="mb-3">
+							<Form.Group className="conversation-info-list">
 								{conversationNameInput.trim() === "" ? (
 									<>
 										<Form.Label className='d-block mb-2'>
