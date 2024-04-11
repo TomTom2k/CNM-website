@@ -24,7 +24,7 @@ const ConversationProvide = ({ children }) => {
 			}
 		};
 		fetchConversations();
-	}, []);
+	}, [haveNewMessageConversations, messages]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {

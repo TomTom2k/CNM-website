@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Conversation from './Conversation';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -19,12 +19,19 @@ const AsideStyled = styled.aside`
 const ListStyled = styled.div``;
 const ConversationList = () => {
 	const { conversations } = useContext(ConversationToken);
+
+	const [conversationList, setConversationList] = useState(conversations);
+
+	useEffect(() => {
+	  setConversationList(conversations);
+	}, [conversations]);
+
 	return (
 		<AsideStyled>
 			<SearchBox />
 			<ListStyled>
-				{conversations?.map((conversation, index) => (
-					<Conversation key={index} conversation={conversation} />
+				{conversationList?.map((conversation, index) => (
+					<Conversation key={conversation.conversationId} conversation={conversation} />
 				)) || (
 					<p className="text-center mt-4">
 						Chưa có cuộc trò chuyện nào

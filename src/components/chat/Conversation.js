@@ -102,7 +102,7 @@ const Conversation = ({ conversation }) => {
 	const { onlineUsers } = useSocketContext();
 	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversations } =
 		useContext(ConversationToken);
-	const [lastMessage, setLastMessage] = useState({})
+	const [lastMessage, setLastMessage] = useState(conversation.lastMessage)
 	const [haveNewMessage, setHaveNewMessage] = useState({})
 
 	const title =
