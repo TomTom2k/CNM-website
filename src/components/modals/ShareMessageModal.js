@@ -17,7 +17,8 @@ const ModalStyled = styled(Modal)`
 		max-width: 520px;
 		margin-left: auto;
 		margin-right: auto;
-		margin-top: 1rem;
+		margin-top: 0.6rem;
+		margin-bottom: 0rem;
 		position: relative;
 		width: auto;
 		pointer-events: none;
@@ -70,7 +71,7 @@ const ModalStyled = styled(Modal)`
                         font-size: 0.92rem;
                     }
 					.conversation-info-list{
-						height: 29rem; 
+						height: 31rem; 
 						overflow-y: scroll;
 					}
 				}

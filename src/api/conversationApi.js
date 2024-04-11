@@ -6,8 +6,19 @@ const conversationApi = {
 		return axiosClient.get(url);
 	},
 	createConversation: (data) => {
+		const config = {
+			headers: {
+				'content-type': 'multipart/form-data'
+			}
+		}
+		let formData = new FormData();
+		formData.append('groupAvatar', data.avatar)
+		formData.append('name', data.name)
+		for(const participantId of data.participantIds){
+			formData.append('participantIds', participantId)
+		}
 		const url = '/conversation/';
-		return axiosClient.post(url, data);
+		return axiosClient.post(url, formData, config);
 	},
 	getLastMessage: (conversationId) => {
 		const url = `/conversation/${conversationId}`;
@@ -15,6 +26,10 @@ const conversationApi = {
 	},
 	getRecentlyConversations: (quantity) => {
 		const url = `/conversation/recently/${quantity}`;
+		return axiosClient.get(url);
+	},
+	getRecentlyFriendConversations: (quantity) => {
+		const url = `/conversation/recently-with-friend/${quantity}`;
 		return axiosClient.get(url);
 	},
 };

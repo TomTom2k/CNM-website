@@ -18,8 +18,13 @@ const GlobalStyle = createGlobalStyle`
     --button-neutral-text: #081c36;
     --border: #d6dbe1;
     --border-focused: #0068ff;
+    --icon-primary: #081c36;
     --icon-secondary: #7589a3;
     --layer-background-hover: #f3f5f6;
+    --layer-background-selected: #e5efff;
+    --layer-background-leftmenu-selected: #006edc;
+    --layer-background-leftmenu-hover: rgba(0, 0, 0, 0.1);
+    --field-bg-filled: #eaedf0;
     --color-10: #91caee;
     --color-11: #dce1e8;
   }
@@ -29,6 +34,10 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  input::placeholder {
+    color: #778aa4 !important;
   }
 `;
 

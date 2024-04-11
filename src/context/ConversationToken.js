@@ -12,6 +12,7 @@ const ConversationProvide = ({ children }) => {
 	const [conversationSelected, setConversationSelected] = useState(null);
 	const [conversations, setConversations] = useState([]);
 	const [haveNewMessageConversations, setHaveNewMessageConversations] = useState([])
+	const [newConversation, setNewConversation] = useState('')
 	const [messages, setMessages] = useState(null);
 
 	useEffect(() => {
@@ -24,7 +25,7 @@ const ConversationProvide = ({ children }) => {
 			}
 		};
 		fetchConversations();
-	}, [haveNewMessageConversations, messages]);
+	}, [haveNewMessageConversations, messages, newConversation]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -51,7 +52,8 @@ const ConversationProvide = ({ children }) => {
 				messages,
 				setMessages,
 				haveNewMessageConversations,
-				setHaveNewMessageConversations
+				setHaveNewMessageConversations,
+				setNewConversation
 			}}
 		>
 			{children}

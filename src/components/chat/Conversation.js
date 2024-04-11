@@ -14,10 +14,10 @@ const WrapperStyled = styled.div`
 	justify-items: center;
 	&:hover {
 		cursor: pointer;
-		background-color: #eee;
+		background: var(--layer-background-hover);
 	}
 	&.active {
-		background-color: var(--color-60);
+		background-color: var(--layer-background-selected);
 	}
 `;
 const AvatarStyled = styled.div`
