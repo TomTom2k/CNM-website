@@ -31,6 +31,7 @@ const useListenMessage = () => {
 				
 				// Cập nhật state của messages
 				setMessages(updatedMessages);
+				setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: updatedMessage.conversationId, message: updatedMessage}] : [{conversationId: updatedMessage.conversationId, message: updatedMessage}])
 			} else {
 				setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: updatedMessage.conversationId, message: updatedMessage}] : [{conversationId: updatedMessage.conversationId, message: updatedMessage}])
 			}

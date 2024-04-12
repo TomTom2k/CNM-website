@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 const MessageItemStyled = styled.div`
     min-width: 6%;
     max-width: 50%;
-    margin: 0.6rem;
+    margin: 0.6rem 0.6rem 0.6rem 3.2rem;
     border-radius: 0.6rem;
     background-color: var(--white-message);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -55,8 +55,23 @@ const MessageItemStyled = styled.div`
         background-color: transparent;
     }
 
+    .sender-avatar{
+        position: absolute;
+        top: 0;
+        left: -3.2rem;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+
+        img {
+            width: 2.5rem;
+            height: 2.5rem;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    }
+
     &.short-time-message {
-        margin: 0.6rem 0.6rem -0.3rem;
+        margin: 0.6rem 0.6rem -0.3rem 3.2rem;
     }
 
     .message-action {
@@ -98,6 +113,7 @@ const MessageItemStyled = styled.div`
     &.self {
         background-color: var(--blue-message);
         align-self: flex-end;
+        margin: 0.6rem;
 
         .message-action {
             left: -80px;
@@ -466,6 +482,19 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 ? null
                                 : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
                             }
+                            {
+                                user.userID !== message?.senderId 
+                                && (
+                                    !arr[index-1]
+                                    || arr[index-1].senderId !== message.senderId
+                                    || new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000 
+                                )
+                                && (
+                                    <div className='sender-avatar'>
+                                        <img src={message?.senderAvatar} alt=''/>
+                                    </div>
+                                )
+                            }
                         </MessageItemStyled>
                     ) : (
                         <MessageItemStyled 
@@ -540,6 +569,19 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
                                 ? null
                                 : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
+                            }
+                            {
+                                user.userID !== message?.senderId 
+                                && (
+                                    !arr[index-1]
+                                    || arr[index-1].senderId !== message.senderId
+                                    || new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000 
+                                )
+                                && (
+                                    <div className='sender-avatar'>
+                                        <img src={message?.senderAvatar} alt=''/>
+                                    </div>
+                                )
                             }
                             <Tippy
                                 visible={elementShowTippy === message.messageId}
