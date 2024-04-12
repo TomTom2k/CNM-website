@@ -281,7 +281,7 @@ const PopperWrapper = styled.div`
     }
 `;
 
-const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages}) => {
+const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages, setHaveNewMessageConversations}) => {
     const MENU_ITEMS = [
         {
             icon: <MdOutlineContentCopy />,
@@ -410,7 +410,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     const handleRecall = async () => {
         try {
-            await messageApi.recallMessage(message.messageId);
+            const res = await messageApi.recallMessage(message.messageId);
             const updatedMessages = messages.map(messageItem => {
 				if (messageItem.messageId === message.messageId) {
 					messageItem.isRecalled = true;
@@ -418,6 +418,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 				return messageItem;
 			});
             setMessages(updatedMessages)
+            setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: res.updatedMessage.conversationId, message: res.updatedMessage}] : [{conversationId: res.updatedMessage.conversationId, message: res.updatedMessage}])
         } catch (error) {
             console.log(error)
         }
@@ -425,7 +426,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 
     const handleDeleteForMeOnly = async () => {
         try {
-            await messageApi.deleteMessageForMeOnly(message.messageId);
+            const res = await messageApi.deleteMessageForMeOnly(message.messageId);
             const updatedMessages = messages.map(messageItem => {
 				if (messageItem.messageId === message.messageId) {
 					messageItem.deletedUserIds.push(user.userID)
@@ -433,6 +434,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
 				return messageItem;
 			});
             setMessages(updatedMessages)
+            setHaveNewMessageConversations((prev) => prev ? [...prev, {conversationId: res.updatedMessage.conversationId, message: res.updatedMessage}] : [{conversationId: res.updatedMessage.conversationId, message: res.updatedMessage}])
         } catch (error) {
             console.log(error)
         }

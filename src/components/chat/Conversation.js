@@ -14,10 +14,10 @@ const WrapperStyled = styled.div`
 	justify-items: center;
 	&:hover {
 		cursor: pointer;
-		background-color: #eee;
+		background: var(--layer-background-hover);
 	}
 	&.active {
-		background-color: var(--color-60);
+		background-color: var(--layer-background-selected);
 	}
 `;
 const AvatarStyled = styled.div`
@@ -102,7 +102,7 @@ const Conversation = ({ conversation }) => {
 	const { onlineUsers } = useSocketContext();
 	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversations } =
 		useContext(ConversationToken);
-	const [lastMessage, setLastMessage] = useState({})
+	const [lastMessage, setLastMessage] = useState(conversation.lastMessage)
 	const [haveNewMessage, setHaveNewMessage] = useState({})
 
 	const title =
@@ -111,7 +111,7 @@ const Conversation = ({ conversation }) => {
 			(member) => member.userID !== user?.userID
 		)?.fullName;
 	const isOnline = conversation.participantIds.some((id) =>
-		onlineUsers.includes(id)
+		onlineUsers.includes(id.participantId)
 	);
 
 	const handlerConversation = () => {
@@ -130,7 +130,7 @@ const Conversation = ({ conversation }) => {
 	useEffect(() => {
 		getLastMessage()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	},[haveNewMessage, messages])
+	},[haveNewMessage])
 
 	const getLastMessage = async () => {
 		try {
@@ -154,6 +154,7 @@ const Conversation = ({ conversation }) => {
 			<AvatarStyled className={isOnline ? 'online' : ''}>
 				<img
 					src={
+						conversation?.avatar ||
 						conversation?.membersInfo?.find(
 							(member) => member.userID !== user?.userID
 						)?.profilePic

@@ -12,7 +12,7 @@ import { RiContactsBookLine, RiContactsBookFill } from 'react-icons/ri';
 import configs from '../../configs';
 
 const NavbarStyled = styled(Nav)`
-	margin-top: 1rem;
+	margin-top: 0.2rem;
 	width: 100%;
 	display: flex;
 	flex-direction: column;
@@ -20,23 +20,20 @@ const NavbarStyled = styled(Nav)`
 
 const NavItemStyled = styled(Nav.Link)`
 	width: 100%;
-	padding: 0.75rem 0;
+	padding: 1.2rem 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	color: white;
-	font-size: 2rem;
+	font-size: 1.7rem;
 	transition: background-color 0.3s ease;
 
 	&:hover {
-		background-color: rgba(0, 0, 0, 0.05);
+		background: var(--layer-background-leftmenu-hover);
 	}
 
 	&.active {
-		background-color: var(--color-10);
-		&:hover {
-			background-color: var(--color-10);
-		}
+		background: var(--layer-background-leftmenu-selected);
 	}
 `;
 
