@@ -9,6 +9,8 @@ import { HiOutlineFaceSmile } from "react-icons/hi2";
 import { IoCallOutline } from "react-icons/io5";
 import { GoDeviceCameraVideo } from "react-icons/go";
 import { toast, Toaster } from "react-hot-toast";
+import { FaRegUser } from "react-icons/fa6";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -33,23 +35,51 @@ const HeaderChatStyled = styled.div`
 `;
 
 const UserInfoHeaderChatStyled = styled.div`
+	height: 100%;
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-start;
+	align-items: center;
 
 	img {
 		width: 3rem;
 		height: 3rem;
 		border-radius: 50%;
 		object-fit: cover;
-		margin-right: 0.9rem
+		margin-right: 0.9rem;
 	}
 
-	h5 {
-		margin-top: 0.2rem;
-		font-size: 1.1rem;
-		font-weight: 600;
+	.conversation-info{
+		height: 100%;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: column;
+
+		h5 {
+			padding-top: 0.65rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin: 0rem;
+		}
+
+		.conversation-members{
+			padding-bottom: 0.65rem;
+			display: flex;
+			align-items: center;
+			font-size: 0.9rem;
+			cursor: pointer;
+
+			span{
+				padding-top: 0.2rem;
+				margin-left: 0.3rem;
+				font-size: 0.90rem;
+			}
+
+			&:hover{
+				color: var(--text-information);
+			}
+		}
 	}
+
 `;
 
 const ActionHeaderChatStyled = styled.div`
@@ -63,6 +93,10 @@ const ActionHeaderChatStyled = styled.div`
 
 		&:hover {
 			background-color: var(--button-tertiary-neutral-hover);
+		}
+
+		&.add-friend-into-group-icon{
+			padding: 0.3rem;
 		}
 	}
 `;
@@ -435,14 +469,23 @@ const ChatBox = () => {
 								)?.profilePic} 
 								alt=''
 							/>
-							<h5>
-								{conversationSelected?.name ||
-									conversationSelected?.membersInfo?.find(
-										(member) => member.userID !== user?.userID
-									)?.fullName}
-							</h5>
+							<div className={conversationSelected.participantIds.length > 2 ? 'conversation-info' : 'conversation-info pt-1'}>
+								<h5>
+									{conversationSelected?.name ||
+										conversationSelected?.membersInfo?.find(
+											(member) => member.userID !== user?.userID
+										)?.fullName}
+								</h5>
+								{conversationSelected.participantIds.length > 2 && (
+									<div className='conversation-members'>
+										<FaRegUser />
+										<span>{conversationSelected.participantIds.length} thành viên</span>
+									</div>
+								)}
+							</div>
 						</UserInfoHeaderChatStyled>
 						<ActionHeaderChatStyled>
+							{conversationSelected.participantIds.length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
 							<IoCallOutline className='action-header-chat-icon'/>
 							<GoDeviceCameraVideo className='action-header-chat-icon'/>
 						</ActionHeaderChatStyled>

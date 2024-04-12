@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
     --white-message: #fff;
     --text-primary: #081c36;
     --text-secondary: #7589a3;
+    --text-information: #005ae0;
     --button-tertiary-neutral-hover: #dfe2e7;
     --button-tertiary-primary-text: #0068ff;
     --button-primary-normal: #0068ff;
