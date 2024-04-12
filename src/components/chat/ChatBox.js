@@ -233,7 +233,7 @@ const ChatBox = () => {
     const [elementShowTippy, setElementShowTippy] = useState('');
 	useListenMessage();
 	const { user } = useContext(AuthToken);
-	const { conversationSelected, messages, setMessages } =
+	const { conversationSelected, messages, setMessages, setHaveNewMessageConversations } =
 	useContext(ConversationToken);
 	const contentChatRef = useRef()
 
@@ -264,6 +264,7 @@ const ChatBox = () => {
 				setMessages((prevMessages) =>
 					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: res.message[res.message.length -1]}])
 			} catch (error) {
 				if(error?.response && error?.response.status === 500){
 					toast.error("Vui lòng chọn ảnh có kích thước không quá 4MB.")
@@ -295,6 +296,7 @@ const ChatBox = () => {
 				setMessages((prevMessages) =>
 					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: res.message[res.message.length -1]}])
 			} catch (error) {
 				if(error?.response && error?.response.status === 500){
 					toast.error("Vui lòng chọn file có kích thước không quá 4MB.")
@@ -316,6 +318,7 @@ const ChatBox = () => {
 				setMessages((prevMessages) =>
 					prevMessages ? [...prevMessages, ...res.message] : [...res.message]
 				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: res.message[res.message.length -1]}])
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -425,7 +428,9 @@ const ChatBox = () => {
 					<HeaderChatStyled>
 						<UserInfoHeaderChatStyled>
 							<img 
-								src={conversationSelected?.membersInfo?.find(
+								src={
+									conversationSelected?.avatar ||
+									conversationSelected?.membersInfo?.find(
 									(member) => member.userID !== user?.userID
 								)?.profilePic} 
 								alt=''
@@ -458,7 +463,7 @@ const ChatBox = () => {
 									</div>
 									: null 
 								}
-								<MessageItem messages={messages} setMessages={setMessages} elementShowTippy={elementShowTippy} setElementShowTippy={setElementShowTippy} hideEmojiPicker={emojiPicker ? hideEmojiPicker : null} user={user} message={message} index={index} arr={arr}/>
+								<MessageItem setHaveNewMessageConversations={setHaveNewMessageConversations} messages={messages} setMessages={setMessages} elementShowTippy={elementShowTippy} setElementShowTippy={setElementShowTippy} hideEmojiPicker={emojiPicker ? hideEmojiPicker : null} user={user} message={message} index={index} arr={arr}/>
 							</>
 						))}
 					</ContentChatStyled>

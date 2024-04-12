@@ -180,7 +180,7 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, friendsWi
 				const res = await messageApi.shareMessage({checkedConversations, messageContent: message.content, messageType: message.type});
 				let haveNewMessageConversations = []
 				res.data.forEach(item => {
-					haveNewMessageConversations.push({conversationId: item.conversation.conversationId, message: item.savedMessage.messageId})
+					haveNewMessageConversations.push({conversationId: item.conversation.conversationId, message: item.savedMessage})
 				})
 				setHaveNewMessageConversations(haveNewMessageConversations)
 				handleCancelShareMessage()
@@ -255,7 +255,9 @@ const ShareMessageModal = ({ show, handleClose, recentlyConversations, friendsWi
 													/>
 													<Form.Label className="conversation-info-item">
 														<img 
-															src={conversation?.membersInfo?.find(
+															src={
+																conversation?.avatar ||
+																conversation?.membersInfo?.find(
 																(member) => member.userID !== user?.userID
 															)?.profilePic} 
 															alt=''
