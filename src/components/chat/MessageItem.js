@@ -145,6 +145,11 @@ const MessageItemStyled = styled.div`
             border-radius: 1rem;
         }
 
+        .sender-name {
+            padding: 0.2rem 0.3rem 0;
+            margin-bottom: 0.45rem;
+        }
+
         &.self {
             .message-time {
                 float: right;
@@ -232,6 +237,14 @@ const MessageItemStyled = styled.div`
         -webkit-user-select: none; /* Safari */
         -ms-user-select: none; /* IE 10 and IE 11 */
         user-select: none; /* Standard syntax */
+    }
+
+    .sender-name{
+        font-size: 0.8rem;
+        padding: 1rem 1rem 0rem;
+        display: block;
+        color: #476285;
+        margin-bottom: -0.5rem;
     }
 `;
 
@@ -472,6 +485,19 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 }
                             `}
                         >
+                            {
+                                user.userID !== message?.senderId 
+                                && (
+                                    !arr[index-1]
+                                    || arr[index-1].senderId !== message.senderId
+                                    || new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000 
+                                )
+                                && (
+                                    <span className='sender-name'>
+                                        {message?.senderFullName}
+                                    </span>
+                                )
+                            }
                             <p className='text-message-item recalled-message-item'>
                                 Tin nhắn đã được thu hồi
                             </p>
@@ -509,6 +535,19 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 }
                             `}
                         >
+                            {
+                                user.userID !== message?.senderId 
+                                && (
+                                    !arr[index-1]
+                                    || arr[index-1].senderId !== message.senderId
+                                    || new Date(message.createdAt).getTime() - new Date(arr[index-1].createdAt).getTime() > 1800000 
+                                )
+                                && (
+                                    <span className='sender-name'>
+                                        {message?.senderFullName}
+                                    </span>
+                                )
+                            }
                             {(() => {
                                 if (message.type === "text") {
                                     return (
