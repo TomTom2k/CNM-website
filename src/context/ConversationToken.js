@@ -14,6 +14,7 @@ const ConversationProvide = ({ children }) => {
 	const [haveNewMessageConversations, setHaveNewMessageConversations] = useState([])
 	const [newConversation, setNewConversation] = useState('')
 	const [messages, setMessages] = useState(null);
+	const [toggleConversationInfo, setToggleConversationInfo] = useState({})
 
 	useEffect(() => {
 		const fetchConversations = async () => {
@@ -53,7 +54,9 @@ const ConversationProvide = ({ children }) => {
 				setMessages,
 				haveNewMessageConversations,
 				setHaveNewMessageConversations,
-				setNewConversation
+				setNewConversation,
+				toggleConversationInfo,
+				setToggleConversationInfo
 			}}
 		>
 			{children}

@@ -11,6 +11,7 @@ import { GoDeviceCameraVideo } from "react-icons/go";
 import { toast, Toaster } from "react-hot-toast";
 import { FaRegUser } from "react-icons/fa6";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
+import { PiSquareHalfFill, PiSquareSplitHorizontal } from "react-icons/pi";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -95,21 +96,38 @@ const ActionHeaderChatStyled = styled.div`
 			background-color: var(--button-tertiary-neutral-hover);
 		}
 
-		&.add-friend-into-group-icon{
+		&.add-friend-into-group-icon {
 			padding: 0.3rem;
+		}
+
+		&.toggle-icon{
+			padding: 0.3rem;
+
+			&.on-toggle-icon{
+				background-color: var(--button-tertiary-neutral-focus-bg);
+				color: var(--button-tertiary-neutral-focus-text);
+			}
 		}
 	}
 `;
 
 const ContentChatStyled = styled.div`
 	height: calc(100vh - 160.8px);
-	overflow-y: scroll;
+	overflow-y: auto;
 	padding: 1rem;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	background-color: #eef0f1;
 
+	/* Ẩn thanh cuộn cho các trình duyệt Chrome */
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Tùy chỉnh thanh cuộn cho các trình duyệt khác */
+	scrollbar-width: none; /* Ẩn thanh cuộn */
+	-ms-overflow-style: none; /* Ẩn thanh cuộn cho IE/Edge */
 
 	.chat-time {
 		width: 100%;
@@ -267,7 +285,7 @@ const ChatBox = () => {
     const [elementShowTippy, setElementShowTippy] = useState('');
 	useListenMessage();
 	const { user } = useContext(AuthToken);
-	const { conversationSelected, messages, setMessages, setHaveNewMessageConversations } =
+	const { conversationSelected, messages, setMessages, setHaveNewMessageConversations, toggleConversationInfo, setToggleConversationInfo } =
 	useContext(ConversationToken);
 	const contentChatRef = useRef()
 
@@ -477,7 +495,7 @@ const ChatBox = () => {
 										)?.fullName}
 								</h5>
 								{conversationSelected.participantIds.length > 2 && (
-									<div className='conversation-members'>
+									<div className='conversation-members' onClick={() => setToggleConversationInfo({toggle: true, level: 1})}>
 										<FaRegUser />
 										<span>{conversationSelected.participantIds.length} thành viên</span>
 									</div>
@@ -488,6 +506,11 @@ const ChatBox = () => {
 							{conversationSelected.participantIds.length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
 							<IoCallOutline className='action-header-chat-icon'/>
 							<GoDeviceCameraVideo className='action-header-chat-icon'/>
+							{toggleConversationInfo?.toggle ? (
+								<PiSquareHalfFill className='action-header-chat-icon toggle-icon on-toggle-icon' onClick={() => setToggleConversationInfo({toggle: false, level: 0})}/>
+							) : (
+								<PiSquareSplitHorizontal className='action-header-chat-icon toggle-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.length > 2 ? 0 : 2})}/>
+							)}
 						</ActionHeaderChatStyled>
 					</HeaderChatStyled>
 					<ContentChatStyled ref={contentChatRef} onScroll={() => handleOnScrollChatContent()}>
