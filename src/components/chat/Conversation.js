@@ -100,7 +100,7 @@ const InfoStyled = styled.div`
 const Conversation = ({ conversation }) => {
 	const { user } = useContext(AuthToken);
 	const { onlineUsers } = useSocketContext();
-	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversations } =
+	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversations, toggleConversationInfo, setToggleConversationInfo } =
 		useContext(ConversationToken);
 	const [lastMessage, setLastMessage] = useState(conversation.lastMessage)
 	const [haveNewMessage, setHaveNewMessage] = useState({})
@@ -115,6 +115,7 @@ const Conversation = ({ conversation }) => {
 	);
 
 	const handlerConversation = () => {
+		setToggleConversationInfo({toggle: toggleConversationInfo?.toggle, level: conversation.participantIds.length > 2 ? 0 : 2})
 		setConversationSelected(conversation);
 	};
 

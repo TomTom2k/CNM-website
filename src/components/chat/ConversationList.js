@@ -11,7 +11,7 @@ const AsideStyled = styled.aside`
 	height: 100vh;
 	position: sticky;
 	top: 0;
-	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+	border-right: 1px solid var(--border);
 
 	background-color: rgba(0, 0, 0, 0.01);
 `;
