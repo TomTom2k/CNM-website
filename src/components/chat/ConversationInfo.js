@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import Tippy from '@tippyjs/react/headless';
 import { MdArrowBackIos } from "react-icons/md";
 import { AiOutlineEdit, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { TbBellRinging } from "react-icons/tb";
@@ -7,11 +8,15 @@ import { BsPinAngle } from "react-icons/bs";
 import { LuUsers } from "react-icons/lu";
 import { FiTrash } from "react-icons/fi";
 import { RxExit } from "react-icons/rx";
-import { PiDotsThreeBold } from "react-icons/pi";
+import { FaEllipsisH } from 'react-icons/fa';
 import { RiKey2Line } from "react-icons/ri";
 import { IoKeyOutline } from "react-icons/io5";
 import { ConversationToken } from '../../context/ConversationToken';
 import { AuthToken } from '../../context/AuthToken';
+import ConfirmModal from '../modals/ConfirmModal';
+import AddMemberModal from '../modals/AddMemberModal';
+import conversationApi from '../../api/conversationApi';
+import userApi from '../../api/userApi';
 
 const WrapperStyled = styled.div`;
     width: 33.5%;
@@ -356,7 +361,7 @@ const MemberListStyled = styled.div`
             }
     
             .member-action{
-                font-size: 1.4rem;
+                font-size: 1rem;
                 height:2rem;
                 width: 2rem;
                 display: flex;
@@ -377,13 +382,136 @@ const MemberListStyled = styled.div`
     }
 `
 
+const PopperWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-radius: 0.3rem;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    padding: 8px 0;
+
+    .action-wrapper {
+        align-items: center;
+        min-width: 156px;
+        padding: 3px 12px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: 1px solid transparent;
+        user-select: none;
+        width: 100%;
+        justify-content: flex-start;
+        line-height: 1.8rem;
+
+        &.separate {
+            border-bottom: 1px solid rgba(22, 24, 35, 0.12);
+        }
+    
+        &:hover {
+            background-color: rgba(22, 24, 35, 0.03);
+        }
+    }
+`;
+
 const ConversationInfo = () => {
     const { toggleConversationInfo, setToggleConversationInfo, conversationSelected } = useContext(ConversationToken);
     const { user } = useContext(AuthToken);
+    const [showMemberActionTippy, setShowMemberActionTippy] = useState('')
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [memberIdForDelete, setMemberIdForDelete] = useState('')
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const [recentlyConversations, setRecentlyConversations] = useState([])
+    const [friendsWithConversationId, setFriendsWithConversationId] = useState([])
 
     const isGroupOwner = (userID) => {
         return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
     } 
+
+    const MENU_ITEMS_FOR_MEMBERS = [
+        {
+            title: 'Xóa khỏi nhóm',
+            separate: false,
+            handleClick: (memberId) => handleDeleteMemberOutOfGroup(memberId)
+        }
+    ];
+
+    const MENU_ITEMS_FOR_OWNER = [
+        {
+            title: 'Rời nhóm',
+            separate: false,
+            handleClick: (memberId) => alert(memberId)
+        }
+    ]
+
+    const handleDeleteMemberOutOfGroup = (memberId) => {
+        setMemberIdForDelete(memberId)
+        setShowConfirm(true)
+    }
+
+    const renderItems = (memberId) => {
+        const MENU_ITEMS = isGroupOwner(memberId) ? MENU_ITEMS_FOR_OWNER : MENU_ITEMS_FOR_MEMBERS
+        return MENU_ITEMS.map((item, index) => (
+            <div  
+                key={index} 
+                className={`
+                    action-wrapper 
+                    ${item.separate ? 'separate' : ''} 
+                `} 
+                onClick={() => item.handleClick(memberId)}
+            >
+                <span className='title'>{item.title}</span>
+            </div>
+        ))
+    }
+
+    const renderMemberActions = (props) => {
+        return (
+            <div tabIndex="-1" {...props}>
+                <PopperWrapper>
+                    {renderItems(props)}
+                </PopperWrapper>
+            </div>
+        );
+    };
+
+    const handleShowMemberActionTippy = (e, memberId) => {
+        e.stopPropagation();
+        setShowMemberActionTippy(memberId)
+    }
+
+    window.addEventListener("click", (e) => {
+		if(showMemberActionTippy !== '') {
+            setShowMemberActionTippy('')
+        }
+    });
+
+    useEffect(() => {
+        if(showAddMemberModal){
+            getRecentlyConversations(5)
+            getAllFriendsWithConversationId()
+        }
+    }, [showAddMemberModal])
+
+    const getRecentlyConversations = async (quantity) => {
+        try {
+            const res = await conversationApi.getRecentlyFriendConversations(quantity);
+			console.log(res.conversations)
+            setRecentlyConversations(res.conversations)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const getAllFriendsWithConversationId = async () => {
+        try {
+            const res = await userApi.getAllFriendsWithConversationId();
+			console.log(res.friends)
+            setFriendsWithConversationId(res.friends)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const items = [
 		{
@@ -457,7 +585,7 @@ const ConversationInfo = () => {
             body: (
                 <>
                     <AddMemberStyled>
-                        <div className='add-member-item'>
+                        <div className='add-member-item' onClick={() => setShowAddMemberModal(true)}>
                             <AiOutlineUsergroupAdd/>
                             <span>Thêm thành viên</span>
                         </div>
@@ -483,9 +611,18 @@ const ConversationInfo = () => {
                                             )}
                                         </div>
                                         {isGroupOwner(user.userID) && (
-                                            <div className='member-action'>
-                                                <PiDotsThreeBold className='member-action-icon'/>
-                                            </div>
+                                            <Tippy
+                                                visible={member.userID === showMemberActionTippy}
+                                                interactive
+                                                delay={[0, 0]}
+                                                offset={[0, 0]}
+                                                placement="bottom-end"
+                                                render={() => renderMemberActions(member.userID)}
+                                            >
+                                                <div className='member-action' onClick={(e) => handleShowMemberActionTippy(e, member.userID)}>
+                                                    <FaEllipsisH className='member-action-icon'/>
+                                                </div>
+                                            </Tippy>
                                         )}
                                     </div>
                                 </div>
@@ -520,6 +657,14 @@ const ConversationInfo = () => {
                     <ConversationInfoBodyStyled>
                         {items[toggleConversationInfo?.level].body}
                     </ConversationInfoBodyStyled>
+                    <ConfirmModal memberIdForDelete={memberIdForDelete} show={showConfirm} handleClose={() => setShowConfirm(false)}/>
+                    <AddMemberModal
+                        show={showAddMemberModal}
+                        handleClose={() => setShowAddMemberModal(false)}
+                        recentlyConversations={recentlyConversations}
+                        friends={friendsWithConversationId}
+                        currentMembers={conversationSelected.participantIds.map(participantId => participantId.participantId)}
+                    />
                 </WrapperStyled>
             )}
         </>

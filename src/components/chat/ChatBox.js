@@ -173,6 +173,7 @@ const InputMessageStyled = styled(Row)`
 	height: 56%;
 	align-items: center;
 	border-top: 1px solid var(--border);
+	padding: 0 0.4rem 0 0;
 
 	&:has(input:focus) {
 		border-top: 1px solid var(--border-focused);
@@ -538,7 +539,7 @@ const ChatBox = () => {
 							<CiImageOn onClick={() => handleChooseImage()}/>
 							<CiFileOn onClick={() => handleChooseFile()}/>
 						</SendMediaStyled>
-						<InputMessageStyled className="p-0 g-0">
+						<InputMessageStyled className="g-0">
 							<Col md={11}>
 								<input
 									className='send-message-input'
@@ -548,7 +549,7 @@ const ChatBox = () => {
 									onKeyPress={(e) => handlePressEnter(e)}
 								/>
 							</Col>
-							<Col md={1}>
+							<Col md={1} sm={4}>
 								<ActionStyled>									
 									<ImojiIconStyled>
 										{!emojiPicker ? (
