@@ -7,8 +7,11 @@ import { BsPinAngle } from "react-icons/bs";
 import { LuUsers } from "react-icons/lu";
 import { FiTrash } from "react-icons/fi";
 import { RxExit } from "react-icons/rx";
+import { PiDotsThreeBold } from "react-icons/pi";
+import { RiKey2Line } from "react-icons/ri";
 import { IoKeyOutline } from "react-icons/io5";
 import { ConversationToken } from '../../context/ConversationToken';
+import { AuthToken } from '../../context/AuthToken';
 
 const WrapperStyled = styled.div`;
     width: 33.5%;
@@ -220,6 +223,16 @@ const ManageGroupStyled = styled.div`;
             font-size: 0.875rem;
         }
     }
+
+    &.disable{
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        > *{
+            cursor: not-allowed;
+            pointer-events:none;
+        }
+    }
 `;
 
 const DeleteGroupStyled = styled.div`;
@@ -235,15 +248,142 @@ const DeleteGroupStyled = styled.div`;
         font-weight: 600;
         font-size: 0.98rem;
         cursor: pointer;
+        border-radius: 0.2rem;
 
         &:hover {
             background-color: var(--button-secondary-danger-hover);
         }
     }
+
+    &.disable{
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        > *{
+            cursor: not-allowed;
+            pointer-events:none;
+        }
+    }
 `;
+
+const AddMemberStyled = styled.div`
+    padding: 1rem;
+
+    .add-member-item{
+        padding: 0.4rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 0.2rem;
+        background-color: var(--button-neutral-normal);
+        color: var(--button-neutral-text);
+
+        span{
+            font-size: 0.94rem;
+            margin-left: 0.2rem;
+        }
+
+        &:hover {
+            background-color: var(--button-neutral-hover);
+        }
+    }
+`
+
+const MemberListStyled = styled.div`
+    .member-list-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.4rem 1rem 1rem;
+        margin: 0;
+    }
+
+    .member-info-item{
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--layer-background-hover);
+
+            .member-info-detail{
+                .member-action{
+                    visibility: visible;
+                }
+            }
+        }
+
+        .member-avatar{
+            position: relative;
+            padding-right: 0.65rem;
+            img{
+                width: 2.4rem;
+                height: 2.4rem;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .group-owner-icon{
+                position: absolute;
+                color: #ffd95c;
+                bottom: 0rem;
+                right: 0.5rem;
+                background-color: rgba(0, 0, 0, 0.6);
+                border-radius: 50%;
+                padding: 0.1rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        .member-info-detail{
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .member-name-and-role{
+                font-size: 0.87rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+    
+                .member-name {
+                    font-weight: 600;
+                }
+            }
+    
+            .member-action{
+                font-size: 1.4rem;
+                height:2rem;
+                width: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 0.2rem;
+                visibility: hidden;
+
+                &:hover {
+                    background-color: var(--button-tertiary-neutral-hover);
+                }
+
+                .member-action-icon{
+                    margin: 0;
+                }
+            }
+        }
+    }
+`
 
 const ConversationInfo = () => {
     const { toggleConversationInfo, setToggleConversationInfo, conversationSelected } = useContext(ConversationToken);
+    const { user } = useContext(AuthToken);
+
+    const isGroupOwner = (userID) => {
+        return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
+    } 
 
     const items = [
 		{
@@ -295,7 +435,7 @@ const ConversationInfo = () => {
                         </div>
                     </SecuritySettingStyled>
                     <SeparatedStyled></SeparatedStyled>
-                    <ManageGroupStyled>
+                    <ManageGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
                         <h6>Quản lý nhóm</h6>
                         <div className='manage-group-item'>
                             <IoKeyOutline className='manage-group-icon'/>
@@ -303,7 +443,7 @@ const ConversationInfo = () => {
                         </div>
                     </ManageGroupStyled>
                     <SeparatedStyled></SeparatedStyled>
-                    <DeleteGroupStyled>
+                    <DeleteGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
                         <div className='delete-group-item'>
                             <span>Giải tán nhóm</span>
                         </div>
@@ -316,7 +456,42 @@ const ConversationInfo = () => {
 			title: 'Thành viên',
             body: (
                 <>
-                    <div style={{height: "5rem", background: "yellow"}}>Thành viên</div>
+                    <AddMemberStyled>
+                        <div className='add-member-item'>
+                            <AiOutlineUsergroupAdd/>
+                            <span>Thêm thành viên</span>
+                        </div>
+                    </AddMemberStyled>
+                    <MemberListStyled>
+                        <h6 className='member-list-title'>
+                            Danh sách thành viên ({conversationSelected?.participantIds.length})
+                        </h6>
+                        {conversationSelected?.membersInfo.map(member => {
+                            return (
+                                <div className='member-info-item'>
+                                    <div className='member-avatar'>
+                                        <img src={member.profilePic} alt=''/>
+                                        {isGroupOwner(member.userID) && (
+                                            <RiKey2Line className='group-owner-icon'/>
+                                        )}
+                                    </div>
+                                    <div className='member-info-detail'>
+                                        <div className='member-name-and-role'>
+                                            <span className='member-name'>{member.userID === user.userID ? "Bạn" : member.fullName}</span>
+                                            {isGroupOwner(member.userID) && (
+                                                <span className='member-role'>Trưởng nhóm</span>    
+                                            )}
+                                        </div>
+                                        {isGroupOwner(user.userID) && (
+                                            <div className='member-action'>
+                                                <PiDotsThreeBold className='member-action-icon'/>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </MemberListStyled>
                 </>
             )
 		}
