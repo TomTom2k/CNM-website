@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import Tippy from '@tippyjs/react/headless';
 import { MdArrowBackIos } from "react-icons/md";
 import { AiOutlineEdit, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { TbBellRinging } from "react-icons/tb";
@@ -7,8 +8,15 @@ import { BsPinAngle } from "react-icons/bs";
 import { LuUsers } from "react-icons/lu";
 import { FiTrash } from "react-icons/fi";
 import { RxExit } from "react-icons/rx";
+import { FaEllipsisH } from 'react-icons/fa';
+import { RiKey2Line } from "react-icons/ri";
 import { IoKeyOutline } from "react-icons/io5";
 import { ConversationToken } from '../../context/ConversationToken';
+import { AuthToken } from '../../context/AuthToken';
+import ConfirmModal from '../modals/ConfirmModal';
+import AddMemberModal from '../modals/AddMemberModal';
+import conversationApi from '../../api/conversationApi';
+import userApi from '../../api/userApi';
 
 const WrapperStyled = styled.div`;
     width: 33.5%;
@@ -220,6 +228,16 @@ const ManageGroupStyled = styled.div`;
             font-size: 0.875rem;
         }
     }
+
+    &.disable{
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        > *{
+            cursor: not-allowed;
+            pointer-events:none;
+        }
+    }
 `;
 
 const DeleteGroupStyled = styled.div`;
@@ -235,15 +253,265 @@ const DeleteGroupStyled = styled.div`;
         font-weight: 600;
         font-size: 0.98rem;
         cursor: pointer;
+        border-radius: 0.2rem;
 
         &:hover {
             background-color: var(--button-secondary-danger-hover);
+        }
+    }
+
+    &.disable{
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        > *{
+            cursor: not-allowed;
+            pointer-events:none;
+        }
+    }
+`;
+
+const AddMemberStyled = styled.div`
+    padding: 1rem;
+
+    .add-member-item{
+        padding: 0.4rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 0.2rem;
+        background-color: var(--button-neutral-normal);
+        color: var(--button-neutral-text);
+
+        span{
+            font-size: 0.94rem;
+            margin-left: 0.2rem;
+        }
+
+        &:hover {
+            background-color: var(--button-neutral-hover);
+        }
+    }
+`
+
+const MemberListStyled = styled.div`
+    .member-list-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.4rem 1rem 1rem;
+        margin: 0;
+    }
+
+    .member-info-item{
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--layer-background-hover);
+
+            .member-info-detail{
+                .member-action{
+                    visibility: visible;
+                }
+            }
+        }
+
+        .member-avatar{
+            position: relative;
+            padding-right: 0.65rem;
+            img{
+                width: 2.4rem;
+                height: 2.4rem;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .group-owner-icon{
+                position: absolute;
+                color: #ffd95c;
+                bottom: 0rem;
+                right: 0.5rem;
+                background-color: rgba(0, 0, 0, 0.6);
+                border-radius: 50%;
+                padding: 0.1rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        .member-info-detail{
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .member-name-and-role{
+                font-size: 0.87rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+    
+                .member-name {
+                    font-weight: 600;
+                }
+            }
+    
+            .member-action{
+                font-size: 1rem;
+                height:2rem;
+                width: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 0.2rem;
+                visibility: hidden;
+
+                &:hover {
+                    background-color: var(--button-tertiary-neutral-hover);
+                }
+
+                .member-action-icon{
+                    margin: 0;
+                }
+            }
+        }
+    }
+`
+
+const PopperWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-radius: 0.3rem;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    padding: 8px 0;
+
+    .action-wrapper {
+        align-items: center;
+        min-width: 156px;
+        padding: 3px 12px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: 1px solid transparent;
+        user-select: none;
+        width: 100%;
+        justify-content: flex-start;
+        line-height: 1.8rem;
+
+        &.separate {
+            border-bottom: 1px solid rgba(22, 24, 35, 0.12);
+        }
+    
+        &:hover {
+            background-color: rgba(22, 24, 35, 0.03);
         }
     }
 `;
 
 const ConversationInfo = () => {
     const { toggleConversationInfo, setToggleConversationInfo, conversationSelected } = useContext(ConversationToken);
+    const { user } = useContext(AuthToken);
+    const [showMemberActionTippy, setShowMemberActionTippy] = useState('')
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [memberIdForDelete, setMemberIdForDelete] = useState('')
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const [recentlyConversations, setRecentlyConversations] = useState([])
+    const [friendsWithConversationId, setFriendsWithConversationId] = useState([])
+
+    const isGroupOwner = (userID) => {
+        return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
+    } 
+
+    const MENU_ITEMS_FOR_MEMBERS = [
+        {
+            title: 'Xóa khỏi nhóm',
+            separate: false,
+            handleClick: (memberId) => handleDeleteMemberOutOfGroup(memberId)
+        }
+    ];
+
+    const MENU_ITEMS_FOR_OWNER = [
+        {
+            title: 'Rời nhóm',
+            separate: false,
+            handleClick: (memberId) => alert(memberId)
+        }
+    ]
+
+    const handleDeleteMemberOutOfGroup = (memberId) => {
+        setMemberIdForDelete(memberId)
+        setShowConfirm(true)
+    }
+
+    const renderItems = (memberId) => {
+        const MENU_ITEMS = isGroupOwner(memberId) ? MENU_ITEMS_FOR_OWNER : MENU_ITEMS_FOR_MEMBERS
+        return MENU_ITEMS.map((item, index) => (
+            <div  
+                key={index} 
+                className={`
+                    action-wrapper 
+                    ${item.separate ? 'separate' : ''} 
+                `} 
+                onClick={() => item.handleClick(memberId)}
+            >
+                <span className='title'>{item.title}</span>
+            </div>
+        ))
+    }
+
+    const renderMemberActions = (props) => {
+        return (
+            <div tabIndex="-1" {...props}>
+                <PopperWrapper>
+                    {renderItems(props)}
+                </PopperWrapper>
+            </div>
+        );
+    };
+
+    const handleShowMemberActionTippy = (e, memberId) => {
+        e.stopPropagation();
+        setShowMemberActionTippy(memberId)
+    }
+
+    window.addEventListener("click", (e) => {
+		if(showMemberActionTippy !== '') {
+            setShowMemberActionTippy('')
+        }
+    });
+
+    useEffect(() => {
+        if(showAddMemberModal){
+            getRecentlyConversations(5)
+            getAllFriendsWithConversationId()
+        }
+    }, [showAddMemberModal])
+
+    const getRecentlyConversations = async (quantity) => {
+        try {
+            const res = await conversationApi.getRecentlyFriendConversations(quantity);
+			console.log(res.conversations)
+            setRecentlyConversations(res.conversations)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const getAllFriendsWithConversationId = async () => {
+        try {
+            const res = await userApi.getAllFriendsWithConversationId();
+			console.log(res.friends)
+            setFriendsWithConversationId(res.friends)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const items = [
 		{
@@ -295,7 +563,7 @@ const ConversationInfo = () => {
                         </div>
                     </SecuritySettingStyled>
                     <SeparatedStyled></SeparatedStyled>
-                    <ManageGroupStyled>
+                    <ManageGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
                         <h6>Quản lý nhóm</h6>
                         <div className='manage-group-item'>
                             <IoKeyOutline className='manage-group-icon'/>
@@ -303,7 +571,7 @@ const ConversationInfo = () => {
                         </div>
                     </ManageGroupStyled>
                     <SeparatedStyled></SeparatedStyled>
-                    <DeleteGroupStyled>
+                    <DeleteGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
                         <div className='delete-group-item'>
                             <span>Giải tán nhóm</span>
                         </div>
@@ -316,7 +584,51 @@ const ConversationInfo = () => {
 			title: 'Thành viên',
             body: (
                 <>
-                    <div style={{height: "5rem", background: "yellow"}}>Thành viên</div>
+                    <AddMemberStyled>
+                        <div className='add-member-item' onClick={() => setShowAddMemberModal(true)}>
+                            <AiOutlineUsergroupAdd/>
+                            <span>Thêm thành viên</span>
+                        </div>
+                    </AddMemberStyled>
+                    <MemberListStyled>
+                        <h6 className='member-list-title'>
+                            Danh sách thành viên ({conversationSelected?.participantIds.length})
+                        </h6>
+                        {conversationSelected?.membersInfo.map(member => {
+                            return (
+                                <div className='member-info-item'>
+                                    <div className='member-avatar'>
+                                        <img src={member.profilePic} alt=''/>
+                                        {isGroupOwner(member.userID) && (
+                                            <RiKey2Line className='group-owner-icon'/>
+                                        )}
+                                    </div>
+                                    <div className='member-info-detail'>
+                                        <div className='member-name-and-role'>
+                                            <span className='member-name'>{member.userID === user.userID ? "Bạn" : member.fullName}</span>
+                                            {isGroupOwner(member.userID) && (
+                                                <span className='member-role'>Trưởng nhóm</span>    
+                                            )}
+                                        </div>
+                                        {isGroupOwner(user.userID) && (
+                                            <Tippy
+                                                visible={member.userID === showMemberActionTippy}
+                                                interactive
+                                                delay={[0, 0]}
+                                                offset={[0, 0]}
+                                                placement="bottom-end"
+                                                render={() => renderMemberActions(member.userID)}
+                                            >
+                                                <div className='member-action' onClick={(e) => handleShowMemberActionTippy(e, member.userID)}>
+                                                    <FaEllipsisH className='member-action-icon'/>
+                                                </div>
+                                            </Tippy>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </MemberListStyled>
                 </>
             )
 		}
@@ -345,6 +657,14 @@ const ConversationInfo = () => {
                     <ConversationInfoBodyStyled>
                         {items[toggleConversationInfo?.level].body}
                     </ConversationInfoBodyStyled>
+                    <ConfirmModal memberIdForDelete={memberIdForDelete} show={showConfirm} handleClose={() => setShowConfirm(false)}/>
+                    <AddMemberModal
+                        show={showAddMemberModal}
+                        handleClose={() => setShowAddMemberModal(false)}
+                        recentlyConversations={recentlyConversations}
+                        friends={friendsWithConversationId}
+                        currentMembers={conversationSelected.participantIds.map(participantId => participantId.participantId)}
+                    />
                 </WrapperStyled>
             )}
         </>

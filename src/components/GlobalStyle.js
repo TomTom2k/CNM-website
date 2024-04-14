@@ -20,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
     --button-neutral-text: #081c36;
     --button-tertiary-neutral-focus-bg: #e5efff;
     --button-tertiary-neutral-focus-text: #005ae0;
+    --button-tertiary-neutral-hover: #dfe2e7;
     --button-secondary-danger-normal: #fbdfdf;
     --button-secondary-danger-text: #d91b1b;
     --button-secondary-danger-hover: #f9cdcd;

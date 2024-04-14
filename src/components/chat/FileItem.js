@@ -53,6 +53,9 @@ const DownloadFileIconStyled = styled.div`
     color: rgb(33, 37, 41); 
     text-align: center;
     border-radius: 6px;
+    &:hover {
+        background-color: var(--button-tertiary-neutral-hover);
+    }
 `;
 
 const VideoItemStyled = styled.div`
