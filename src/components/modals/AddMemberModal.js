@@ -202,8 +202,7 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
                 conversationSelected.membersInfo.push(...response.resData.membersInfo)
                 conversationSelected.participantIds = updatedParticipantIds
                 setConversationSelected((prev) => ({...conversationSelected}))
-                const currentMembersIds = updatedParticipantIds.filter(participantId => participantId && participantId.isDeleted !== true)
-                                            .map(updatedParticipantId => updatedParticipantId.participantId)
+                const currentMembersIds = updatedParticipantIds.map(updatedParticipantId => updatedParticipantId.participantId)
                 setCurrentMembers((prev) => ([...currentMembersIds]))
                 handleCancelAddMember()
             } catch (error) {

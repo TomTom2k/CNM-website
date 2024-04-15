@@ -488,29 +488,29 @@ const ChatBox = () => {
 								)?.profilePic} 
 								alt=''
 							/>
-							<div className={conversationSelected.participantIds.filter(participantId => participantId.isDeleted !== true).length > 2 ? 'conversation-info' : 'conversation-info pt-1'}>
+							<div className={conversationSelected.participantIds.length > 2 ? 'conversation-info' : 'conversation-info pt-1'}>
 								<h5>
 									{conversationSelected?.name ||
 										conversationSelected?.membersInfo?.find(
 											(member) => member.userID !== user?.userID
 										)?.fullName}
 								</h5>
-								{conversationSelected.participantIds.filter(participantId => participantId.isDeleted !== true).length > 2 && (
+								{conversationSelected.participantIds.length > 2 && (
 									<div className='conversation-members' onClick={() => setToggleConversationInfo({toggle: true, level: 1})}>
 										<FaRegUser />
-										<span>{conversationSelected?.participantIds.filter(participantId => participantId.isDeleted !== true).length} thành viên</span>
+										<span>{conversationSelected?.participantIds.length} thành viên</span>
 									</div>
 								)}
 							</div>
 						</UserInfoHeaderChatStyled>
 						<ActionHeaderChatStyled>
-							{conversationSelected.participantIds.filter(participantId => participantId.isDeleted !== true).length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
+							{conversationSelected.participantIds.length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
 							<IoCallOutline className='action-header-chat-icon'/>
 							<GoDeviceCameraVideo className='action-header-chat-icon'/>
 							{toggleConversationInfo?.toggle ? (
 								<PiSquareHalfFill className='action-header-chat-icon toggle-icon on-toggle-icon' onClick={() => setToggleConversationInfo({toggle: false, level: 0})}/>
 							) : (
-								<PiSquareSplitHorizontal className='action-header-chat-icon toggle-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.filter(participantId => participantId.isDeleted !== true).length > 2 ? 0 : 2})}/>
+								<PiSquareSplitHorizontal className='action-header-chat-icon toggle-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.length > 2 ? 0 : 2})}/>
 							)}
 						</ActionHeaderChatStyled>
 					</HeaderChatStyled>
