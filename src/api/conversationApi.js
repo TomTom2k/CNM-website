@@ -32,6 +32,10 @@ const conversationApi = {
 		const url = `/conversation/recently-with-friend/${quantity}`;
 		return axiosClient.get(url);
 	},
+	deleteConversation: (conversationId) => {
+		const url = `/conversation/${conversationId}`;
+		return axiosClient.delete(url);
+	},
 };
 
 export default conversationApi;
