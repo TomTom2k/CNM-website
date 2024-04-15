@@ -42,6 +42,10 @@ const conversationApi = {
 		return axiosClient.post(url, {userId});
 	},
 	
+	deleteConversation: (conversationId) => {
+		const url = `/conversation/${conversationId}`;
+		return axiosClient.delete(url);
+	},
 };
 
 export default conversationApi;

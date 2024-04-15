@@ -50,6 +50,7 @@ const ConversationProvide = ({ children }) => {
 				conversationSelected,
 				setConversationSelected,
 				conversations,
+				setConversations,
 				messages,
 				setMessages,
 				haveNewMessageConversations,
