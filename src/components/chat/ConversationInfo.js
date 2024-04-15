@@ -14,6 +14,7 @@ import { IoKeyOutline } from "react-icons/io5";
 import { ConversationToken } from '../../context/ConversationToken';
 import { AuthToken } from '../../context/AuthToken';
 import ConfirmModal from '../modals/ConfirmModal';
+import DeleteGroupModal from '../modals/DeleteGroupModal';
 import AddMemberModal from '../modals/AddMemberModal';
 import conversationApi from '../../api/conversationApi';
 import userApi from '../../api/userApi';
@@ -423,6 +424,7 @@ const ConversationInfo = () => {
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [recentlyConversations, setRecentlyConversations] = useState([])
     const [friendsWithConversationId, setFriendsWithConversationId] = useState([])
+    const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false)
 
     const isGroupOwner = (userID) => {
         return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
@@ -571,7 +573,7 @@ const ConversationInfo = () => {
                         </div>
                     </ManageGroupStyled>
                     <SeparatedStyled></SeparatedStyled>
-                    <DeleteGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
+                    <DeleteGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'} onClick={() => setShowDeleteGroupModal(true)}>
                         <div className='delete-group-item'>
                             <span>Giải tán nhóm</span>
                         </div>
@@ -594,7 +596,7 @@ const ConversationInfo = () => {
                         <h6 className='member-list-title'>
                             Danh sách thành viên ({conversationSelected?.participantIds.length})
                         </h6>
-                        {conversationSelected?.membersInfo.map(member => {
+                        {conversationSelected?.membersInfo?.map(member => {
                             return (
                                 <div className='member-info-item'>
                                     <div className='member-avatar'>
@@ -665,6 +667,7 @@ const ConversationInfo = () => {
                         friends={friendsWithConversationId}
                         currentMembers={conversationSelected.participantIds.map(participantId => participantId.participantId)}
                     />
+                    <DeleteGroupModal show={showDeleteGroupModal} handleClose={() => setShowDeleteGroupModal(false)}/>
                 </WrapperStyled>
             )}
         </>
