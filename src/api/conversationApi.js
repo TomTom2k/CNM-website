@@ -32,6 +32,16 @@ const conversationApi = {
 		const url = `/conversation/recently-with-friend/${quantity}`;
 		return axiosClient.get(url);
 	},
+	//function addMemberIntoGroup gồm 2 tham số là conversationId và danh sách userId
+	addMemberIntoGroup: (conversationId, userIds) => {
+		const url = `/conversation/${conversationId}/add-member`;
+		return axiosClient.post(url, {userIds});
+	},
+	removeMemberFromGroup: (conversationId, userId) => {
+		const url = `/conversation/${conversationId}/remove-member`;
+		return axiosClient.post(url, {userId});
+	},
+	
 	deleteConversation: (conversationId) => {
 		const url = `/conversation/${conversationId}`;
 		return axiosClient.delete(url);

@@ -8,8 +8,7 @@ import { toast, Toaster } from "react-hot-toast";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
-
-
+import conversationApi from '../../api/conversationApi';
 
 const ModalStyled = styled(Modal)`
 	.modal-dialog{
@@ -98,11 +97,14 @@ const ConfirmModal = ({ memberIdForDelete, show, handleClose }) => {
 	const { user } = useContext(AuthToken);
 	const { conversationSelected } = useContext(ConversationToken);
 
-    const handleConfirmDeleteMember = () => {
+    const handleConfirmDeleteMember = async () => {
         try {
 			console.log(conversationSelected.conversationId ,memberIdForDelete)
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
-            handleClose()
+			const response = await conversationApi.removeMemberFromGroup(conversationSelected.conversationId, memberIdForDelete)
+			console.log(response)
+			handleClose()
+			toast.success('Xóa thành viên thành công')
         } catch (error) {
             console.log(error)
         }
