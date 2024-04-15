@@ -93,18 +93,28 @@ const FormFooterStyled = styled.div`
 `;
 
 
-const ConfirmModal = ({ memberIdForDelete, show, handleClose }) => {
+const ConfirmModal = ({ memberIdForDelete, show, handleClose, setCurrentMembers }) => {
 	const { user } = useContext(AuthToken);
-	const { conversationSelected } = useContext(ConversationToken);
+	const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
 
     const handleConfirmDeleteMember = async () => {
         try {
-			console.log(conversationSelected.conversationId ,memberIdForDelete)
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
 			const response = await conversationApi.removeMemberFromGroup(conversationSelected.conversationId, memberIdForDelete)
-			console.log(response)
+			conversationSelected.membersInfo = conversationSelected.membersInfo.filter(member => {
+				return member.userID !== response.RemovedUserId
+			})
+			conversationSelected.participantIds.forEach(participantId => {
+				if(participantId.participantId === response.RemovedUserId){
+					participantId.isDeleted = true
+				}
+			})
+			setConversationSelected((prev) => ({...conversationSelected}))
+			const currentMembersIds = conversationSelected.participantIds.filter(participantId => participantId && participantId.isDeleted !== true)
+			.map(updatedParticipantId => updatedParticipantId.participantId)
+			console.log(currentMembersIds)
+			setCurrentMembers((prev) => ([...currentMembersIds]))
 			handleClose()
-			toast.success('Xóa thành viên thành công')
         } catch (error) {
             console.log(error)
         }

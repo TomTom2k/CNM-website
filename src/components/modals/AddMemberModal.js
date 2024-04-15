@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -163,11 +163,15 @@ const ConversationFormCheckStyled = styled.div`
     }
 `
 
-const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, currentMembers}) => {
+const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, currentMembers, setCurrentMembers}) => {
 	const { user } = useContext(AuthToken);
     const [friendSearchInput, setFriendSearchInput] = useState('')
     const [checkedFriends, setCheckedFriends] = useState(currentMembers)
-    const { conversationSelected } = useContext(ConversationToken);
+    const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
+
+    useEffect(() => {
+        setCheckedFriends(currentMembers)
+    }, [currentMembers])
 
     const handleCancelAddMember = () => {
         setFriendSearchInput('')
@@ -188,15 +192,20 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
     };
 
     const handleAddMember = async () => {
-        if(checkedFriends.length - currentMembers.length > 0){
+        if(checkedFriends.length - currentMembers?.length > 0){
             try {
                 const friendsToAddIntoGroup = checkedFriends.filter(friend => !currentMembers.includes(friend))
-                console.log(conversationSelected.conversationId ,friendsToAddIntoGroup)
                 //Call api thêm thành viên ở dây với 2 tham số conversationId, với danh sách userID muốn add
                 const response = await conversationApi.addMemberIntoGroup(conversationSelected.conversationId, friendsToAddIntoGroup)
-                console.log(response)
+                let updatedParticipantIds = conversationSelected.participantIds.filter(participantId => !response.resData.addedParticipantIds.includes(participantId.participantId))
+                updatedParticipantIds.push(...response.resData.addedParticipantIds)
+                conversationSelected.membersInfo.push(...response.resData.membersInfo)
+                conversationSelected.participantIds = updatedParticipantIds
+                setConversationSelected((prev) => ({...conversationSelected}))
+                const currentMembersIds = updatedParticipantIds.filter(participantId => participantId && participantId.isDeleted !== true)
+                                            .map(updatedParticipantId => updatedParticipantId.participantId)
+                setCurrentMembers((prev) => ([...currentMembersIds]))
                 handleCancelAddMember()
-                toast.success('Thêm thành viên thành công')
             } catch (error) {
                 console.log(error)
             }
@@ -326,7 +335,7 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
                                 <Button 
                                     className='confirm-btn' 
                                     variant="primary"
-                                    disabled={checkedFriends.length - currentMembers.length === 0}
+                                    disabled={checkedFriends.length - currentMembers?.length === 0}
                                     onClick={handleAddMember}
                                 >
                                     Xác nhận
