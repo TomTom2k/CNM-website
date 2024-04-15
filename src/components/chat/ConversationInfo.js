@@ -594,7 +594,7 @@ const ConversationInfo = () => {
                         <h6 className='member-list-title'>
                             Danh sách thành viên ({conversationSelected?.participantIds.length})
                         </h6>
-                        {conversationSelected?.membersInfo.map(member => {
+                        {conversationSelected?.membersInfo?.map(member => {
                             return (
                                 <div className='member-info-item'>
                                     <div className='member-avatar'>

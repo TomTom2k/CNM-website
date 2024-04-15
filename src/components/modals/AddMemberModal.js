@@ -9,6 +9,7 @@ import { CiSearch } from "react-icons/ci";
 
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
+import conversationApi from '../../api/conversationApi';
 
 
 const ModalStyled = styled(Modal)`
@@ -192,7 +193,10 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
                 const friendsToAddIntoGroup = checkedFriends.filter(friend => !currentMembers.includes(friend))
                 console.log(conversationSelected.conversationId ,friendsToAddIntoGroup)
                 //Call api thêm thành viên ở dây với 2 tham số conversationId, với danh sách userID muốn add
+                const response = await conversationApi.addMemberIntoGroup(conversationSelected.conversationId, friendsToAddIntoGroup)
+                console.log(response)
                 handleCancelAddMember()
+                toast.success('Thêm thành viên thành công')
             } catch (error) {
                 console.log(error)
             }
