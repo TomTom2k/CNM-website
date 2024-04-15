@@ -550,7 +550,7 @@ const ConversationInfo = () => {
                         <h6>Thành viên nhóm</h6>
                         <div className='member-info-item' onClick={() => setToggleConversationInfo({toggle: true, level: 1})}>
                             <LuUsers className='member-info-icon'/>
-                            <span>{conversationSelected?.participantIds.filter(participantId => participantId.isDeleted !== true).length} thành viên</span>
+                            <span>{conversationSelected?.participantIds.length} thành viên</span>
                         </div>
                     </MemberInfoStyled>
                     <SeparatedStyled></SeparatedStyled>
@@ -595,7 +595,7 @@ const ConversationInfo = () => {
                     </AddMemberStyled>
                     <MemberListStyled>
                         <h6 className='member-list-title'>
-                            Danh sách thành viên ({conversationSelected?.participantIds.filter(participantId => participantId.isDeleted !== true).length})
+                            Danh sách thành viên ({conversationSelected?.participantIds.length})
                         </h6>
                         {conversationSelected?.membersInfo?.map(member => {
                             return (
@@ -653,7 +653,7 @@ const ConversationInfo = () => {
                 <WrapperStyled>
                     <ConversationInfoHeaderStyled>
                         {toggleConversationInfo?.level === 1 && (
-                            <MdArrowBackIos className='back-conversation-info-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.filter(participantId => participantId.isDeleted !== true).length > 2 ? 0 : 2})}/>
+                            <MdArrowBackIos className='back-conversation-info-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.length > 2 ? 0 : 2})}/>
                         )}
                         <h5 className='conversation-info-title'>{items[toggleConversationInfo?.level].title}</h5>
                     </ConversationInfoHeaderStyled>
@@ -669,8 +669,7 @@ const ConversationInfo = () => {
                         currentMembers={
                             currentMembers.length > 0 ? currentMembers : (
                                 conversationSelected?.participantIds
-                                ?.filter(participantId => participantId && participantId.isDeleted !== true)
-                                .map(participantId => participantId.participantId) || []
+                                ?.map(participantId => participantId.participantId) || []
                             )
                         }
                         setCurrentMembers={setCurrentMembers}

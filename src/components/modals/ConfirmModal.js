@@ -104,15 +104,9 @@ const ConfirmModal = ({ memberIdForDelete, show, handleClose, setCurrentMembers 
 			conversationSelected.membersInfo = conversationSelected.membersInfo.filter(member => {
 				return member.userID !== response.RemovedUserId
 			})
-			conversationSelected.participantIds.forEach(participantId => {
-				if(participantId.participantId === response.RemovedUserId){
-					participantId.isDeleted = true
-				}
-			})
+			conversationSelected.participantIds = conversationSelected.participantIds.filter(participantId => participantId.participantId !==  response.RemovedUserId)
 			setConversationSelected((prev) => ({...conversationSelected}))
-			const currentMembersIds = conversationSelected.participantIds.filter(participantId => participantId && participantId.isDeleted !== true)
-			.map(updatedParticipantId => updatedParticipantId.participantId)
-			console.log(currentMembersIds)
+			const currentMembersIds = conversationSelected.participantIds.map(updatedParticipantId => updatedParticipantId.participantId)
 			setCurrentMembers((prev) => ([...currentMembersIds]))
 			handleClose()
         } catch (error) {
