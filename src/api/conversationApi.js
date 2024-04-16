@@ -52,9 +52,9 @@ const conversationApi = {
 		return axiosClient.post(url, {userId});
 	},
 
-	leaveGroup:(conversationId, userId) => {
+	leaveGroup:(conversationId, userId, choseOwner) => {
 		const url = `/conversation/${conversationId}/leave-group`;
-		return axiosClient.post(url, {userId});
+		return axiosClient.post(url, {userId, choseOwner});
 	}
 };
 
