@@ -46,6 +46,11 @@ const conversationApi = {
 		const url = `/conversation/${conversationId}`;
 		return axiosClient.delete(url);
 	},
+
+	chanceRoleOwner:(conversationId, userId) => {
+		const url = `/conversation/${conversationId}/change-role-owner`;
+		return axiosClient.post(url, {userId});
+	}
 };
 
 export default conversationApi;

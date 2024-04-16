@@ -173,6 +173,10 @@ const ChangeGroupOwnerModal = ({ show, handleClose, membersInfo }) => {
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
 			console.log(choseOwner.userID)
 			console.log(conversationSelected.conversationId)
+
+			const reponse = await conversationApi.chanceRoleOwner(conversationSelected.conversationId, choseOwner.userID)
+			console.log(reponse)
+			toast.success('Chuyển quyền trưởng nhóm thành công!')
 			setShowConfirmChangeModal(false)
 			setShowChooseOwnerModal(false)
         } catch (error) {
