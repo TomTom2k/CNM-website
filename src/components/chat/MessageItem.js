@@ -25,6 +25,19 @@ const MessageItemStyled = styled.div`
     color: var(--text-primary);
     position: relative; 
 
+    &:has(.notification-item) {
+        align-self: center;
+        border-radius: 1rem;
+        background: hsla(0, 0%, 100%, 0.5);
+        color: var(--text-secondary);   
+        box-shadow: none; 
+        &:hover {
+            .message-action {
+              display: none;
+            }  
+        }
+    }
+
     &:has(.file-item) {
 		width: 40%;
 	}
@@ -310,6 +323,31 @@ const PopperWrapper = styled.div`
     }
 `;
 
+const NotificationStyled = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+
+    img{
+        width: 1.3rem;
+		height: 1.3rem;
+		border-radius: 50%;
+		object-fit: cover;
+		margin-right: 0.6rem;
+    }
+
+    .notification-fullname{
+        font-weight: 600;
+        font-size: 0.8rem;
+        margin-right: 0.25rem;
+    }
+
+    .notification-content{
+        font-size: 0.8rem;
+    }
+`
+
 const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages, setHaveNewMessageConversations}) => {
     const MENU_ITEMS = [
         {
@@ -537,6 +575,7 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                         >
                             {
                                 user.userID !== message?.senderId 
+                                && message.type !== "notification"
                                 && (
                                     !arr[index-1]
                                     || arr[index-1].senderId !== message.senderId
@@ -595,6 +634,14 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                             <img src={message.content} alt=''/>
                                         </p>
                                     );
+                                } else if (message.type === "notification") {
+                                    return (
+                                        <NotificationStyled className='notification-item'>
+                                            <img src={message?.senderAvatar} alt=''/>
+                                            <span className='notification-fullname'>{message?.senderFullName}</span>
+                                            <span className='notification-content'>{message.content}</span>
+                                        </NotificationStyled>
+                                    );
                                 }
                             })()}
                             {/* Điều kiện hiển thị thời gian của tin nhắn
@@ -603,14 +650,18 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 3. Nếu tin nhắn phía sau cách tin nhắn hiện tại hơn 5 phút 
                             */}
                             {
-                                arr[index+1] 
-                                && arr[index+1].senderId === message.senderId 
-                                && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
+                                message.type === "notification"
+                                || (
+                                    arr[index+1] 
+                                    && arr[index+1].senderId === message.senderId 
+                                    && new Date(arr[index+1].createdAt).getTime() - new Date(message.createdAt).getTime() <= 1800000 
+                                )
                                 ? null
                                 : <span className='message-time'>{`${new Date(message.createdAt).getHours().toString().padStart(2, '0')}:${new Date(message.createdAt).getMinutes().toString().padStart(2, '0')}`}</span> 
                             }
                             {
                                 user.userID !== message?.senderId 
+                                && message.type !== "notification"
                                 && (
                                     !arr[index-1]
                                     || arr[index-1].senderId !== message.senderId

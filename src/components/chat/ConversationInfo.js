@@ -11,6 +11,7 @@ import { RxExit } from "react-icons/rx";
 import { FaEllipsisH } from 'react-icons/fa';
 import { RiKey2Line } from "react-icons/ri";
 import { IoKeyOutline } from "react-icons/io5";
+import { toast, Toaster } from "react-hot-toast";
 import { ConversationToken } from '../../context/ConversationToken';
 import { AuthToken } from '../../context/AuthToken';
 import ConfirmModal from '../modals/ConfirmModal';
@@ -452,8 +453,12 @@ const ConversationInfo = () => {
     ]
 
     const handleDeleteMemberOutOfGroup = (memberId) => {
-        setMemberIdForDelete(memberId)
-        setShowConfirm(true)
+        if(conversationSelected?.participantIds.length <= 3){
+            toast.error("Không thể xóa vì nhóm phải có ít nhất 3 thành viên.")
+        } else {
+            setMemberIdForDelete(memberId)
+            setShowConfirm(true)
+        }
     }
 
     const renderItems = (memberId) => {
@@ -521,7 +526,11 @@ const ConversationInfo = () => {
     }
 
     const handleLeaveGroup = () => {
-        setShowLeaveGroupModal(true)
+        if(conversationSelected?.participantIds.length <= 3){
+            toast.error("Không thể rời nhóm vì nhóm phải có ít nhất 3 thành viên.")
+        } else {
+            setShowLeaveGroupModal(true)
+        }
     }
 
     const items = [
@@ -659,6 +668,7 @@ const ConversationInfo = () => {
         <>
             {toggleConversationInfo?.toggle && (
                 <WrapperStyled>
+                    <Toaster toastOptions={{ duration: 4000 }}/>
                     <ConversationInfoHeaderStyled>
                         {toggleConversationInfo?.level === 1 && (
                             <MdArrowBackIos className='back-conversation-info-icon' onClick={() => setToggleConversationInfo({toggle: true, level: conversationSelected.participantIds.length > 2 ? 0 : 2})}/>
@@ -668,7 +678,12 @@ const ConversationInfo = () => {
                     <ConversationInfoBodyStyled>
                         {items[toggleConversationInfo?.level].body}
                     </ConversationInfoBodyStyled>
-                    <ConfirmModal memberIdForDelete={memberIdForDelete} show={showConfirm} handleClose={() => setShowConfirm(false)} setCurrentMembers={setCurrentMembers}/>
+                    <ConfirmModal 
+                        memberIdForDelete={memberIdForDelete} 
+                        show={showConfirm} 
+                        handleClose={() => setShowConfirm(false)} 
+                        setCurrentMembers={setCurrentMembers}
+                    />
                     <AddMemberModal
                         show={showAddMemberModal}
                         handleClose={() => setShowAddMemberModal(false)}

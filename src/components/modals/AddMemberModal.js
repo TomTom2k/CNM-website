@@ -167,7 +167,7 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
 	const { user } = useContext(AuthToken);
     const [friendSearchInput, setFriendSearchInput] = useState('')
     const [checkedFriends, setCheckedFriends] = useState(currentMembers)
-    const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
+    const { conversationSelected, setConversationSelected, setMessages,setHaveNewMessageConversations } = useContext(ConversationToken);
 
     useEffect(() => {
         setCheckedFriends(currentMembers)
@@ -202,6 +202,10 @@ const AddMemberModal = ({ show, handleClose, recentlyConversations, friends, cur
                 conversationSelected.membersInfo.push(...response.resData.membersInfo)
                 conversationSelected.participantIds = updatedParticipantIds
                 setConversationSelected((prev) => ({...conversationSelected}))
+                setMessages((prevMessages) =>
+                    prevMessages ? [...prevMessages, ...response.resData.messages] : [...response.resData.messages]
+                );
+                setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: response.resData.messages[response.resData.messages.length -1]}])
                 const currentMembersIds = updatedParticipantIds.map(updatedParticipantId => updatedParticipantId.participantId)
                 setCurrentMembers((prev) => ([...currentMembersIds]))
                 handleCancelAddMember()
