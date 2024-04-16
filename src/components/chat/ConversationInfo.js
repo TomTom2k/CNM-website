@@ -16,6 +16,7 @@ import { AuthToken } from '../../context/AuthToken';
 import ConfirmModal from '../modals/ConfirmModal';
 import DeleteGroupModal from '../modals/DeleteGroupModal';
 import AddMemberModal from '../modals/AddMemberModal';
+import ChangeGroupOwnerModal from '../modals/ChangeGroupOwnerModal';
 import conversationApi from '../../api/conversationApi';
 import userApi from '../../api/userApi';
 
@@ -426,6 +427,7 @@ const ConversationInfo = () => {
     const [friendsWithConversationId, setFriendsWithConversationId] = useState([])
     const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false)
     const [currentMembers, setCurrentMembers] = useState([])
+    const [showChangeGroupOwnerModal, setShowChangeGroupOwnerModal] = useState(false)
 
     const isGroupOwner = (userID) => {
         return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
@@ -568,7 +570,7 @@ const ConversationInfo = () => {
                     <SeparatedStyled></SeparatedStyled>
                     <ManageGroupStyled className={isGroupOwner(user.userID) ? '' : 'disable'}>
                         <h6>Quản lý nhóm</h6>
-                        <div className='manage-group-item'>
+                        <div className='manage-group-item' onClick={() => setShowChangeGroupOwnerModal(true)}>
                             <IoKeyOutline className='manage-group-icon'/>
                             <span>Chuyển quyền trưởng nhóm</span>
                         </div>
@@ -675,6 +677,11 @@ const ConversationInfo = () => {
                         setCurrentMembers={setCurrentMembers}
                     />
                     <DeleteGroupModal show={showDeleteGroupModal} handleClose={() => setShowDeleteGroupModal(false)}/>
+                    <ChangeGroupOwnerModal 
+                        membersInfo={conversationSelected?.membersInfo.filter(member => member.userID !== user.userID)} 
+                        show={showChangeGroupOwnerModal} 
+                        handleClose={() => setShowChangeGroupOwnerModal(false)}
+                    />
                 </WrapperStyled>
             )}
         </>
