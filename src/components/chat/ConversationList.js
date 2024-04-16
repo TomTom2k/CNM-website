@@ -4,6 +4,7 @@ import Conversation from './Conversation';
 import { ConversationToken } from '../../context/ConversationToken';
 import SearchBox from '../SearchBox';
 import { useSocketContext } from '../../context/SocketContext';
+import useListenConversation from '../../hooks/useListenConversation';
 
 const AsideStyled = styled.aside`
 	min-width: 21.5rem;
@@ -21,6 +22,8 @@ const ConversationList = () => {
 	const { conversations } = useContext(ConversationToken);
 
 	const [conversationList, setConversationList] = useState(conversations);
+
+	useListenConversation()
 
 	useEffect(() => {
 	  setConversationList(conversations);
