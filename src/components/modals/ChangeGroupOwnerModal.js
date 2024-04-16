@@ -163,7 +163,7 @@ const MemberForChoosingStyled = styled.div`
 
 
 const ChangeGroupOwnerModal = ({ show, handleClose, membersInfo }) => {
-	const { conversationSelected } = useContext(ConversationToken);
+	const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
 	const [ showChooseOwnerModal, setShowChooseOwnerModal ] = useState(false)
 	const [ showConfirmChangeModal, setShowConfirmChangeModal ] = useState(false)
 	const [ choseOwner, setChoseOwner ] = useState({})
@@ -171,12 +171,10 @@ const ChangeGroupOwnerModal = ({ show, handleClose, membersInfo }) => {
     const handleConfirmChangeGroupOwner = async () => {
         try {
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
-			console.log(choseOwner.userID)
-			console.log(conversationSelected.conversationId)
-
 			const reponse = await conversationApi.chanceRoleOwner(conversationSelected.conversationId, choseOwner.userID)
-			console.log(reponse)
-			toast.success('Chuyển quyền trưởng nhóm thành công!')
+			conversationSelected.participantIds = reponse.resData.participantIds
+			conversationSelected.membersInfo = reponse.resData.membersInfo
+			setConversationSelected((prev) => ({...conversationSelected}))
 			setShowConfirmChangeModal(false)
 			setShowChooseOwnerModal(false)
         } catch (error) {
