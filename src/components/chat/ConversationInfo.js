@@ -17,6 +17,7 @@ import ConfirmModal from '../modals/ConfirmModal';
 import DeleteGroupModal from '../modals/DeleteGroupModal';
 import AddMemberModal from '../modals/AddMemberModal';
 import ChangeGroupOwnerModal from '../modals/ChangeGroupOwnerModal';
+import LeaveGroupForMembersModal from '../modals/LeaveGroupForMembersModal';
 import conversationApi from '../../api/conversationApi';
 import userApi from '../../api/userApi';
 
@@ -428,6 +429,8 @@ const ConversationInfo = () => {
     const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false)
     const [currentMembers, setCurrentMembers] = useState([])
     const [showChangeGroupOwnerModal, setShowChangeGroupOwnerModal] = useState(false)
+    const [showLeaveGroupForMembersModal, setShowLeaveGroupForMembersModal] = useState(false)
+    const [showLeaveGroupForOwnerModal, setShowLeaveGroupForOwnerModal] = useState(false)
 
     const isGroupOwner = (userID) => {
         return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
@@ -518,6 +521,14 @@ const ConversationInfo = () => {
         }
     }
 
+    const handleLeaveGroup = () => {
+        if(isGroupOwner(user.userID)){
+            setShowLeaveGroupForOwnerModal(true)
+        } else {
+            setShowLeaveGroupForMembersModal(true)
+        }
+    }
+
     const items = [
 		{
 			key: 'group-info',
@@ -562,7 +573,7 @@ const ConversationInfo = () => {
                             <FiTrash className='security-setting-icon'/>
                             <span>Xóa lịch sử trò chuyện</span>
                         </div>
-                        <div className='security-setting-item'>
+                        <div className='security-setting-item' onClick={() => handleLeaveGroup()}>
                             <RxExit className='security-setting-icon'/>
                             <span>Rời nhóm</span>
                         </div>
@@ -681,6 +692,11 @@ const ConversationInfo = () => {
                         membersInfo={conversationSelected?.membersInfo.filter(member => member.userID !== user.userID)} 
                         show={showChangeGroupOwnerModal} 
                         handleClose={() => setShowChangeGroupOwnerModal(false)}
+                    />
+                    <LeaveGroupForMembersModal  
+                        show={showLeaveGroupForMembersModal} 
+                        handleClose={() => setShowLeaveGroupForMembersModal(false)}
+                        setCurrentMembers={setCurrentMembers}
                     />
                 </WrapperStyled>
             )}
