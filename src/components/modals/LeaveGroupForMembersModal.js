@@ -102,6 +102,8 @@ const LeaveGroupForMembersModal = ({ show, handleClose, setCurrentMembers }) => 
         try {
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
             console.log(conversationSelected.conversationId, user.userID)
+			const response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID)
+			console.log(response)
 			handleClose()
         } catch (error) {
             console.log(error)
