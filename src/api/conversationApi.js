@@ -50,6 +50,11 @@ const conversationApi = {
 	chanceRoleOwner:(conversationId, userId) => {
 		const url = `/conversation/${conversationId}/change-role-owner`;
 		return axiosClient.post(url, {userId});
+	},
+
+	leaveGroup:(conversationId, userId) => {
+		const url = `/conversation/${conversationId}/leave-group`;
+		return axiosClient.post(url, {userId});
 	}
 };
 
