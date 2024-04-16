@@ -24,6 +24,9 @@ const GlobalStyle = createGlobalStyle`
     --button-secondary-danger-normal: #fbdfdf;
     --button-secondary-danger-text: #d91b1b;
     --button-secondary-danger-hover: #f9cdcd;
+    --button-danger-normal: #c31818;
+    --button-danger-text: #fff;
+    --button-danger-hover: #9a1313;
     --border: #d6dbe1;
     --border-focused: #0068ff;
     --icon-primary: #081c36;
