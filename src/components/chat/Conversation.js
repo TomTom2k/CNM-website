@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { CiImageOn } from "react-icons/ci";
 import { MdAttachFile } from "react-icons/md";
+import { GrAnnounce } from "react-icons/gr";
 import { AuthToken } from '../../context/AuthToken';
 import { ConversationToken } from '../../context/ConversationToken';
 import { useSocketContext } from '../../context/SocketContext';
@@ -72,7 +73,6 @@ const InfoStyled = styled.div`
 		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
-
 		
 		.last-message-sender{
 			font-size: 0.85rem;
@@ -84,6 +84,7 @@ const InfoStyled = styled.div`
 		}
 		
 		p {
+			width: 14rem;
 			font-size: 0.85rem;
 			margin: 0;
 			overflow: hidden;
@@ -172,6 +173,7 @@ const Conversation = ({ conversation }) => {
 						: lastMessage?.type === "like" ? (<p><img src={lastMessage?.content} alt=''/></p>) 
 						: lastMessage?.type === "image" ? (<div className='d-flex align-items-center'><CiImageOn className='last-message-icon'/><p>Hình ảnh</p></div>)
 						: lastMessage?.type === "file" ? (<div className='d-flex align-items-center'><MdAttachFile  className='last-message-icon'/><p>{lastMessage.content.split('.').slice(-2).join('.')}</p></div>)
+						: lastMessage?.type === "notification" ? (<div className='d-flex align-items-center'><GrAnnounce  className='last-message-icon'/><p>{`${lastMessage.senderName} ${lastMessage.content}`}</p></div>)
 						: (<p>{lastMessage?.content || 'Chưa có tin nhắn'}</p>)
 					}
 				</div>
