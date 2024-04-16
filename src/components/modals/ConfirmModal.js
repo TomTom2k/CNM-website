@@ -95,17 +95,21 @@ const FormFooterStyled = styled.div`
 
 const ConfirmModal = ({ memberIdForDelete, show, handleClose, setCurrentMembers }) => {
 	const { user } = useContext(AuthToken);
-	const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
+	const { conversationSelected, setConversationSelected, setMessages, setHaveNewMessageConversations } = useContext(ConversationToken);
 
     const handleConfirmDeleteMember = async () => {
         try {
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
 			const response = await conversationApi.removeMemberFromGroup(conversationSelected.conversationId, memberIdForDelete)
 			conversationSelected.membersInfo = conversationSelected.membersInfo.filter(member => {
-				return member.userID !== response.RemovedUserId
+				return member.userID !== response.resData.RemovedUserId
 			})
-			conversationSelected.participantIds = conversationSelected.participantIds.filter(participantId => participantId.participantId !==  response.RemovedUserId)
+			conversationSelected.participantIds = conversationSelected.participantIds.filter(participantId => participantId.participantId !==  response.resData.RemovedUserId)
 			setConversationSelected((prev) => ({...conversationSelected}))
+			setMessages((prevMessages) =>
+				prevMessages ? [...prevMessages, response.resData.savedMessage] : [response.resData.savedMessage]
+			);
+			setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: response.resData.savedMessage}])
 			const currentMembersIds = conversationSelected.participantIds.map(updatedParticipantId => updatedParticipantId.participantId)
 			setCurrentMembers((prev) => ([...currentMembersIds]))
 			handleClose()
