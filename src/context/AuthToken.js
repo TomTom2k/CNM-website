@@ -1,9 +1,13 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
 import authApi from '../api/authApi';
 
 export let AuthToken = createContext();
+
+export const useAuth = () => {
+	return useContext(AuthToken);
+};
 
 const AuthProvide = ({ children }) => {
 	const [user, setUser] = useState(null);
