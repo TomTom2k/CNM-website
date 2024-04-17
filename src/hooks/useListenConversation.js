@@ -52,6 +52,7 @@ const useListenConversation = () => {
 					setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: resData.savedMessage}])
 				} else {
 					setMessages(null)
+					setConversationSelected(null)
 					setConversations((prev) => (prev.filter(conversation => conversation.conversationId !== resData.conversationId)))
 				}
             } else {

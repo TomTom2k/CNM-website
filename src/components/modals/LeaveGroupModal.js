@@ -172,7 +172,7 @@ const ConversationFormCheckStyled = styled.div`
 
 const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo }) => {
 	const { user } = useContext(AuthToken);
-	const { conversationSelected, setConversations, setMessages, conversations, setToggleConversationInfo  } = useContext(ConversationToken);
+	const { conversationSelected, setConversations, setMessages, conversations, setToggleConversationInfo, setConversationSelected } = useContext(ConversationToken);
 	const [ showChooseOwnerBeforeLeavingModal, setShowChooseOwnerBeforeLeavingModal ] = useState(false)
 	const [ showLeaveGroupModal, setShowLeaveGroupModal ] = useState(false)
 	const [ choseOwner, setChoseOwner ] = useState(membersInfo[0].userID)
@@ -199,6 +199,7 @@ const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo }) => {
 			}
 			const updatedConversations = conversations.filter(conversation => conversation.conversationId !== response.conversationId);
             setMessages(null)
+			setConversationSelected(null)
             setConversations(updatedConversations)
             setToggleConversationInfo({toggle: false, level: 0})
 			setChoseOwner(membersInfo[0].userID)
