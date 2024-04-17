@@ -97,7 +97,7 @@ const FormFooterStyled = styled.div`
 
 const DeleteGroupModal = ({ show, handleClose }) => {
 	const { user } = useContext(AuthToken);
-	const { conversationSelected, setConversations, setMessages, conversations, setToggleConversationInfo } = useContext(ConversationToken);
+	const { conversationSelected, setConversations, setMessages, conversations, setToggleConversationInfo, setConversationSelected } = useContext(ConversationToken);
 
     const handleDeleteGroupConversation = async () => {
         try {
@@ -105,6 +105,7 @@ const DeleteGroupModal = ({ show, handleClose }) => {
             const res = await conversationApi.deleteConversation(conversationSelected.conversationId)
             const updatedConversations = conversations.filter(conversation => conversation.conversationId !== res.conversation);
             setMessages(null)
+			setConversationSelected(null)
             setConversations(updatedConversations)
             setToggleConversationInfo({toggle: false, level: 0})
             handleClose()

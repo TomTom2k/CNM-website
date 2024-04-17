@@ -17,7 +17,10 @@ const AsideStyled = styled.aside`
 	background-color: rgba(0, 0, 0, 0.01);
 `;
 
-const ListStyled = styled.div``;
+const ListStyled = styled.div`
+	height: calc(100vh - 71.4px);
+	overflow-y: auto;
+`;
 const ConversationList = () => {
 	const { conversations } = useContext(ConversationToken);
 

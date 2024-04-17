@@ -8,7 +8,7 @@ const useListenConversation = () => {
 	const { socket } = useSocketContext();
     const { messages, setMessages } = useConversation();
 	const { user } = useAuth();
-	const { setNewConversation, setConversations, conversationSelected, setConversationSelected, setHaveNewMessageConversations } = useContext(ConversationToken);
+	const { setNewConversation, setConversations, conversationSelected, setConversationSelected, setHaveNewMessageConversations, setToggleConversationInfo } = useContext(ConversationToken);
 
 	useEffect(() => {
 		socket?.on('newConversation', (newConversation) => {
@@ -18,6 +18,8 @@ const useListenConversation = () => {
         socket?.on('deleteConversation', (conversationId) => {
             if(conversationSelected?.conversationId === conversationId){
                 setMessages(null)
+				setToggleConversationInfo({toggle: false, level: 0})
+				setConversationSelected(null)
             }
             setConversations((prev) => (prev.filter(conversation => conversation.conversationId !== conversationId)))
 		});
@@ -51,7 +53,9 @@ const useListenConversation = () => {
 					);
 					setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: resData.savedMessage}])
 				} else {
+					setToggleConversationInfo({toggle: false, level: 0})
 					setMessages(null)
+					setConversationSelected(null)
 					setConversations((prev) => (prev.filter(conversation => conversation.conversationId !== resData.conversationId)))
 				}
             } else {
@@ -79,9 +83,7 @@ const useListenConversation = () => {
 
 		socket?.on('leaveConversation', (resData) => {
             if(conversationSelected?.conversationId === resData.conversationId){
-				conversationSelected.membersInfo = conversationSelected.membersInfo.filter(member => {
-					return member.userID !== resData.leftUserID
-				})
+				conversationSelected.membersInfo = resData.membersInfo
 				conversationSelected.participantIds = resData.updatedParticipantIds
 				setConversationSelected((prev) => ({...conversationSelected}))
 				setMessages((prevMessages) =>
