@@ -77,12 +77,29 @@ const useListenConversation = () => {
 			}
 		});
 
+		socket?.on('leaveConversation', (resData) => {
+            if(conversationSelected?.conversationId === resData.conversationId){
+				conversationSelected.membersInfo = conversationSelected.membersInfo.filter(member => {
+					return member.userID !== resData.leftUserID
+				})
+				conversationSelected.participantIds = resData.updatedParticipantIds
+				setConversationSelected((prev) => ({...conversationSelected}))
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, ...resData.savedMessages] : [...resData.savedMessages]
+				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: resData.savedMessages[resData.savedMessages.length -1]}])
+            } else {
+				setHaveNewMessageConversations([{conversationId: resData.conversationId, message: resData.savedMessages[resData.savedMessages.length -1]}])
+			}
+		});
+
 		return () => {
 			socket?.off('newConversation');
 			socket?.off('deleteConversation');
 			socket?.off('addMemberIntoConversation');
 			socket?.off('removeMemberOutOfConversation');
 			socket?.off('changeOwnerOfConversation');
+			socket?.off('leaveConversation');
 		}
 	}, [socket, setMessages, messages, user]);
 };

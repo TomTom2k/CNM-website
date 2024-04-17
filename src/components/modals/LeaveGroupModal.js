@@ -190,8 +190,13 @@ const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo }) => {
 
     const handleConfirmLeaveGroup = async () => {
         try {
+			let response
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
-			const response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, choseOwner)
+			if(isOwner){
+				response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, choseOwner)
+			} else {
+				response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, null)
+			}
 			const updatedConversations = conversations.filter(conversation => conversation.conversationId !== response.conversationId);
             setMessages(null)
             setConversations(updatedConversations)
