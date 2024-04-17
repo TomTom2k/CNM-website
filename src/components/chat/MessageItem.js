@@ -31,10 +31,19 @@ const MessageItemStyled = styled.div`
         background: hsla(0, 0%, 100%, 0.5);
         color: var(--text-secondary);   
         box-shadow: none; 
+        margin: 0.6rem;
+        max-width: 60%;
         &:hover {
             .message-action {
               display: none;
             }  
+        }
+        &.short-time-message{
+            margin: 0.6rem;
+        }
+        &.self {
+            align-self: center;
+            background: hsla(0, 0%, 100%, 0.5);
         }
     }
 
@@ -337,13 +346,11 @@ const NotificationStyled = styled.div`
 		margin-right: 0.6rem;
     }
 
-    .notification-fullname{
-        font-weight: 600;
-        font-size: 0.8rem;
-        margin-right: 0.25rem;
-    }
-
     .notification-content{
+        .notification-fullname{
+            font-weight: 600;
+            margin-right: 0.25rem;
+        }
         font-size: 0.8rem;
     }
 `
@@ -637,9 +644,15 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                 } else if (message.type === "notification") {
                                     return (
                                         <NotificationStyled className='notification-item'>
-                                            <img src={message?.senderAvatar} alt=''/>
-                                            <span className='notification-fullname'>{message?.senderFullName}</span>
-                                            <span className='notification-content'>{message.content}</span>
+                                            {message.senderId !== user.userID && (
+                                                <img src={message?.senderAvatar} alt=''/>
+                                            )}
+                                            <span className='notification-content'>
+                                                <span className='notification-fullname'>
+                                                    {message.senderId !== user.userID ? message?.senderFullName : 'Bạn'}
+                                                </span>
+                                                {message.content}
+                                            </span>
                                         </NotificationStyled>
                                     );
                                 }

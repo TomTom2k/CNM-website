@@ -167,13 +167,13 @@ const Conversation = ({ conversation }) => {
 			<InfoStyled>
 				<h6>{title}</h6>
 				<div className='last-message-info'>
-					{lastMessage?.content && lastMessage?.senderId === user.userID && (<span className='last-message-sender'>Bạn:</span>)}
+					{lastMessage?.content && lastMessage?.senderId === user.userID && lastMessage?.type !== "notification" && (<span className='last-message-sender'>Bạn:</span>)}
 					{
 						lastMessage?.isRecalled ? (<p>Tin nhắn đã được thu hồi</p>)
 						: lastMessage?.type === "like" ? (<p><img src={lastMessage?.content} alt=''/></p>) 
 						: lastMessage?.type === "image" ? (<div className='d-flex align-items-center'><CiImageOn className='last-message-icon'/><p>Hình ảnh</p></div>)
 						: lastMessage?.type === "file" ? (<div className='d-flex align-items-center'><MdAttachFile  className='last-message-icon'/><p>{lastMessage.content.split('.').slice(-2).join('.')}</p></div>)
-						: lastMessage?.type === "notification" ? (<div className='d-flex align-items-center'><GrAnnounce  className='last-message-icon'/><p>{`${lastMessage.senderName} ${lastMessage.content}`}</p></div>)
+						: lastMessage?.type === "notification" ? (<div className='d-flex align-items-center'><GrAnnounce  className='last-message-icon'/><p>{`${lastMessage?.senderId !== user.userID ? lastMessage.senderName : "Bạn"} ${lastMessage.content}`}</p></div>)
 						: (<p>{lastMessage?.content || 'Chưa có tin nhắn'}</p>)
 					}
 				</div>
