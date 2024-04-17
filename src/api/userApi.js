@@ -64,6 +64,14 @@ const userApi = {
 		const url = '/user/cancel-friend';
 		return axiosClient.put(url, data);
 	},
+
+	cancelRequestAddFriends: (userId, userRequestedId) => {
+		const data = {userId, userRequestedId};
+		console.log('data', data)
+		const url = '/user/cancel-request-add-friend';
+		return axiosClient.put(url, data);
+	},
+
 	deleteFriend: (userId, friendId) => {
 		const data = {userId, friendId};
 		const url = '/user/delete-friend';

@@ -151,7 +151,16 @@ const ListFriend = () => {
     const handleCancelFriendRequest = async (requestedFriend) => {
         try {
             await userApi.cancelFriend(user.userID, requestedFriend.user.userID);
-            toast.success("Hủy kết bạn thành công");
+            toast.success("Thu hồi lời mời kết bạn thành công");
+        } catch (error) {
+            console.error("Error canceling friend request:", error);
+        }
+	};
+
+    const handleCancelRequestAddFriend = async (requestedFriend) => {
+        try {
+            await userApi.cancelRequestAddFriends(user.userID, requestedFriend.user.userID);
+            toast.success("Từ chối yêu cầu kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
         }
@@ -221,6 +230,9 @@ const ListFriend = () => {
                                             <p>{requestedFriend.user.phoneNumber}</p>
                                         </div>
                                     </InfoStyled>
+                                    <div className="d-flex align-items-center p-2">
+                                        <Button className="py-2"  onClick={() => handleCancelRequestAddFriend(requestedFriend)} style={{backgroundColor:"red"}}>Từ chối</Button>
+                                    </div>
                                     <div className="d-flex align-items-center">
                                         <Button className="py-2"  onClick={() => handleSuccessAddFriendRequest(requestedFriend)}>Đồng ý</Button>
                                     </div>
@@ -242,7 +254,7 @@ const ListFriend = () => {
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">
-                                        <Button className="py-2"  onClick={() => handleCancelFriendRequest(requestedFriend)} style={{backgroundColor:"red"}}>Hủy</Button>
+                                        <Button className="py-2"  onClick={() => handleCancelFriendRequest(requestedFriend)} style={{backgroundColor:"red"}}>Thu hồi</Button>
                                     </div>
                                 </WrapContent>
                             ))}
