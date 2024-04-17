@@ -163,7 +163,7 @@ const MemberForChoosingStyled = styled.div`
 
 
 const ChangeGroupOwnerModal = ({ show, handleClose, membersInfo }) => {
-	const { conversationSelected, setConversationSelected } = useContext(ConversationToken);
+	const { conversationSelected, setConversationSelected, setMessages, setHaveNewMessageConversations } = useContext(ConversationToken);
 	const [ showChooseOwnerModal, setShowChooseOwnerModal ] = useState(false)
 	const [ showConfirmChangeModal, setShowConfirmChangeModal ] = useState(false)
 	const [ choseOwner, setChoseOwner ] = useState({})
@@ -175,6 +175,10 @@ const ChangeGroupOwnerModal = ({ show, handleClose, membersInfo }) => {
 			conversationSelected.participantIds = reponse.resData.participantIds
 			conversationSelected.membersInfo = reponse.resData.membersInfo
 			setConversationSelected((prev) => ({...conversationSelected}))
+			setMessages((prevMessages) =>
+				prevMessages ? [...prevMessages, reponse.resData.savedMessage] : [reponse.resData.savedMessage]
+			);
+			setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: reponse.resData.savedMessage}])
 			setShowConfirmChangeModal(false)
 			setShowChooseOwnerModal(false)
         } catch (error) {
