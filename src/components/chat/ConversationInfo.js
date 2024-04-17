@@ -432,9 +432,14 @@ const ConversationInfo = () => {
     const [showChangeGroupOwnerModal, setShowChangeGroupOwnerModal] = useState(false)
     const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false)
 
+    useEffect(() => {
+        setCurrentMembers(() => (conversationSelected?.participantIds
+            ?.map(participantId => participantId.participantId)))
+    }, [conversationSelected])
+
     const isGroupOwner = (userID) => {
         return conversationSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
-    } 
+    }
 
     const MENU_ITEMS_FOR_MEMBERS = [
         {
