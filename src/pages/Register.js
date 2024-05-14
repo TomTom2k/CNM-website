@@ -185,7 +185,9 @@ const Register = () => {
 		handleSubmit,
 		register,
 		formState: { errors }, reset
-	} = useForm();
+	} = useForm({
+		shouldFocusError: false, // Ngăn không cho focus vào trường bị lỗi
+	});
 	const navigate = useNavigate();
 	const { login } = useContext(AuthToken);
 	const [isLoading, setIsLoading] = useState(false);
@@ -394,6 +396,9 @@ const Register = () => {
 									name="dateOfBirth"
 									control={control}
 									defaultValue={null}
+									rules={{
+										required: 'Vui lòng chọn ngày sinh',
+									}}
 									render={({ field }) => (
 										<DatePickerStyled
 											selected={field.value}
