@@ -1,11 +1,13 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Col, Container, Modal, Row, Spinner } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import styled from 'styled-components';
 import { toast, Toaster } from "react-hot-toast";
 
+import configs from '../../configs';
 import { AuthToken } from '../../context/AuthToken';
 import userApi from '../../api/userApi';
 
@@ -98,10 +100,11 @@ const FormFooterStyled = styled.div`
 
 
 const ChangePasswordModal = ({ show, handleClose }) => {
-	const { user } = useContext(AuthToken);
+	const { user, logout } = useContext(AuthToken);
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [reenteredNewPassword, setReenteredNewPassword] = useState('')
+	const navigate = useNavigate();
 
     const handleCancelChangePassword = () => {
         setCurrentPassword('')
@@ -121,7 +124,11 @@ const ChangePasswordModal = ({ show, handleClose }) => {
                 setCurrentPassword('')
                 setNewPassword('')
                 setReenteredNewPassword('')
-                toast.success("Cập nhật mật khẩu thành công")
+                toast.success("Cập nhật mật khẩu thành công. Vui lòng đăng nhập lại!")
+				setTimeout(() => {
+					logout();
+					navigate(configs.routes.login);
+				}, 2000);
             } catch (error) {
                 if(error?.response && error?.response.status === 400){
                     toast.error("Mật khẩu hiện tại không chính xác!")
@@ -132,7 +139,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
 
 	return (
 		<ModalStyled show={show} onHide={handleCancelChangePassword}>
-			<Toaster toastOptions={{ duration: 4000 }}/>
+			<Toaster toastOptions={{ duration: 2000 }}/>
 			<Modal.Header closeButton>
 				<Modal.Title>
 					<Row className=" justify-content-between">
