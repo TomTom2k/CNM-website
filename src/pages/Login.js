@@ -228,14 +228,24 @@ const Login = () => {
 	const handleSubmitPassword = async () => {
 		try {
 			// Kiểm tra mật khẩu mới và mật khẩu mới nhập lại có đủ tối thiểu 6 ký tự không
-			if (newPassword.length < 6 || reNewPassword.length < 6) {
+			if (newPassword.length < 6) {
 				setPasswordError("Mật khẩu mới phải có ít nhất 6 ký tự");
+				return;
+			}
+			if (newPassword.length > 32) {
+				setPasswordError("Mật khẩu mới không được vượt quá 32 ký tự");
+				return;
+			}
+			// Regex kiểm tra mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt
+			const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+			if (!passwordRegex.test(newPassword)) {
+				setPasswordError("Mật khẩu mới phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt");
 				return;
 			}
 			setPasswordError(null);
 	
 			if (newPassword !== reNewPassword) {
-				setPasswordError("Mật khẩu mới không khớp");
+				setPasswordError("Mật khẩu nhập lại không khớp");
 				return;
 			}
 			setPasswordError(null);

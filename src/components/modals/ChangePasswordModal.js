@@ -97,6 +97,11 @@ const FormFooterStyled = styled.div`
 		}
 	}
 `;
+const ErrorMessage = styled.span`
+	font-size: 0.85rem;
+	color: red;
+	margin: 0.5rem 0;
+`;
 
 
 const ChangePasswordModal = ({ show, handleClose }) => {
@@ -104,6 +109,8 @@ const ChangePasswordModal = ({ show, handleClose }) => {
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [reenteredNewPassword, setReenteredNewPassword] = useState('')
+	const [newPasswordError, setNewPasswordError] = useState('')
+	const [currentPasswordError, setCurrentPasswordError] = useState('')
 	const navigate = useNavigate();
 
     const handleCancelChangePassword = () => {
@@ -114,10 +121,15 @@ const ChangePasswordModal = ({ show, handleClose }) => {
     }
 
     const handleChangePassword = async () => {
+		setCurrentPasswordError('')
+		setNewPasswordError('')
+		const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
         if(newPassword.length < 6){
-            toast.error("Mật khẩu quá ngắn. Mật khẩu hợp lệ phải gồm 6-32 ký tự.")
+			setNewPasswordError("Mật khẩu quá ngắn. Mật khẩu hợp lệ phải gồm 6-32 ký tự")
         } else if(newPassword.length > 32){
-            toast.error("Mật khẩu quá dài. Mật khẩu hợp lệ phải gồm 6-32 ký tự.")
+			setNewPasswordError("Mật khẩu quá dài. Mật khẩu hợp lệ phải gồm 6-32 ký tự")
+        } else if(!passwordRegex.test(newPassword)){
+			setNewPasswordError("Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt")
         } else {
             try {
                 await userApi.updatePassword(currentPassword, newPassword)
@@ -131,7 +143,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
 				}, 2000);
             } catch (error) {
                 if(error?.response && error?.response.status === 400){
-                    toast.error("Mật khẩu hiện tại không chính xác!")
+					setCurrentPasswordError("Mật khẩu hiện tại không chính xác!")
                 }
             }
         }
@@ -166,7 +178,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
                             <Form.Label className='mb-2'>
 								<NoteLabelStyled>
                                     <span className='fw-bold'>Lưu ý: </span>
-                                    Mật khẩu tối thiểu 6 ký tự trở lên & tối đa 32 ký tự.
+                                    Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt, tối thiểu 6 ký tự trở lên & tối đa 32 ký tự.
                                 </NoteLabelStyled>
 							</Form.Label>
 							<Form.Group className="mb-3">
@@ -180,6 +192,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
                                     onChange={(e) => setCurrentPassword(e.target.value)}
 								>
 								</Form.Control>
+								{currentPasswordError && <ErrorMessage>{currentPasswordError}</ErrorMessage>}
 							</Form.Group>
                             <hr />
 							<Form.Group className="mb-3">
@@ -193,6 +206,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
                                     onChange={(e) => setNewPassword(e.target.value)}
 								>
 								</Form.Control>
+								{newPasswordError && <ErrorMessage>{newPasswordError}</ErrorMessage>}
 							</Form.Group>
 
                             <Form.Group className="mb-4">
