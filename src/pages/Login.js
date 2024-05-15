@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link  } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import styled from 'styled-components';
@@ -9,14 +9,14 @@ import { BsFillShieldLockFill, BsTelephoneFill } from 'react-icons/bs';
 import { MdLockReset } from "react-icons/md";
 import OtpInput from 'otp-input-react';
 import { CgSpinner } from 'react-icons/cg';
-import { auth } from '../configs/firebase.config';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { toast, Toaster } from "react-hot-toast";
 import userApi from '../api/userApi';
 import "react-datepicker/dist/react-datepicker.css";
 
 import { AuthToken } from '../context/AuthToken';
 import configs from '../configs';
+import otpApi from '../api/otpApi';
+
 
 const WrapperStyled = styled.div`
 		width: 100vw;
@@ -171,20 +171,18 @@ const ModalStyled = styled.div`
 	height: 100vh;
 	display: flex;
 	justify-content: center;
-	align-items: center;
-	
 `;
 
 const ModalContent = styled.div`
 	background-color: #fff;
 	padding: 2rem;
 	border-radius: 0.25rem;
-	margin-top:20px;
-	min-width: 25rem;
+	width: 25rem;
+	margin-top: 12.5rem;
+	height: fit-content;
 	`;
 const WrapperStyledForgotPass = styled.div`
-		background-color: #fff;
-		padding: 2rem;
+	background-color: #fff;
 `;
 const Login = () => {
 	const navigate = useNavigate();
@@ -200,11 +198,19 @@ const Login = () => {
 	const [otp, setOtp] = useState(""); // State để lưu giá trị của OTP
 	const [ph, setPh] = useState("");
 	const [showOTP, setShowOTP] = useState(false); // State để điều khiển hiển thị/ẩn OTP
-	const [user, setUser] = useState(null);
+	const [showChangePasswordForm, setShowChangePasswordForm] = useState(false)
 	const [newPassword, setNewPassword] = useState("");
 	const [reNewPassword, setReNewPassword] = useState("");
 	const [passwordError, setPasswordError] = useState("");
-	const [phoneN, setPhoneN] = useState("");
+	const phoneNumber = useWatch({
+        control,
+        name: 'phoneNumber',
+        defaultValue: '', 
+    });
+
+	useEffect(() => {
+		setPh(phoneNumber)
+    }, [phoneNumber]);
 
 	const handleShowRegisterPage = () => {
 		navigate(configs.routes.register);
@@ -234,93 +240,51 @@ const Login = () => {
 			}
 			setPasswordError(null);
 	
-			await sendChangePasswordRequest(newPassword, phoneN);
+			await userApi.changePassword(newPassword, ph);
 	
 			toast.success("Đổi mật khẩu thành công");
 			setTimeout(() => {
-				setShowModal(false);
+				closeModal()
 			}, 1500);
 		} catch (error) {
 			console.log(error)
 		}
 	};
 
-	const sendChangePasswordRequest = async (newPassword, phoneN) => {
-
-		try {
-			// Gọi API để thực hiện yêu cầu đổi mật khẩu
-			await userApi.changePassword(newPassword, phoneN);
-			// Đóng modal
-			toast.success("Đổi mật khẩu thành công");
-			setTimeout(() => {
-				setShowModal(false);
-			}, 1500);
+	const sendOTP = async () => {
+		try {	
+			setIsLoading(true);	
+			await otpApi.sendOTP(ph);
+			setIsLoading(false);
+			toast.success("OTP đã được gửi thành công");
+			setShowOTP(true);
+			setTimeout(async () => {
+				setShowOTP(true);
+			}, 1500)
 		} catch (error) {
-			// Xử lý lỗi (nếu có)
-			console.error('Đổi mật khẩu không thành công:', error);
+			setIsLoading(false);
+			console.log(error);
+			toast.error("Gửi OTP không thành công")
 		}
-	};
+	}
 
-	function onCaptchVerify() {
-		try {
-			if (!window.recaptchaVerifier) {
-				window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-					'size': 'invisible',
-					'callback': (response) => {
-	
-						onSignup();
-					},
-					'expired-callback': () => {
-	
-					}
-				});
+	const onOTPVerify = async () => {
+		try {	
+			setIsLoading(true);		
+			await otpApi.verifyOTP(ph, otp)
+			setIsLoading(false);
+			toast.success("Xác thực OTP thành công")
+			setTimeout(() => {
+				setShowOTP(false)
+				setOtp("")
+				setShowChangePasswordForm(true)
+			}, 1500)		
+		} catch (error) {
+			setIsLoading(false);
+			console.log(error)
+			if(error?.response && error?.response.data && error?.response.data.message){
+				toast.error(error.response.data.message)
 			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	function onSignup() {
-		try {
-			setIsLoading(true);
-			onCaptchVerify();
-	
-			const appVerifier = window.recaptchaVerifier;
-	
-			const formatPh = '+' + ph;
-	
-			signInWithPhoneNumber(auth, formatPh, appVerifier)
-				.then((confirmationResult) => {
-					// SMS sent. Prompt user to type the code from the message, then sign the
-					// user in with confirmationResult.confirm(code).
-					window.confirmationResult = confirmationResult;
-					setIsLoading(false);
-					setShowOTP(true);
-					toast.success("OTP sent successfully");
-					// ...
-				}).catch((error) => {
-					console.log(error);
-					setIsLoading(false);
-				});
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	function onOTPVerify() {
-		try {			
-			setIsLoading(true);
-			window.confirmationResult.confirm(otp).then(async (res) => {
-				console.log(res);
-				setUser(res.user);
-				setPhoneN(res.user.phoneNumber);
-				setIsLoading(false);
-			}).catch(err => {
-				console.log(err);
-				setIsLoading(false);
-			})
-		} catch (error) {
-			console.log(error)
 		}
 	}
 
@@ -347,7 +311,11 @@ const Login = () => {
 	};
 
 	const closeModal = () => {
+		setShowChangePasswordForm(false)
+		setShowOTP(false)
 		setShowModal(false);
+		setNewPassword("")
+		setReNewPassword("")
 	};
 
 	return (
@@ -434,7 +402,7 @@ const Login = () => {
 								<div>
 									<Toaster toastOptions={{ duration: 1500 }} />
 									<div id="recaptcha-container"></div>
-									{user ? (
+									{showChangePasswordForm ? (
 										<WrapperStyledForgotPass>
 											{/* Thêm icon reset password */}
 											<DivRestPassword>
@@ -443,7 +411,7 @@ const Login = () => {
 
 											<InputWrapper>
 												<LabelPhoneFill>Đổi mật khẩu cho tài khoản</LabelPhoneFill>
-												<p>{user.phoneNumber}</p>
+												<p>{ph}</p>
 											</InputWrapper>
 
 											<InputWrapper>
@@ -485,7 +453,7 @@ const Login = () => {
 														otpType="number"
 														disabled={false}
 														autoFocus
-
+														className="justify-content-center ps-3 pb-3"
 													>
 													</OtpInput>
 													<ButtonStyled
@@ -512,7 +480,7 @@ const Login = () => {
 													<PhoneInputStyled className="mb-4" country={"in"} value={ph} onChange={setPh} />
 													<ButtonStyled
 														type="button"
-														onClick={onSignup}
+														onClick={sendOTP}
 														style={{ marginTop: "1rem" }}
 
 													>
