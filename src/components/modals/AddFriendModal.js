@@ -7,13 +7,70 @@ import userApi from '../../api/userApi';
 import SearchItem from '../chat/SearchItem';
 import { AuthToken } from '../../context/AuthToken';
 
+
+const ModalStyled = styled(Modal)`
+    & + .modal-backdrop{
+        z-index: 1059;
+    }
+	.modal-dialog{
+		max-width: 410px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 3.5rem;
+		margin-bottom: 0rem;
+		position: relative;
+		width: auto;
+		pointer-events: none;
+
+		.modal-content {
+			border-radius: 0.3rem;
+			.modal-header {
+				padding: 0.8rem 1rem;			
+				.modal-title {
+					font-size: 1rem;
+					font-weight: 700;
+					width: 100%;
+				}
+				.btn-close {
+					margin-left: 0;
+				}
+			}
+			.modal-body {
+				padding: 1rem 0rem;
+			}
+		}
+	}
+
+	hr {
+		margin: 0.8rem 0;
+	}
+`;
+
 const PhoneInputStyled = styled(PhoneInput)`
+	margin-left: 1rem;
+	margin-right: 1.2rem;
 	& > * {
 		border: none;
 		border-bottom: 1px solid #ccc;
 		outline: none;
 		padding: 5px 0;
-		font-size: 1rem;
+		font-size: 0.9rem;
+		&:focus {
+			border-bottom-color: var(--border-focused);
+		}
+	}
+`;
+
+const FriendListStyled = styled.div`
+	margin-top: 1.4rem;
+	height: 31rem; 
+	overflow-y: scroll;
+
+	.friend-list-title {
+		font-size: 0.85rem;
+		padding-left: 1rem;
+		color: var(--text-secondary);
+		margin-bottom: 0.3rem;
 	}
 `;
 
@@ -71,7 +128,7 @@ const AddFriendModel = ({ show, handleClose }) => {
 	}, [debouncedValue]);
 
 	return (
-		<Modal show={show} onHide={handleClose}>
+		<ModalStyled show={show} onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>Thêm bạn</Modal.Title>
 			</Modal.Header>
@@ -81,18 +138,18 @@ const AddFriendModel = ({ show, handleClose }) => {
 					value={phoneNumber}
 					onChange={setPhoneNumber}
 				/>
-				<div className="mt-4">
-					<p>Kết quả</p>
+				<FriendListStyled>
+					<p className='friend-list-title'>Kết quả</p>
 					{searchResult.map((user) => (
 						<SearchItem key={user?.userID} userItem={user} />
 					))}
-					<p>Lịch sử</p>
+					<p className='friend-list-title'>Lịch sử</p>
 					{searchHistory.map((user) => (
 						<SearchItem key={user?.userID} userItem={user} />
 					))}
-				</div>
+				</FriendListStyled>
 			</Modal.Body>
-		</Modal>
+		</ModalStyled>
 	);
 };
 

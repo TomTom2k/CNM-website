@@ -13,6 +13,7 @@ const GlobalStyle = createGlobalStyle`
     --text-errors: #d91b1b;
     --button-tertiary-neutral-hover: #dfe2e7;
     --button-tertiary-primary-text: #0068ff;
+    --button-tertiary-primary-hover: #e5efff;
     --button-primary-normal: #0068ff;
     --button-primary-hover: #004bb9;
     --button-neutral-normal: #eaedf0;
