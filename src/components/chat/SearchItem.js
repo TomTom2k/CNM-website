@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import Button from '../common/Button';
 import { AuthToken } from '../../context/AuthToken';
 import conversationApi from '../../api/conversationApi';
 import { ConversationToken } from '../../context/ConversationToken';
@@ -8,10 +7,9 @@ import userApi from '../../api/userApi';
 import { toast, Toaster } from "react-hot-toast";
 
 const ItemStyled = styled.div`
-	margin: 0 -1rem;
-	padding: 0 1rem;
+	padding: 0.3rem 0.2rem 0.3rem 1rem;
 	&:hover {
-		background-color: var(--color-60);
+		background: var(--layer-background-hover);
 	}
 `;
 
@@ -30,13 +28,36 @@ const InfoStyled = styled.div`
 		margin-right: 0.5rem;
 	}
 	> div {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding-left: 0.2rem;
 		> * {
 			margin: 0;
+
 		}
-		p {
-			color: #777;
-			font-size: 0.75rem;
+		.search-fullname {
+			font-weight: 600;
+			font-size: 0.875rem;
+			color: var(--text-primary);
 		}
+		.search-phone-number{
+			font-size: 0.725rem;
+			color: var(--text-secondary);
+		}
+	}
+`;
+
+const AddFriendButtonStyled = styled.div`
+	border: 1px solid var(--button-tertiary-primary-text);
+	color: var(--button-tertiary-primary-text);
+	padding: 0.15rem 1rem !important;
+	border-radius: 0.2rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	&:hover {
+		background-color: var(--button-tertiary-primary-hover);
 	}
 `;
 
@@ -66,19 +87,19 @@ const SearchItem = ({ userItem }) => {
 	};
 	return (
 		<ItemStyled
-			className="d-flex justify-content-between mb-1"
+			className="d-flex justify-content-between"
 			onClick={handlerItem}
 		>
 			<Toaster toastOptions={{ duration: 1500 }} />
 			<InfoStyled>
 				<img src={userItem?.profilePic} alt="" />
 				<div>
-					<b>{userItem?.fullName}</b>
-					<p>{userItem?.phoneNumber}</p>
+					<p className='search-fullname'>{userItem?.fullName}</p>
+					<p className='search-phone-number'>{userItem?.phoneNumber}</p>
 				</div>
 			</InfoStyled>
 			<div className="d-flex align-items-center">
-				<Button className="py-2" onClick={handleFriendRequest}>Gửi kết bạn</Button>
+				<AddFriendButtonStyled className="py-2" onClick={handleFriendRequest}>Kết bạn</AddFriendButtonStyled>
 			</div>
 		</ItemStyled>
 	);
