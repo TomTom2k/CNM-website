@@ -229,6 +229,9 @@ const Register = () => {
 			}, 1500)
 		} catch (error) {
 			console.error('Error while signing up:', error);
+			if(error?.response && error?.response.data && error?.response.data.message){
+				toast.error(error.response.data.message)
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -326,7 +329,7 @@ const Register = () => {
 						otpType="number"
 						disabled={false}
 						autoFocus
-						style={{ marginBottom: '1.5rem' }}
+						style={{ marginBottom: '1.5rem', marginLeft: '1.25rem' }}
 					>
 					</OtpInput>
 					<ButtonStyled
@@ -375,6 +378,14 @@ const Register = () => {
 										minLength: {
 											value: 6,
 											message: 'Mật khẩu phải tối thiểu 6 ký tự',
+										},
+										maxLength: {
+											value: 32,
+											message: 'Mật khẩu không được vượt quá 32 ký tự',
+										},
+										pattern: {
+											value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+											message: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt',
 										},
 									}}
 									render={({ field }) => (
