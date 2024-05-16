@@ -146,7 +146,7 @@ const AddFriendModel = ({ show, handleClose }) => {
 
 	useEffect(() => {
 		getUsersByIds()
-	}, [mySearchHistory])
+	}, [mySearchHistory, show])
 
 	const handleHideAddFriendModal = () => {
 		setPhoneNumber("")
@@ -167,11 +167,11 @@ const AddFriendModel = ({ show, handleClose }) => {
 				<FriendListStyled>
 					<p className='friend-list-title'>Kết quả</p>
 					{searchResult.map((user) => (
-						<SearchItem key={user?.userID} userItem={user} />
+						<SearchItem key={user?.userID} userItem={user} handleHideAddFriendModal={handleHideAddFriendModal}/>
 					))}
 					<p className='friend-list-title'>Lịch sử</p>
 					{mySearchHistoryInfoList?.map((user) => (
-						<SearchItem key={user?.userID} userItem={user} />
+						<SearchItem key={user?.userID} userItem={user} handleHideAddFriendModal={handleHideAddFriendModal}/>
 					))}
 				</FriendListStyled>
 			</Modal.Body>
