@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { AuthToken } from '../../context/AuthToken';
 import conversationApi from '../../api/conversationApi';
@@ -62,19 +62,39 @@ const AddFriendButtonStyled = styled.div`
 `;
 
 const SearchItem = ({ userItem, handleHideAddFriendModal }) => {
-	const { user } = useContext(AuthToken);
+	const { user, setUser } = useContext(AuthToken);
 	const { setConversationSelected, toggleConversationInfo, setToggleConversationInfo, setNewConversation } = useContext(ConversationToken);
+	const [isSentAddFriend, setIsSentAddFriend] = useState(user?.listRequestAddFriendsSent?.includes(userItem.userID) || false);
 
 	const handleFriendRequest = async (e) => {
 		try {
 			e.stopPropagation()
 			await userApi.sentRequestAddFriend(user.userID, userItem.userID);
+			setIsSentAddFriend(true)
+			setUser(prevUser => ({
+				...prevUser,
+				listRequestAddFriendsSent: [...(prevUser.listRequestAddFriendsSent || []), userItem.userID]
+			}));
 			toast.success("Đã gửi lời mời kết bạn");
 		} catch (error) {
 		  	console.log('Error:', error);    
 		}
 	};
 
+	const handleCancelFriendRequest = async (e) => {
+		try {
+			e.stopPropagation()
+			await userApi.cancelFriend(user.userID, userItem.userID);
+			setIsSentAddFriend(false)
+			setUser(prevUser => ({
+				...prevUser,
+				listRequestAddFriendsSent: (prevUser.listRequestAddFriendsSent || []).filter(id => id !== userItem.userID)
+			}));
+			toast.success("Đã thu hồi lời mời kết bạn");
+		} catch (error) {
+		  	console.log('Error:', error);    
+		}
+	};
 
 	const handlerItem = async () => {
 		try {
@@ -103,7 +123,15 @@ const SearchItem = ({ userItem, handleHideAddFriendModal }) => {
 				</div>
 			</InfoStyled>
 			<div className="d-flex align-items-center">
-				{!userItem?.friends?.includes(user.userID) && <AddFriendButtonStyled className="py-2" onClick={(e) => handleFriendRequest(e)}>Kết bạn</AddFriendButtonStyled>}
+				{!userItem?.friends?.includes(user.userID) && (
+					<>
+						{isSentAddFriend ? (
+							<AddFriendButtonStyled className="py-2" onClick={(e) => handleCancelFriendRequest(e)}>Thu hồi lời mời</AddFriendButtonStyled>
+						) : (
+							<AddFriendButtonStyled className="py-2" onClick={(e) => handleFriendRequest(e)}>Kết bạn</AddFriendButtonStyled>
+						)}
+					</>
+				)}	
 			</div>
 		</ItemStyled>
 	);
