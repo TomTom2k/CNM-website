@@ -81,6 +81,10 @@ const userApi = {
 		const url = '/user/get-all-friends-with-conversationid';
 		return axiosClient.get(url);
 	},
+	findUsersByIds: (data) => {
+		const url = '/user/find-users-by-ids';
+		return axiosClient.get(url, { params: data });
+	},
 };
 
 export default userApi;
