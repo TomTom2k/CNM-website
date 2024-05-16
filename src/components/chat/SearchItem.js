@@ -61,12 +61,13 @@ const AddFriendButtonStyled = styled.div`
 	}
 `;
 
-const SearchItem = ({ userItem }) => {
+const SearchItem = ({ userItem, handleHideAddFriendModal }) => {
 	const { user } = useContext(AuthToken);
-	const { setConversationSelected } = useContext(ConversationToken);
+	const { setConversationSelected, toggleConversationInfo, setToggleConversationInfo, setNewConversation } = useContext(ConversationToken);
 
-	const handleFriendRequest = async () => {
+	const handleFriendRequest = async (e) => {
 		try {
+			e.stopPropagation()
 			await userApi.sentRequestAddFriend(user.userID, userItem.userID);
 			toast.success("Đã gửi lời mời kết bạn");
 		} catch (error) {
@@ -81,7 +82,10 @@ const SearchItem = ({ userItem }) => {
 				participantIds: [user.userID, userItem.userID],
 			});
 			if (res?.conversation) {
+				setToggleConversationInfo({toggle: toggleConversationInfo?.toggle, level: res?.conversation.participantIds.length > 2 ? 0 : 2})
+				setNewConversation(res?.conversation)
 				setConversationSelected(res?.conversation);
+				handleHideAddFriendModal()
 			}
 		} catch (error) {}
 	};
@@ -99,7 +103,7 @@ const SearchItem = ({ userItem }) => {
 				</div>
 			</InfoStyled>
 			<div className="d-flex align-items-center">
-				{!userItem?.friends?.includes(user.userID) && <AddFriendButtonStyled className="py-2" onClick={handleFriendRequest}>Kết bạn</AddFriendButtonStyled>}
+				{!userItem?.friends?.includes(user.userID) && <AddFriendButtonStyled className="py-2" onClick={(e) => handleFriendRequest(e)}>Kết bạn</AddFriendButtonStyled>}
 			</div>
 		</ItemStyled>
 	);
