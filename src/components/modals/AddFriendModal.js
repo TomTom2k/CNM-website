@@ -78,11 +78,10 @@ const AddFriendModel = ({ show, handleClose }) => {
 	const { user } = useContext(AuthToken);
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [searchResult, setSearchResult] = useState([]);
-	const [searchHistory, setSearchHistory] = useState(
-		localStorage.getItem('searchHistory')
-			? JSON.parse(localStorage.getItem('searchHistory'))
-			: []
-	);
+	let searchHistory = localStorage.getItem('searchHistory') ? JSON.parse(localStorage.getItem('searchHistory')) : []
+	const initialSearchHistory = searchHistory.find(history => history.userId === user.userID) || {};
+	const [mySearchHistory, setMySearchHistory] = useState(initialSearchHistory);
+	const [mySearchHistoryInfoList, setMySearchHistoryInfoList] = useState([])
 	const [isLoading, setIsLoading] = useState(false);
 
 	const debouncedValue = useDebounce(phoneNumber, 500);
@@ -100,22 +99,27 @@ const AddFriendModel = ({ show, handleClose }) => {
 					const newSearchResult = res?.users;
 
 					// Lưu lại lịch sử tìm kiếm
-					const userMap = new Map();
-					searchHistory.forEach((user) =>
-						userMap.set(user.userID, user)
+					const userSet = new Set();
+					mySearchHistory?.searchHistoryList?.forEach((user) =>
+						userSet.add(user)
 					);
 					newSearchResult.forEach((user) =>
-						userMap.set(user.userID, user)
+						userSet.add(user.userID)
 					);
 					// Tạo một mảng mới từ các giá trị trong Map
-					const updatedHistory = Array.from(userMap.values());
+					const updatedHistory = Array.from(userSet);
+					// const userIdsOfUpdatedHistory = updatedHistory.map(item => item.userID)
+					const updatedHistoryWithOwner = {userId: user.userID, searchHistoryList: updatedHistory}
 
+					// eslint-disable-next-line react-hooks/exhaustive-deps
+					searchHistory = searchHistory.filter(item => item.userId !== user.userID);
+					searchHistory.push(updatedHistoryWithOwner)
 					localStorage.setItem(
 						'searchHistory',
-						JSON.stringify(updatedHistory)
+						JSON.stringify(searchHistory)
 					);
 
-					setSearchHistory(updatedHistory);
+					setMySearchHistory(updatedHistoryWithOwner);
 					setSearchResult(newSearchResult);
 				} catch (error) {
 					console.log(error);
@@ -124,11 +128,33 @@ const AddFriendModel = ({ show, handleClose }) => {
 				}
 			};
 			searchPhoneNumber();
+		} else {
+			setSearchResult([]);
 		}
 	}, [debouncedValue]);
 
+	const getUsersByIds = async () => {
+		if(mySearchHistory?.searchHistoryList?.length > 0){
+			try {
+				const res = await userApi.findUsersByIds({ userIds : mySearchHistory?.searchHistoryList })
+				setMySearchHistoryInfoList(res.users)
+			} catch (error) {
+				console.log(error)
+			}
+		}
+	}
+
+	useEffect(() => {
+		getUsersByIds()
+	}, [mySearchHistory])
+
+	const handleHideAddFriendModal = () => {
+		setPhoneNumber("")
+		handleClose()
+	} 
+
 	return (
-		<ModalStyled show={show} onHide={handleClose}>
+		<ModalStyled show={show} onHide={handleHideAddFriendModal}>
 			<Modal.Header closeButton>
 				<Modal.Title>Thêm bạn</Modal.Title>
 			</Modal.Header>
@@ -144,7 +170,7 @@ const AddFriendModel = ({ show, handleClose }) => {
 						<SearchItem key={user?.userID} userItem={user} />
 					))}
 					<p className='friend-list-title'>Lịch sử</p>
-					{searchHistory.map((user) => (
+					{mySearchHistoryInfoList?.map((user) => (
 						<SearchItem key={user?.userID} userItem={user} />
 					))}
 				</FriendListStyled>

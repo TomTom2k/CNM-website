@@ -99,7 +99,7 @@ const SearchItem = ({ userItem }) => {
 				</div>
 			</InfoStyled>
 			<div className="d-flex align-items-center">
-				<AddFriendButtonStyled className="py-2" onClick={handleFriendRequest}>Kết bạn</AddFriendButtonStyled>
+				{!userItem?.friends?.includes(user.userID) && <AddFriendButtonStyled className="py-2" onClick={handleFriendRequest}>Kết bạn</AddFriendButtonStyled>}
 			</div>
 		</ItemStyled>
 	);
