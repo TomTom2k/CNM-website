@@ -61,16 +61,15 @@ const AddFriendButtonStyled = styled.div`
 	}
 `;
 
-const SearchItem = ({ userItem, handleHideAddFriendModal }) => {
+const SearchItem = ({ userItem, handleHideAddFriendModal, isSentAddFriend, updateSendAddFriendStatus }) => {
 	const { user, setUser } = useContext(AuthToken);
 	const { setConversationSelected, toggleConversationInfo, setToggleConversationInfo, setNewConversation } = useContext(ConversationToken);
-	const [isSentAddFriend, setIsSentAddFriend] = useState(user?.listRequestAddFriendsSent?.includes(userItem.userID) || false);
 
 	const handleFriendRequest = async (e) => {
 		try {
 			e.stopPropagation()
 			await userApi.sentRequestAddFriend(user.userID, userItem.userID);
-			setIsSentAddFriend(true)
+			updateSendAddFriendStatus(userItem.userID, true);
 			setUser(prevUser => ({
 				...prevUser,
 				listRequestAddFriendsSent: [...(prevUser.listRequestAddFriendsSent || []), userItem.userID]
@@ -85,7 +84,7 @@ const SearchItem = ({ userItem, handleHideAddFriendModal }) => {
 		try {
 			e.stopPropagation()
 			await userApi.cancelFriend(user.userID, userItem.userID);
-			setIsSentAddFriend(false)
+			updateSendAddFriendStatus(userItem.userID, false);
 			setUser(prevUser => ({
 				...prevUser,
 				listRequestAddFriendsSent: (prevUser.listRequestAddFriendsSent || []).filter(id => id !== userItem.userID)

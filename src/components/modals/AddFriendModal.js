@@ -83,6 +83,23 @@ const AddFriendModel = ({ show, handleClose }) => {
 	const [mySearchHistory, setMySearchHistory] = useState(initialSearchHistory);
 	const [mySearchHistoryInfoList, setMySearchHistoryInfoList] = useState([])
 	const [isLoading, setIsLoading] = useState(false);
+	const [sendAddFriendStatus, setSendAddFriendStatus] = useState({});
+
+	useEffect(() => {
+        const defaultFriendStatus = {};
+        mySearchHistoryInfoList.forEach(user2 => {
+            const isSent = user.listRequestAddFriendsSent && user.listRequestAddFriendsSent.includes(user2.userID);
+            defaultFriendStatus[user2.userID] = isSent;
+        });
+        setSendAddFriendStatus(defaultFriendStatus);
+    }, [mySearchHistoryInfoList]);
+
+	const updateSendAddFriendStatus = (userId, status) => {
+        setSendAddFriendStatus(prevState => ({
+            ...prevState,
+            [userId]: status
+        }));
+    };
 
 	const debouncedValue = useDebounce(phoneNumber, 500);
 
@@ -167,11 +184,23 @@ const AddFriendModel = ({ show, handleClose }) => {
 				<FriendListStyled>
 					<p className='friend-list-title'>Kết quả</p>
 					{searchResult.map((user) => (
-						<SearchItem key={user?.userID} userItem={user} handleHideAddFriendModal={handleHideAddFriendModal}/>
+						<SearchItem 
+							key={user?.userID} 
+							userItem={user} 
+							handleHideAddFriendModal={handleHideAddFriendModal}
+							isSentAddFriend={sendAddFriendStatus[user?.userID] || false}
+							updateSendAddFriendStatus={updateSendAddFriendStatus}
+						/>
 					))}
 					<p className='friend-list-title'>Lịch sử</p>
 					{mySearchHistoryInfoList?.map((user) => (
-						<SearchItem key={user?.userID} userItem={user} handleHideAddFriendModal={handleHideAddFriendModal}/>
+						<SearchItem 
+							key={user?.userID} 
+							userItem={user} 
+							handleHideAddFriendModal={handleHideAddFriendModal}
+							isSentAddFriend={sendAddFriendStatus[user?.userID] || false}
+							updateSendAddFriendStatus={updateSendAddFriendStatus}
+						/>
 					))}
 				</FriendListStyled>
 			</Modal.Body>
