@@ -55,6 +55,11 @@ const conversationApi = {
 	leaveGroup:(conversationId, userId, choseOwner) => {
 		const url = `/conversation/${conversationId}/leave-group`;
 		return axiosClient.post(url, {userId, choseOwner});
+	},
+
+	getAllGroupConversationsOfUser: () => {
+		const url = '/conversation/group-conversations';
+		return axiosClient.get(url);
 	}
 };
 
