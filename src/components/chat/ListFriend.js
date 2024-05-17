@@ -11,6 +11,7 @@ import { CgUserList } from "react-icons/cg";
 import { GrSend } from "react-icons/gr";
 import userApi from '../../api/userApi';
 import { toast, Toaster } from "react-hot-toast";
+import conversationApi from '../../api/conversationApi';
 
 const HeaderChatStyled = styled.h3`
     display: flex;
@@ -90,6 +91,7 @@ const ListFriend = () => {
     const [requestedFriends, setRequestedFriends] = useState([]);
     const [requestAddFriendsReceived, setRequestAddFriendsReceived] = useState([]);
     const [listFriend, setListFriend] = useState([]);
+    const [listGroup, setListGroup] = useState([])
 
     useEffect(() => {
         if (conversationSelected && conversationSelected.icon === 'GrSend') {
@@ -97,6 +99,9 @@ const ListFriend = () => {
         }
         if (conversationSelected && conversationSelected.icon === 'SiTinyletter') {
             fetchRequestAddFriendsReceived(user?.listRequestAddFriendsReceived);
+        }
+        if (conversationSelected && conversationSelected.icon === 'GrGroup') {
+            fetchListGroup();
         }
         if (conversationSelected && conversationSelected.icon === 'CgUserList') {
             fetchListFriend(user?.friends);
@@ -121,11 +126,19 @@ const ListFriend = () => {
         }
     };
 
+    const fetchListGroup = async () => {
+        try {
+            const res = await conversationApi.getAllGroupConversationsOfUser()
+            setListGroup(res.conversations);
+        } catch (error) {
+            console.error("Error fetching requested friends:", error);
+        }
+    };
+
     const fetchListFriend = async (userIds) => {
         try {
             const requests = await userApi.findUsersByIds({userIds: userIds})
             setListFriend(requests.users);
-            console.log("aaaa", requests.users)
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -222,10 +235,22 @@ const ListFriend = () => {
                         </ContentList>
                     )}
                     {conversationSelected.icon === 'GrGroup' && (
-                        <GroupListSection>
-                            {/* Nội dung danh sách bạn bè */}
-                            <h1>Chưa có vui lòng thêm nhóm</h1>
-                        </GroupListSection>
+                        <ContentList>
+                            {listGroup.map(group => (
+                                <WrapContent key={group.conversationId}>
+                                    <InfoStyled>
+                                        <img src={group.avatar} alt="" />
+                                        <div>
+                                            <b>{group.name}</b>
+                                            <p>{group.participantIds.length} thành viên</p>
+                                        </div>
+                                    </InfoStyled>
+                                    <div className="d-flex align-items-center">
+                                        <Button className="py-2 danger">Rời nhóm</Button>
+                                    </div>
+                                </WrapContent>
+                            ))}
+                        </ContentList>
                     )}
                     {conversationSelected.icon === 'SiTinyletter' && (
                         <ContentList>
