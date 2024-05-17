@@ -12,6 +12,7 @@ import { GrSend } from "react-icons/gr";
 import userApi from '../../api/userApi';
 import { toast, Toaster } from "react-hot-toast";
 import conversationApi from '../../api/conversationApi';
+import LeaveGroupModal from '../modals/LeaveGroupModal';
 
 const HeaderChatStyled = styled.h3`
     display: flex;
@@ -92,6 +93,12 @@ const ListFriend = () => {
     const [requestAddFriendsReceived, setRequestAddFriendsReceived] = useState([]);
     const [listFriend, setListFriend] = useState([]);
     const [listGroup, setListGroup] = useState([])
+    const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false)
+    const [groupSelected, setGroupSelected] = useState(null)
+
+    const isGroupOwner = (userID) => {
+        return groupSelected?.participantIds.find(participantId => participantId.role === "owner")?.participantId === userID;
+    }
 
     useEffect(() => {
         if (conversationSelected && conversationSelected.icon === 'GrSend') {
@@ -206,6 +213,16 @@ const ListFriend = () => {
             console.error("Error canceling friend request:", error);
         }
     }
+
+    const handleLeaveGroup = (group) => {
+        if(group?.participantIds.length <= 3){
+            toast.error("Không thể rời nhóm vì nhóm phải có ít nhất 3 thành viên.")
+        } else {
+            setGroupSelected(group)
+            setShowLeaveGroupModal(true)
+        }
+    }
+
     return (
         <>
             <AsideStyled>
@@ -246,7 +263,7 @@ const ListFriend = () => {
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">
-                                        <Button className="py-2 danger">Rời nhóm</Button>
+                                        <Button className="py-2 danger" onClick={() => handleLeaveGroup(group)}>Rời nhóm</Button>
                                     </div>
                                 </WrapContent>
                             ))}
@@ -293,6 +310,15 @@ const ListFriend = () => {
                             ))}
                         </ContentList>
                     )}
+                    {groupSelected && (<LeaveGroupModal  
+                        groupSelected={groupSelected}
+                        isOwner={isGroupOwner(user.userID)}
+                        show={showLeaveGroupModal} 
+                        handleClose={() => setShowLeaveGroupModal(false)}
+                        membersInfo={groupSelected?.membersInfo.filter(member => member.userID !== user.userID)} 
+                        listGroup={listGroup}
+                        setListGroup={setListGroup}
+                    />)}
                 </WrapContentStyled>
             </AsideStyled>
         </>
