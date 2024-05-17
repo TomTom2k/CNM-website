@@ -152,8 +152,12 @@ const ListFriend = () => {
 
     const fetchListFriend = async (userIds) => {
         try {
-            const requests = await userApi.findUsersByIds({userIds: userIds})
-            setListFriend(requests.users);
+            if(userIds.length > 0){
+                const requests = await userApi.findUsersByIds({userIds: userIds})
+                setListFriend(requests.users);
+            } else {
+                setListFriend([]);
+            }
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
