@@ -117,8 +117,12 @@ const ListFriend = () => {
 
     const fetchRequestedFriends = async (userIds) => {
         try {
-            const requests = await userApi.findUsersByIds({userIds: userIds})
-            setRequestedFriends(requests.users);
+            if(userIds.length > 0){
+                const requests = await userApi.findUsersByIds({userIds: userIds})
+                setRequestedFriends(requests.users);
+            } else {
+                setRequestedFriends([])
+            }
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -126,8 +130,12 @@ const ListFriend = () => {
 
     const fetchRequestAddFriendsReceived = async (userIds) => {
         try {
-            const requests = await userApi.findUsersByIds({userIds: userIds})
-            setRequestAddFriendsReceived(requests.users);
+            if(userIds.length > 0){
+                const requests = await userApi.findUsersByIds({userIds: userIds})
+                setRequestAddFriendsReceived(requests.users);
+            } else {
+                setRequestAddFriendsReceived([])
+            }
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -178,7 +186,12 @@ const ListFriend = () => {
     
     const handleCancelFriendRequest = async (requestedFriend) => {
         try {
-            await userApi.cancelFriend(user.userID, requestedFriend.userID);
+            const res = await userApi.cancelFriend(user.userID, requestedFriend.userID);
+            setRequestedFriends(prevFriends => prevFriends.filter(friend => friend.userID !== res.canceledFriend))
+            setUser(prevUser => ({
+				...prevUser,
+				listRequestAddFriendsSent: prevUser.listRequestAddFriendsSent.filter(friend => friend !== res.canceledFriend)
+			}));
             toast.success("Thu hồi lời mời kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -197,7 +210,14 @@ const ListFriend = () => {
     const handleSuccessAddFriendRequest = async (requestedFriend) => {
         // console.log("requestedFriend",user.userID +","+ requestedFriend.user.userID);
         try {
-            await userApi.addFriend(user.userID, requestedFriend.userID);
+            const res = await userApi.addFriend(user.userID, requestedFriend.userID);
+            setListFriend(prevFriends => [...prevFriends, res.acceptedFriend]);
+            setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.acceptedFriend))
+            setUser(prevUser => ({
+				...prevUser,
+				friends: [...(prevUser.friends || []), res.acceptedFriend],
+                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.acceptedFriend)
+			}));
             toast.success("Đồng ý kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
