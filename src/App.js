@@ -4,8 +4,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import routing from './routes';
 import PrivateRoute from './routes/PrivateRoute';
 import DefaultLayout from './layout/DefaultLayout';
+import useListenFriend from './hooks/useListenFriend';
 
 function App() {
+	useListenFriend()
 	return (
 		<div className="App">
 			<Router>
