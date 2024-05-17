@@ -86,7 +86,7 @@ const GroupListSection = styled.div`
 
 
 const ListFriend = () => {
-    const { user } = useContext(AuthToken);
+    const { user, setUser } = useContext(AuthToken);
     const { conversationSelected} =
     useContext(ConversationToken);
     const [requestedFriends, setRequestedFriends] = useState([]);
@@ -207,7 +207,12 @@ const ListFriend = () => {
 
     const handleDeleteFriend = async (requestedFriend) => {
         try {
-            await userApi.deleteFriend(user.userID, requestedFriend.userID);
+            const res = await userApi.deleteFriend(user.userID, requestedFriend.userID);
+            setListFriend(prevFriends => prevFriends.filter(friend => friend.userID !== res.deletedUser))
+            setUser(prevUser => ({
+				...prevUser,
+				friends: prevUser.friends.filter(friend => friend !== res.deletedUser)
+			}));
             toast.success("Xóa bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
