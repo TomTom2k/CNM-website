@@ -11,10 +11,18 @@ const ButtonStyled = styled.button`
 
 	color: white;
 	font-size: 0.875rem;
-	background-color: var(--color-10);
+	background-color: #3498db;
+
+	&.danger {
+		background-color: #e74c3c;
+
+		&:hover {
+			background-color: #c0392b;
+		}
+	}
 
 	&:hover {
-		opacity: 0.9;
+		background-color: #2980b9;
 	}
 	&:active {
 		opacity: 1;

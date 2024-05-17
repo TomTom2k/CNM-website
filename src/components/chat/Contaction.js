@@ -10,17 +10,17 @@ import { CgUserList } from "react-icons/cg";
 import { GrSend } from "react-icons/gr";
 
 const WrapperStyled = styled.div`
-	padding: 1.2rem 1rem;
+	padding: 1rem 1.2rem;
 	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-items: center;
 	&:hover {
 		cursor: pointer;
-		background-color: #eee;
+		background-color: var(--layer-background-hover);
 	}
 	&.active {
-		background-color: var(--color-60);
+		background: var(--layer-background-selected);
 	}
 `;
 
@@ -35,11 +35,12 @@ const InfoStyled = styled.div`
 	h6 {
 		width: 100%;
 		margin: 0;
-		font-size: 1rem;
-		font-weight: 550;
+		font-size: 0.9rem;
+		font-weight: 600;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: var(--text-primary);
 	}
 	p {
 		margin: 0;
@@ -100,7 +101,7 @@ const Contaction = ({ contaction }) => {
 				}
 			>
 			<IconContainer>
-				<IconComponent  size={30} />
+				<IconComponent  size={26}/>
 			</IconContainer>
 			<InfoStyled>
 				<h6>{contaction?.name}</h6>
