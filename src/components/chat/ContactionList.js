@@ -35,33 +35,19 @@ const ConversationList = () => {
     
 	const { user } = useContext(AuthToken);
 	const { setConversationSelected } = useContext(ConversationToken);
-    const [userInfo, setUserInfo] = useState(null);
 
- 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await userApi.inFoUser(user.userID);
-			setUserInfo(response);
-		};
-		fetchData();
-	}, [user.userID]);
-
-    const defaultContacts = userInfo ? [
-        { id: 1, name: 'Danh sách bạn bè', icon: 'CgUserList', onClick: () => handleItemClick(1), userInfo },
-        { id: 2, name: 'Danh sách nhóm', icon: 'GrGroup', onClick: () => handleItemClick(2), userInfo },
-        { id: 3, name: 'Lời mời kết bạn', icon: 'SiTinyletter', onClick: () => handleItemClick(3), userInfo},
-        { id: 4, name: 'Danh sách đã gửi', icon: 'GrSend', onClick: () => handleItemClick(4), userInfo },
-    ] : [];
+    const defaultContacts = [
+        { id: 1, name: 'Danh sách bạn bè', icon: 'CgUserList' },
+        { id: 2, name: 'Danh sách nhóm', icon: 'GrGroup' },
+        { id: 3, name: 'Lời mời kết bạn', icon: 'SiTinyletter' },
+        { id: 4, name: 'Danh sách đã gửi', icon: 'GrSend' },
+    ];
 
     useEffect(() => {
         if (defaultContacts.length > 0) {
             setConversationSelected(defaultContacts[0]);
         }
-    }, [userInfo]);
-
-    const handleItemClick = async (id) => {
-        console.log(`Item with id ${id} clicked`);
-		console.log("API data:", userInfo);
-    };
+    }, []);
     
     const displayedContacts = defaultContacts.slice(0, 4);
     return (

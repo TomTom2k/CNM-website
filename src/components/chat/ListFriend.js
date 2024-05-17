@@ -93,20 +93,20 @@ const ListFriend = () => {
 
     useEffect(() => {
         if (conversationSelected && conversationSelected.icon === 'GrSend') {
-            fetchRequestedFriends(conversationSelected.userInfo.user.listRequestAddFriendsSent);
+            fetchRequestedFriends(user?.listRequestAddFriendsSent);
         }
         if (conversationSelected && conversationSelected.icon === 'SiTinyletter') {
-            fetchRequestAddFriendsReceived(conversationSelected.userInfo.user.listRequestAddFriendsReceived);
+            fetchRequestAddFriendsReceived(user?.listRequestAddFriendsReceived);
         }
         if (conversationSelected && conversationSelected.icon === 'CgUserList') {
-            fetchListFriend(conversationSelected.userInfo.user.friends);
+            fetchListFriend(user?.friends);
         }
-    }, [conversationSelected]);
+    }, [conversationSelected, user?.friends, user?.listRequestAddFriendsReceived, user?.listRequestAddFriendsSent]);
 
     const fetchRequestedFriends = async (userIds) => {
         try {
-            const requests = await Promise.all(userIds.map(userId => userApi.findUserById(userId)));
-            setRequestedFriends(requests);
+            const requests = await userApi.findUsersByIds({userIds: userIds})
+            setRequestedFriends(requests.users);
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -114,8 +114,8 @@ const ListFriend = () => {
 
     const fetchRequestAddFriendsReceived = async (userIds) => {
         try {
-            const requests = await Promise.all(userIds.map(userId => userApi.findUserById(userId)));
-            setRequestAddFriendsReceived(requests);
+            const requests = await userApi.findUsersByIds({userIds: userIds})
+            setRequestAddFriendsReceived(requests.users);
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -123,8 +123,9 @@ const ListFriend = () => {
 
     const fetchListFriend = async (userIds) => {
         try {
-            const requests = await Promise.all(userIds.map(userId => userApi.findUserById(userId)));
-            setListFriend(requests);
+            const requests = await userApi.findUsersByIds({userIds: userIds})
+            setListFriend(requests.users);
+            console.log("aaaa", requests.users)
         } catch (error) {
             console.error("Error fetching requested friends:", error);
         }
@@ -157,7 +158,7 @@ const ListFriend = () => {
     
     const handleCancelFriendRequest = async (requestedFriend) => {
         try {
-            await userApi.cancelFriend(user.userID, requestedFriend.user.userID);
+            await userApi.cancelFriend(user.userID, requestedFriend.userID);
             toast.success("Thu hồi lời mời kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -166,7 +167,7 @@ const ListFriend = () => {
 
     const handleCancelRequestAddFriend = async (requestedFriend) => {
         try {
-            await userApi.cancelRequestAddFriends(user.userID, requestedFriend.user.userID);
+            await userApi.cancelRequestAddFriends(user.userID, requestedFriend.userID);
             toast.success("Từ chối yêu cầu kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -176,7 +177,7 @@ const ListFriend = () => {
     const handleSuccessAddFriendRequest = async (requestedFriend) => {
         // console.log("requestedFriend",user.userID +","+ requestedFriend.user.userID);
         try {
-            await userApi.addFriend(user.userID, requestedFriend.user.userID);
+            await userApi.addFriend(user.userID, requestedFriend.userID);
             toast.success("Đồng ý kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -186,7 +187,7 @@ const ListFriend = () => {
 
     const handleDeleteFriend = async (requestedFriend) => {
         try {
-            await userApi.deleteFriend(user.userID, requestedFriend.user.userID);
+            await userApi.deleteFriend(user.userID, requestedFriend.userID);
             toast.success("Xóa bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -205,12 +206,12 @@ const ListFriend = () => {
                     {conversationSelected.icon === 'CgUserList' && (
                         <ContentList>
                            {listFriend.map(requestedFriend => (
-                                <WrapContent key={requestedFriend.user.userId}>
+                                <WrapContent key={requestedFriend.userID}>
                                     <InfoStyled>
-                                        <img src={requestedFriend.user.profilePic} alt="" />
+                                        <img src={requestedFriend.profilePic} alt="" />
                                         <div>
-                                            <b>{requestedFriend.user.fullName}</b>
-                                            <p>{requestedFriend.user.phoneNumber}</p>
+                                            <b>{requestedFriend.fullName}</b>
+                                            <p>{requestedFriend.phoneNumber}</p>
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">
@@ -229,12 +230,12 @@ const ListFriend = () => {
                     {conversationSelected.icon === 'SiTinyletter' && (
                         <ContentList>
                             {requestAddFriendsReceived.map(requestedFriend => (
-                                <WrapContent key={requestedFriend.user.userId}>
+                                <WrapContent key={requestedFriend.userID}>
                                     <InfoStyled>
-                                        <img src={requestedFriend.user.profilePic} alt="" />
+                                        <img src={requestedFriend.profilePic} alt="" />
                                         <div>
-                                            <b>{requestedFriend.user.fullName}</b>
-                                            <p>{requestedFriend.user.phoneNumber}</p>
+                                            <b>{requestedFriend.fullName}</b>
+                                            <p>{requestedFriend.phoneNumber}</p>
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center p-2">
@@ -252,12 +253,12 @@ const ListFriend = () => {
                         <ContentList>
                             {/* Lập qua danh sách  */}
                             {requestedFriends.map(requestedFriend => (
-                                <WrapContent key={requestedFriend.user.userId}>
+                                <WrapContent key={requestedFriend.userID}>
                                     <InfoStyled>
-                                        <img src={requestedFriend.user.profilePic} alt="" />
+                                        <img src={requestedFriend.profilePic} alt="" />
                                         <div>
-                                            <b>{requestedFriend.user.fullName}</b>
-                                            <p>{requestedFriend.user.phoneNumber}</p>
+                                            <b>{requestedFriend.fullName}</b>
+                                            <p>{requestedFriend.phoneNumber}</p>
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">

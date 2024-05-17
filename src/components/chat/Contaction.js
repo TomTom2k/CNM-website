@@ -70,7 +70,6 @@ const Contaction = ({ contaction }) => {
 
 	const handlerConversation = () => {
 		setConversationSelected(contaction);
-		contaction.onClick();
 	};
 	
 	let IconComponent;
