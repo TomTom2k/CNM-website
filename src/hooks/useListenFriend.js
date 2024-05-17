@@ -14,8 +14,24 @@ const useListenFriend = () => {
 			}));
 		});
 
+		socket?.on('addFriend', (userId) => {
+            setUser(prevUser => ({
+				...prevUser,
+				listRequestAddFriendsReceived: [...(prevUser.listRequestAddFriendsReceived || []), userId]
+			}));
+		});
+
+		socket?.on('cancelAddFriend', (userId) => {
+            setUser(prevUser => ({
+				...prevUser,
+				listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== userId)
+			}));
+		});
+
 		return () => {
 			socket?.off('deleteFriend');
+			socket?.off('addFriend');
+			socket?.off('cancelAddFriend');
 		}
 	}, [setUser, socket]);
 };
