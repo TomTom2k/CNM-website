@@ -13,17 +13,16 @@ import userApi from '../../api/userApi';
 import { toast, Toaster } from "react-hot-toast";
 
 const HeaderChatStyled = styled.h3`
-    box-shadow: 1px 1px 1rem rgba(0, 0, 0, 0.05);
-    height: 3.5rem;
+    display: flex;
     margin: 0;
     text-align: left;
-    line-height: 3.5rem;
-    justify-content: center;
-    padding: 0 1rem;
+    align-items: center;
+    padding: 1.38rem 1.2rem;
 
-    font-size: 1.25rem;
-    font-weight: 500;
+    font-size: 0.975rem;
+    font-weight: 600;
     user-select: none;
+    border-bottom: 1px solid var(--border-disabled);
 `;
 
 const InfoStyled = styled.div`
@@ -50,10 +49,18 @@ const InfoStyled = styled.div`
 		}
 	}
 `;
-const WrapContent = styled.div`
+
+const WrapContentStyled = styled.div`
     padding: 1rem;
     display: flex;
- 
+`;
+
+const WrapContent = styled.div`
+    padding: 0.7rem 1rem;
+    display: flex;
+    &:hover{
+        background: var(--layer-background-hover);
+    }
 `;
 
 
@@ -67,7 +74,7 @@ const AsideStyled = styled.aside`
 	background-color: rgba(0, 0, 0, 0.01);
 `;
 
-const FriendRequestSection = styled.div`
+const ContentList = styled.div`
     width: 100%;
 `;
 
@@ -189,14 +196,14 @@ const ListFriend = () => {
         <>
             <AsideStyled>
                 <HeaderChatStyled>
-                    <IconComponent size={30} style={{ marginRight: '1rem' }} />
+                    <IconComponent size={26} style={{ marginRight: '1rem' }} />
                     {conversationSelected?.name}
                 </HeaderChatStyled>
-                <WrapContent>
+                <WrapContentStyled>
                     <Toaster toastOptions={{ duration: 1500 }} />
                     {/* Hiển thị danh sách bạn, danh sách bạn bè hoặc danh sách lời mời kết bạn tương ứng */}
                     {conversationSelected.icon === 'CgUserList' && (
-                        <FriendRequestSection>
+                        <ContentList>
                            {listFriend.map(requestedFriend => (
                                 <WrapContent key={requestedFriend.user.userId}>
                                     <InfoStyled>
@@ -207,11 +214,11 @@ const ListFriend = () => {
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">
-                                        <Button className="py-2"  onClick={() => handleDeleteFriend(requestedFriend)}>Xóa bạn</Button>
+                                        <Button className="py-2 danger"  onClick={() => handleDeleteFriend(requestedFriend)}>Xóa bạn</Button>
                                     </div>
                                 </WrapContent>
                             ))}
-                        </FriendRequestSection>
+                        </ContentList>
                     )}
                     {conversationSelected.icon === 'GrGroup' && (
                         <GroupListSection>
@@ -220,7 +227,7 @@ const ListFriend = () => {
                         </GroupListSection>
                     )}
                     {conversationSelected.icon === 'SiTinyletter' && (
-                        <FriendRequestSection>
+                        <ContentList>
                             {requestAddFriendsReceived.map(requestedFriend => (
                                 <WrapContent key={requestedFriend.user.userId}>
                                     <InfoStyled>
@@ -231,7 +238,7 @@ const ListFriend = () => {
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center p-2">
-                                        <Button className="py-2"  onClick={() => handleCancelRequestAddFriend(requestedFriend)} style={{backgroundColor:"red"}}>Từ chối</Button>
+                                        <Button className="py-2 danger"  onClick={() => handleCancelRequestAddFriend(requestedFriend)}>Từ chối</Button>
                                     </div>
                                     <div className="d-flex align-items-center">
                                         <Button className="py-2"  onClick={() => handleSuccessAddFriendRequest(requestedFriend)}>Đồng ý</Button>
@@ -239,10 +246,10 @@ const ListFriend = () => {
                                 </WrapContent>
                             ))}
                    
-                        </FriendRequestSection>
+                        </ContentList>
                     )}
                     {conversationSelected.icon === 'GrSend' && (
-                        <FriendRequestSection>
+                        <ContentList>
                             {/* Lập qua danh sách  */}
                             {requestedFriends.map(requestedFriend => (
                                 <WrapContent key={requestedFriend.user.userId}>
@@ -254,13 +261,13 @@ const ListFriend = () => {
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">
-                                        <Button className="py-2"  onClick={() => handleCancelFriendRequest(requestedFriend)} style={{backgroundColor:"red"}}>Thu hồi</Button>
+                                        <Button className="py-2 danger"  onClick={() => handleCancelFriendRequest(requestedFriend)}>Thu hồi</Button>
                                     </div>
                                 </WrapContent>
                             ))}
-                        </FriendRequestSection>
+                        </ContentList>
                     )}
-                </WrapContent>
+                </WrapContentStyled>
             </AsideStyled>
         </>
     );

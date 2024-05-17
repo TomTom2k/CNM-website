@@ -30,6 +30,7 @@ const GlobalStyle = createGlobalStyle`
     --button-danger-hover: #9a1313;
     --border: #d6dbe1;
     --border-focused: #0068ff;
+    --border-disabled: #c5c9ce;
     --icon-primary: #081c36;
     --icon-secondary: #7589a3;
     --layer-background-hover: #f3f5f6;
