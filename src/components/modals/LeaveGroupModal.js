@@ -170,7 +170,7 @@ const ConversationFormCheckStyled = styled.div`
 `
 
 
-const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo }) => {
+const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo, groupSelected, listGroup, setListGroup }) => {
 	const { user } = useContext(AuthToken);
 	const { conversationSelected, setConversations, setMessages, conversations, setToggleConversationInfo, setConversationSelected } = useContext(ConversationToken);
 	const [ showChooseOwnerBeforeLeavingModal, setShowChooseOwnerBeforeLeavingModal ] = useState(false)
@@ -192,14 +192,24 @@ const LeaveGroupModal = ({ show, handleClose, isOwner, membersInfo }) => {
         try {
 			let response
             //Call api xóa thành viên ở đây với conversationId và userID của thành viên muốn xóa
-			if(isOwner){
-				response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, choseOwner)
+			if(conversationSelected.conversationId){
+				if(isOwner){
+					response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, choseOwner)
+				} else {
+					response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, null)
+				}
+				setMessages(null)
+				setConversationSelected(null)
 			} else {
-				response = await conversationApi.leaveGroup(conversationSelected.conversationId, user.userID, null)
+				if(isOwner){
+					response = await conversationApi.leaveGroup(groupSelected.conversationId, user.userID, choseOwner)
+				} else {
+					response = await conversationApi.leaveGroup(groupSelected.conversationId, user.userID, null)
+				}
+				const updatedListGroup = listGroup.filter(group => group.conversationId !== response.conversationId)
+				setListGroup(updatedListGroup)
 			}
 			const updatedConversations = conversations.filter(conversation => conversation.conversationId !== response.conversationId);
-            setMessages(null)
-			setConversationSelected(null)
             setConversations(updatedConversations)
             setToggleConversationInfo({toggle: false, level: 0})
 			setChoseOwner(membersInfo[0]?.userID)
