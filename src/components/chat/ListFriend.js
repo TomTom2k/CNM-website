@@ -200,7 +200,12 @@ const ListFriend = () => {
 
     const handleCancelRequestAddFriend = async (requestedFriend) => {
         try {
-            await userApi.cancelRequestAddFriends(user.userID, requestedFriend.userID);
+            const res = await userApi.cancelRequestAddFriends(user.userID, requestedFriend.userID);
+            setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.refusedFriend))
+            setUser(prevUser => ({
+				...prevUser,
+                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.refusedFriend)
+			}));
             toast.success("Từ chối yêu cầu kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);

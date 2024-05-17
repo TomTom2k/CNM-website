@@ -36,11 +36,19 @@ const useListenFriend = () => {
 			}));
 		});
 
+		socket?.on('refuseAddFriend', (userId) => {
+            setUser(prevUser => ({
+				...prevUser,
+                listRequestAddFriendsSent: prevUser.listRequestAddFriendsSent.filter(friend => friend !== userId)
+			}));
+		});
+
 		return () => {
 			socket?.off('deleteFriend');
 			socket?.off('addFriend');
 			socket?.off('cancelAddFriend');
 			socket?.off('acceptAddFriend');
+			socket?.off('refuseAddFriend');
 		}
 	}, [setUser, socket]);
 };
