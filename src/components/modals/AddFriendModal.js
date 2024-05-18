@@ -163,7 +163,7 @@ const AddFriendModel = ({ show, handleClose }) => {
 
 	useEffect(() => {
 		getUsersByIds()
-	}, [mySearchHistory, show])
+	}, [mySearchHistory, show, user?.friends, user?.listRequestAddFriendsReceived, user?.listRequestAddFriendsSent])
 
 	const handleHideAddFriendModal = () => {
 		setPhoneNumber("")

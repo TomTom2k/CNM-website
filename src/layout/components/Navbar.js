@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Nav, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ import {
 import { RiContactsBookLine, RiContactsBookFill } from 'react-icons/ri';
 
 import configs from '../../configs';
+import { AuthToken } from '../../context/AuthToken';
 
 const NavbarStyled = styled(Nav)`
 	margin-top: 0.2rem;
@@ -19,6 +20,7 @@ const NavbarStyled = styled(Nav)`
 `;
 
 const NavItemStyled = styled(Nav.Link)`
+	position: relative;
 	width: 100%;
 	padding: 1.2rem 0;
 	display: flex;
@@ -34,6 +36,26 @@ const NavItemStyled = styled(Nav.Link)`
 
 	&.active {
 		background: var(--layer-background-leftmenu-selected);
+	}
+`;
+
+const AnnouncementStyled = styled.div`
+	background-color: var(--red-dot);
+	border-radius: 50%;
+	height: 0.9rem;
+	width: 0.9rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+
+	span {
+		font-size: 0.75rem;
+		text-align: center;
+		font-weight: 600;
+		color: white;
 	}
 `;
 
@@ -57,6 +79,7 @@ const NavIcon = ({ isActive, Icon }) => {
 };
 
 const Navbar = () => {
+	const { user } = useContext(AuthToken);
 	const location = useLocation();
 	return (
 		<NavbarStyled>
@@ -81,6 +104,11 @@ const Navbar = () => {
 							}
 							isActive={location.pathname === navItem.to}
 						/>
+						{navItem.tooltip === 'Danh bạ' && user?.listRequestAddFriendsReceived.length > 0 && (
+							<AnnouncementStyled>
+								<span>{user?.listRequestAddFriendsReceived.length}</span>
+							</AnnouncementStyled>
+						)}
 					</NavItemStyled>
 				</OverlayTrigger>
 			))}

@@ -57,6 +57,24 @@ const IconContainer = styled.div`
 	margin-right: 0.5rem; /* Add margin to the right of the icon */
 `;
 
+const AnnouncementStyled = styled.div`
+	background-color: var(--red-dot);
+	border-radius: 50%;
+	height: 1rem;
+	width: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 1.6rem;
+
+	span {
+		font-size: 0.8rem;
+		text-align: center;
+		font-weight: 600;
+		color: white;
+	}
+`;
+
 const ThemeContext = createContext();
 
 
@@ -105,6 +123,11 @@ const Contaction = ({ contaction }) => {
 			<InfoStyled>
 				<h6>{contaction?.name}</h6>
 			</InfoStyled>
+			{contaction.icon === 'SiTinyletter' && user?.listRequestAddFriendsReceived.length > 0 && (
+				<AnnouncementStyled>
+					<span>{user?.listRequestAddFriendsReceived.length}</span>
+				</AnnouncementStyled>
+			)}
 		</WrapperStyled>			
 	);
 };
