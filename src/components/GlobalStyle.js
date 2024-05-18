@@ -40,6 +40,7 @@ const GlobalStyle = createGlobalStyle`
     --field-bg-filled: #eaedf0;
     --color-10: #91caee;
     --color-11: #dce1e8;
+    --red-dot: #c31818;
   }
 
   * {
