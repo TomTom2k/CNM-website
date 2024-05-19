@@ -87,7 +87,7 @@ const GroupListSection = styled.div`
 
 const ListFriend = () => {
     const { user, setUser } = useContext(AuthToken);
-    const { conversationSelected} =
+    const { conversationSelected, toggleConversationInfo, setToggleConversationInfo, setNewConversation, conversations } =
     useContext(ConversationToken);
     const [requestedFriends, setRequestedFriends] = useState([]);
     const [requestAddFriendsReceived, setRequestAddFriendsReceived] = useState([]);
@@ -220,13 +220,17 @@ const ListFriend = () => {
         // console.log("requestedFriend",user.userID +","+ requestedFriend.user.userID);
         try {
             const res = await userApi.addFriend(user.userID, requestedFriend.userID);
-            setListFriend(prevFriends => [...prevFriends, res.acceptedFriend]);
-            setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.acceptedFriend))
+            setListFriend(prevFriends => [...prevFriends, res.data.acceptedFriend]);
+            setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.data.acceptedFriend))
             setUser(prevUser => ({
 				...prevUser,
-				friends: [...(prevUser.friends || []), res.acceptedFriend],
-                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.acceptedFriend)
+				friends: [...(prevUser.friends || []), res.data.acceptedFriend],
+                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.data.acceptedFriend)
 			}));
+            const isExistedConversation = conversations.some(conversation => conversation.conversationId === res.data.conversation.conversationId)
+            if(!isExistedConversation) {
+				setNewConversation(res.data.conversation)
+            } 
             toast.success("Đồng ý kết bạn thành công");
         } catch (error) {
             console.error("Error canceling friend request:", error);
@@ -272,10 +276,10 @@ const ListFriend = () => {
                            {listFriend.map(requestedFriend => (
                                 <WrapContent key={requestedFriend.userID}>
                                     <InfoStyled>
-                                        <img src={requestedFriend.profilePic} alt="" />
+                                        <img src={requestedFriend?.profilePic} alt="" />
                                         <div>
-                                            <b>{requestedFriend.fullName}</b>
-                                            <p>{requestedFriend.phoneNumber}</p>
+                                            <b>{requestedFriend?.fullName}</b>
+                                            <p>{requestedFriend?.phoneNumber}</p>
                                         </div>
                                     </InfoStyled>
                                     <div className="d-flex align-items-center">

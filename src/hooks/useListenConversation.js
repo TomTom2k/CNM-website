@@ -8,7 +8,7 @@ const useListenConversation = () => {
 	const { socket } = useSocketContext();
     const { messages, setMessages } = useConversation();
 	const { user } = useAuth();
-	const { setNewConversation, setConversations, conversationSelected, setConversationSelected, setHaveNewMessageConversations, setToggleConversationInfo } = useContext(ConversationToken);
+	const { setNewConversation, setConversations, conversationSelected, setConversationSelected, setHaveNewMessageConversations, setToggleConversationInfo, conversations } = useContext(ConversationToken);
 
 	useEffect(() => {
 		socket?.on('newConversation', (newConversation) => {
@@ -95,6 +95,26 @@ const useListenConversation = () => {
 			}
 		});
 
+		socket?.on('updateConversationAfterAcceptingAddFriend', (data) => {
+			const isExistedConversation = conversations.some(conversation => conversation.conversationId === data.conversation.conversationId)
+			console.log("conversation", conversations)
+            if(!isExistedConversation) {
+				setNewConversation(data.conversation)
+            } else {
+				if(conversationSelected?.conversationId === data.conversation.conversationId){
+					conversationSelected.membersInfo = data.conversation.membersInfo
+					conversationSelected.participantIds = data.conversation.participantIds
+					setConversationSelected((prev) => ({...conversationSelected}))
+					setMessages((prevMessages) =>
+						prevMessages ? [...prevMessages, data.savedMessage] : [data.savedMessage]
+					);
+					setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: data.savedMessage}])
+				} else {
+					setHaveNewMessageConversations([{conversationId: data.conversation.conversationId, message: data.savedMessage}])
+				}
+			}
+		});
+
 		return () => {
 			socket?.off('newConversation');
 			socket?.off('deleteConversation');
@@ -102,6 +122,7 @@ const useListenConversation = () => {
 			socket?.off('removeMemberOutOfConversation');
 			socket?.off('changeOwnerOfConversation');
 			socket?.off('leaveConversation');
+			socket?.off('updateConversationAfterAcceptingAddFriend');
 		}
 	}, [socket, setMessages, messages, user]);
 };
