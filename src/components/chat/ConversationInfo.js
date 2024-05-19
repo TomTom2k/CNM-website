@@ -86,26 +86,28 @@ const GroupInfoStyled = styled.div`;
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative;
         
         span {
+            position: relative;
             font-weight: 600;
-        }
 
-        .edit-group-name-icon{
-            font-size: 1.5rem;
-            position: absolute;
-            top: 0.5rem;
-            right: 4.6rem;
-            padding: 0.2rem;
-            border-radius: 50%;
-            background-color: var(--button-neutral-normal);
-            color: var(--button-neutral-text);
-            cursor: pointer;
-            &:hover{
-                background-color: var(--button-neutral-hover);
+            .edit-group-name-icon{
+                height: 1.4rem;
+                width: 1.4rem;
+                font-size: 1.5rem;
+                position: absolute;
+                right: -2rem;
+                padding: 0.2rem;
+                border-radius: 50%;
+                background-color: var(--button-neutral-normal);
+                color: var(--button-neutral-text);
+                cursor: pointer;
+                &:hover{
+                    background-color: var(--button-neutral-hover);
+                }
             }
         }
+
     }
 
     .group-info-action{
@@ -549,8 +551,10 @@ const ConversationInfo = () => {
                             <img src={conversationSelected?.avatar} alt=''/>
                         </div>
                         <div className='group-name'>
-                            <span>{conversationSelected?.name}</span>
-                            <AiOutlineEdit className='edit-group-name-icon'/>
+                            <span>
+                                {conversationSelected?.name}
+                                <AiOutlineEdit className='edit-group-name-icon'/>
+                            </span>
                         </div>
                         <div className='group-info-action'>
                             <div className='group-info-action-detail'>
@@ -663,7 +667,48 @@ const ConversationInfo = () => {
 			title: 'Thông tin hội thoại',
             body: (
                 <>
-                    <div style={{height: "5rem", background: "green"}}>Thông tin hội thoại</div>
+                    <GroupInfoStyled>
+                        <div className='group-avatar'>
+                            <img 
+                                src={
+                                    conversationSelected?.avatar ||
+                                    conversationSelected?.membersInfo?.find(
+                                    (member) => member.userID !== user?.userID
+                                )?.profilePic} 
+                                alt=''
+                            />
+                        </div>
+                        <div className='group-name'>
+                            <span>
+                                {
+                                    conversationSelected?.name ||
+                                    conversationSelected?.membersInfo?.find(
+                                        (member) => member.userID !== user?.userID
+                                    )?.fullName
+                                }
+                                <AiOutlineEdit className='edit-group-name-icon'/>
+                            </span>
+                        </div>
+                        <div className='group-info-action'>
+                            <div className='group-info-action-detail'>
+                                <TbBellRinging className='group-info-action-icon'/>
+                                <span>Tắt thông báo</span>
+                            </div>
+                            <div className='group-info-action-detail'>
+                                <BsPinAngle className='group-info-action-icon'/>
+                                <span>Ghim hội thoại</span>
+                            </div>
+                        </div>
+                    </GroupInfoStyled>
+                    <SeparatedStyled></SeparatedStyled>
+                    <SecuritySettingStyled>
+                        <h6>Thiết lập bảo mật</h6>
+                        <div className='security-setting-item'>
+                            <FiTrash className='security-setting-icon'/>
+                            <span>Xóa lịch sử trò chuyện</span>
+                        </div>
+                    </SecuritySettingStyled>
+                    <SeparatedStyled></SeparatedStyled>
                 </>
             )
 		}
