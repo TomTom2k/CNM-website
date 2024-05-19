@@ -104,9 +104,9 @@ const Navbar = () => {
 							}
 							isActive={location.pathname === navItem.to}
 						/>
-						{navItem.tooltip === 'Danh bạ' && user?.listRequestAddFriendsReceived.length > 0 && (
+						{navItem.tooltip === 'Danh bạ' && user?.listRequestAddFriendsReceived?.length > 0 && (
 							<AnnouncementStyled>
-								<span>{user?.listRequestAddFriendsReceived.length}</span>
+								<span>{user?.listRequestAddFriendsReceived?.length}</span>
 							</AnnouncementStyled>
 						)}
 					</NavItemStyled>

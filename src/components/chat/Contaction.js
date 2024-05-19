@@ -123,9 +123,9 @@ const Contaction = ({ contaction }) => {
 			<InfoStyled>
 				<h6>{contaction?.name}</h6>
 			</InfoStyled>
-			{contaction.icon === 'SiTinyletter' && user?.listRequestAddFriendsReceived.length > 0 && (
+			{contaction.icon === 'SiTinyletter' && user?.listRequestAddFriendsReceived?.length > 0 && (
 				<AnnouncementStyled>
-					<span>{user?.listRequestAddFriendsReceived.length}</span>
+					<span>{user?.listRequestAddFriendsReceived?.length}</span>
 				</AnnouncementStyled>
 			)}
 		</WrapperStyled>			

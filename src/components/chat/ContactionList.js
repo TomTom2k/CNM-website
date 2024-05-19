@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import SearchBox from '../SearchBox';
 import { AuthToken } from '../../context/AuthToken';
@@ -31,23 +31,23 @@ const ListStyled = styled.div`
     width: 100%;
 `;
 
-const ConversationList = () => {
+const ContactionList = () => {
     
 	const { user } = useContext(AuthToken);
 	const { setConversationSelected } = useContext(ConversationToken);
 
-    const defaultContacts = [
+    const defaultContacts = useMemo(() => [
         { id: 1, name: 'Danh sách bạn bè', icon: 'CgUserList' },
         { id: 2, name: 'Danh sách nhóm', icon: 'GrGroup' },
         { id: 3, name: 'Lời mời kết bạn', icon: 'SiTinyletter' },
         { id: 4, name: 'Danh sách đã gửi', icon: 'GrSend' },
-    ];
+    ], []);
 
     useEffect(() => {
         if (defaultContacts.length > 0) {
             setConversationSelected(defaultContacts[0]);
         }
-    }, []);
+    }, [defaultContacts, setConversationSelected]);
     
     const displayedContacts = defaultContacts.slice(0, 4);
     return (
@@ -67,4 +67,4 @@ const ConversationList = () => {
         </WrapperStyled>
     );
 };
-export default ConversationList;
+export default ContactionList;
