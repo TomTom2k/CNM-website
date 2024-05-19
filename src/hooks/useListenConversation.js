@@ -100,6 +100,7 @@ const useListenConversation = () => {
 			console.log("conversation", conversations)
             if(!isExistedConversation) {
 				setNewConversation(data.conversation)
+				setHaveNewMessageConversations([{conversationId: data.conversation.conversationId, message: data.savedMessage}])
             } else {
 				if(conversationSelected?.conversationId === data.conversation.conversationId){
 					conversationSelected.membersInfo = data.conversation.membersInfo
