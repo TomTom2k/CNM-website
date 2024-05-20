@@ -1,7 +1,5 @@
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: vincent181102/zalo-app-frontend:v1.0
     ports:
       - 3000:80
