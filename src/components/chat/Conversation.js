@@ -20,6 +20,15 @@ const WrapperStyled = styled.div`
 	&.active {
 		background-color: var(--layer-background-selected);
 	}
+	&.unseen {
+		h6 {
+			font-weight: 600;
+		}
+
+		.last-message-info{
+			color: var(--text-primary);
+		}
+	}
 `;
 const AvatarStyled = styled.div`
 	height: 3.2rem;
@@ -83,8 +92,9 @@ const InfoStyled = styled.div`
 			margin-right: 0.2rem;
 		}
 		
-		p {
-			width: 14rem;
+		p, div {
+			flex: 1;
+			min-width: 0;
 			font-size: 0.85rem;
 			margin: 0;
 			overflow: hidden;
@@ -98,12 +108,32 @@ const InfoStyled = styled.div`
 		}
 	}
 `;
+
+const AnnouncementStyled = styled.div`
+	background-color: var(--red-dot);
+	border-radius: 50%;
+	height: 1rem;
+	width: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 0.6rem;
+
+	span {
+		font-size: 0.8rem;
+		text-align: center;
+		font-weight: 600;
+		color: white;
+	}
+`;
+
 const Conversation = ({ conversation }) => {
 	const { user } = useContext(AuthToken);
 	const { onlineUsers } = useSocketContext();
 	const { conversationSelected, setConversationSelected, messages, haveNewMessageConversations, toggleConversationInfo, setToggleConversationInfo } =
 		useContext(ConversationToken);
 	const [lastMessage, setLastMessage] = useState(conversation.lastMessage)
+	const [unseenMessagesQuantity, setUnseenMessagesQuantity] = useState(conversation.unseenMessagesQuantity)
 	const [haveNewMessage, setHaveNewMessage] = useState({})
 
 	const title =
@@ -115,7 +145,13 @@ const Conversation = ({ conversation }) => {
 		onlineUsers.includes(id.participantId)
 	);
 
-	const handlerConversation = () => {
+	const handlerConversation = async () => {
+		if(!lastMessage?.seenUserIds || !lastMessage?.seenUserIds.includes(user.userID)){
+			setLastMessage(prev => ({
+				...prev,
+				seenUserIds : [...(prev?.seenUserIds || []), user.userID]
+			}))
+		}
 		setToggleConversationInfo({toggle: toggleConversationInfo?.toggle, level: conversation.participantIds.length > 2 ? 0 : 2})
 		setConversationSelected(conversation);
 	};
@@ -131,8 +167,21 @@ const Conversation = ({ conversation }) => {
 
 	useEffect(() => {
 		getLastMessage()
+		if(conversation.conversationId !== conversationSelected?.conversationId) {
+			getUnseenMessagesQuantity()
+		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	},[haveNewMessage])
+
+	useEffect(() => {
+		if(conversation.conversationId === conversationSelected?.conversationId){
+			setLastMessage(prev => ({
+				...prev,
+				seenUserIds : [...(prev?.seenUserIds || []), user.userID]
+			}))
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	},[lastMessage])
 
 	const getLastMessage = async () => {
 		try {
@@ -143,14 +192,21 @@ const Conversation = ({ conversation }) => {
         }
 	}
 
+	const getUnseenMessagesQuantity = async () => {
+		try {
+            const res = await conversationApi.getUnseenMessagesQuantity(conversation.conversationId);
+            setUnseenMessagesQuantity(res.unseenMessagesQuantity)
+        } catch (error) {
+            console.log(error)
+        }
+	}
+
 	return (
 		<WrapperStyled
 			onClick={handlerConversation}
 			className={
-				conversation.conversationId ===
-				conversationSelected?.conversationId
-					? 'active'
-					: ''
+				`${conversation.conversationId === conversationSelected?.conversationId ? 'active' : ''}
+				${(lastMessage && !lastMessage?.seenUserIds?.includes(user.userID) && conversation.conversationId !== conversationSelected?.conversationId) ? 'unseen' : ''}`
 			}
 		>
 			<AvatarStyled className={isOnline ? 'online' : ''}>
@@ -168,6 +224,7 @@ const Conversation = ({ conversation }) => {
 				<h6>{title}</h6>
 				<div className='last-message-info'>
 					{lastMessage?.content && lastMessage?.senderId === user.userID && lastMessage?.type !== "notification" && (<span className='last-message-sender'>Bạn:</span>)}
+					{conversation?.participantIds?.length > 2 && lastMessage?.content && lastMessage?.senderId !== user.userID && lastMessage?.type !== "notification" && (<span className='last-message-sender'>{lastMessage?.senderName}:</span>)}
 					{
 						lastMessage?.isRecalled ? (<p>Tin nhắn đã được thu hồi</p>)
 						: lastMessage?.type === "like" ? (<p><img src={lastMessage?.content} alt=''/></p>) 
@@ -178,6 +235,11 @@ const Conversation = ({ conversation }) => {
 					}
 				</div>
 			</InfoStyled>
+			{(!lastMessage?.seenUserIds?.includes(user.userID) && conversation.conversationId !== conversationSelected?.conversationId && unseenMessagesQuantity > 0) && (
+				<AnnouncementStyled>
+					<span>{unseenMessagesQuantity}</span>
+				</AnnouncementStyled>
+			)}
 		</WrapperStyled>
 	);
 };

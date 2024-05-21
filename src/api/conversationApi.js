@@ -21,7 +21,7 @@ const conversationApi = {
 		return axiosClient.post(url, formData, config);
 	},
 	getLastMessage: (conversationId) => {
-		const url = `/conversation/${conversationId}`;
+		const url = `/conversation/${conversationId}/last-message`;
 		return axiosClient.get(url);
 	},
 	getRecentlyConversations: (quantity) => {
@@ -60,7 +60,11 @@ const conversationApi = {
 	getAllGroupConversationsOfUser: () => {
 		const url = '/conversation/group-conversations';
 		return axiosClient.get(url);
-	}
+	},
+	getUnseenMessagesQuantity: (conversationId) => {
+		const url = `/conversation/${conversationId}/unseen-message-quantity`;
+		return axiosClient.get(url);
+	},
 };
 
 export default conversationApi;

@@ -194,7 +194,7 @@ const ListFriend = () => {
             setRequestedFriends(prevFriends => prevFriends.filter(friend => friend.userID !== res.canceledFriend))
             setUser(prevUser => ({
 				...prevUser,
-				listRequestAddFriendsSent: prevUser.listRequestAddFriendsSent.filter(friend => friend !== res.canceledFriend)
+				listRequestAddFriendsSent: prevUser?.listRequestAddFriendsSent.filter(friend => friend !== res.canceledFriend)
 			}));
             toast.success("Thu hồi lời mời kết bạn thành công");
         } catch (error) {
@@ -208,7 +208,7 @@ const ListFriend = () => {
             setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.refusedFriend))
             setUser(prevUser => ({
 				...prevUser,
-                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.refusedFriend)
+                listRequestAddFriendsReceived: prevUser?.listRequestAddFriendsReceived.filter(friend => friend !== res.refusedFriend)
 			}));
             toast.success("Từ chối yêu cầu kết bạn thành công");
         } catch (error) {
@@ -224,8 +224,8 @@ const ListFriend = () => {
             setRequestAddFriendsReceived(prevFriends => prevFriends.filter(friend => friend.userID !== res.data.acceptedFriend))
             setUser(prevUser => ({
 				...prevUser,
-				friends: [...(prevUser.friends || []), res.data.acceptedFriend],
-                listRequestAddFriendsReceived: prevUser.listRequestAddFriendsReceived.filter(friend => friend !== res.data.acceptedFriend)
+				friends: [...(prevUser?.friends || []), res.data.acceptedFriend],
+                listRequestAddFriendsReceived: prevUser?.listRequestAddFriendsReceived.filter(friend => friend !== res.data.acceptedFriend)
 			}));
             const isExistedConversation = conversations.some(conversation => conversation.conversationId === res.data.conversation.conversationId)
             if(!isExistedConversation) {
@@ -244,7 +244,7 @@ const ListFriend = () => {
             setListFriend(prevFriends => prevFriends.filter(friend => friend.userID !== res.deletedUser))
             setUser(prevUser => ({
 				...prevUser,
-				friends: prevUser.friends.filter(friend => friend !== res.deletedUser)
+				friends: prevUser?.friends.filter(friend => friend !== res.deletedUser)
 			}));
             toast.success("Xóa bạn thành công");
         } catch (error) {
