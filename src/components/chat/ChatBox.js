@@ -467,10 +467,23 @@ const ChatBox = () => {
 		xhr.send()
 	}
 
+	const callApiUpdateSeenUsersOfMessages = async () => {
+		const unseenMessages = messages?.filter(message => {
+			return !message?.seenUserIds || !message?.seenUserIds?.includes(user.userID)
+		})
+		if(unseenMessages && unseenMessages.length > 0){
+			const unseenMessageIds = unseenMessages.map(message => {
+				return message.messageId
+			})
+			await messageApi.updateSeenUsersOfMessages({messageIds : unseenMessageIds})
+		}
+	}
+
 	useEffect(() => {
 		if (contentChatRef.current) {
 			contentChatRef.current.scrollTop = contentChatRef.current.scrollHeight;
 		}
+		callApiUpdateSeenUsersOfMessages()
 	}, [messages]);
 
 	return (

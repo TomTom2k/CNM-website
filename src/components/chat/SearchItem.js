@@ -72,7 +72,7 @@ const SearchItem = ({ userItem, handleHideAddFriendModal, isSentAddFriend, updat
 			updateSendAddFriendStatus(userItem.userID, true);
 			setUser(prevUser => ({
 				...prevUser,
-				listRequestAddFriendsSent: [...(prevUser.listRequestAddFriendsSent || []), userItem.userID]
+				listRequestAddFriendsSent: [...(prevUser?.listRequestAddFriendsSent || []), userItem.userID]
 			}));
 			toast.success("Đã gửi lời mời kết bạn");
 		} catch (error) {
@@ -87,7 +87,7 @@ const SearchItem = ({ userItem, handleHideAddFriendModal, isSentAddFriend, updat
 			updateSendAddFriendStatus(userItem.userID, false);
 			setUser(prevUser => ({
 				...prevUser,
-				listRequestAddFriendsSent: (prevUser.listRequestAddFriendsSent || []).filter(id => id !== userItem.userID)
+				listRequestAddFriendsSent: (prevUser?.listRequestAddFriendsSent || []).filter(id => id !== userItem.userID)
 			}));
 			toast.success("Đã thu hồi lời mời kết bạn");
 		} catch (error) {

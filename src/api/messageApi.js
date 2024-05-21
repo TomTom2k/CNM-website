@@ -31,6 +31,10 @@ const messageApi = {
 		const url = `/message/share-message`;
 		return axiosClient.post(url, data);
 	},
+	updateSeenUsersOfMessages: (data) => {
+		const url = `/message/update-seen-user`;
+		return axiosClient.patch(url, data);
+	},
 };
 
 export default messageApi;
