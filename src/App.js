@@ -1,4 +1,4 @@
-// App.js
+
 import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import routing from './routes';
