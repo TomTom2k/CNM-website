@@ -467,6 +467,33 @@ const ChatBox = () => {
 		xhr.send()
 	}
 
+	const handleCallClick = async () => {
+		const dateNow = Date.now();
+		const conversationId = conversationSelected.conversationId;
+		const senderId = conversationSelected.membersInfo[0].userID;
+		const recipientId = conversationSelected.membersInfo[1].userID;
+		const callUrl = `http://localhost:3000/call/${conversationId}-${dateNow}?senderId=${senderId}&recipientId=${recipientId}`;
+		const messageContent = `Click <a href="${callUrl}" target="_blank">here</a> to join the call.`;
+
+
+		window.open(callUrl, '_blank');
+		try {
+			const res = await messageApi.sendMessage({
+				content: messageContent ,
+				conversationId: conversationId,
+				type: "text"
+			});
+			setMessages((prevMessages) =>
+				prevMessages ? [...prevMessages, ...res.message] : [...res.message]
+			);
+			setHaveNewMessageConversations([{conversationId: conversationSelected.conversationId, message: res.message[res.message.length -1]}])
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setNewMessage("")
+		}
+	};
+
 	useEffect(() => {
 		if (contentChatRef.current) {
 			contentChatRef.current.scrollTop = contentChatRef.current.scrollHeight;
@@ -505,7 +532,7 @@ const ChatBox = () => {
 						</UserInfoHeaderChatStyled>
 						<ActionHeaderChatStyled>
 							{conversationSelected.participantIds.length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
-							<IoCallOutline className='action-header-chat-icon'/>
+							<IoCallOutline className='action-header-chat-icon' onClick={() => handleCallClick()}/>
 							<GoDeviceCameraVideo className='action-header-chat-icon'/>
 							{toggleConversationInfo?.toggle ? (
 								<PiSquareHalfFill className='action-header-chat-icon toggle-icon on-toggle-icon' onClick={() => setToggleConversationInfo({toggle: false, level: 0})}/>

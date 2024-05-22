@@ -6,6 +6,7 @@ import PrivateRoute from './routes/PrivateRoute';
 import DefaultLayout from './layout/DefaultLayout';
 import useListenFriend from './hooks/useListenFriend';
 
+import CallPage from './pages/CallPage/CallOne';
 function App() {
 	useListenFriend()
 	return (
@@ -40,6 +41,7 @@ function App() {
 							/>
 						);
 					})}
+					<Route path="/call/:callId" element={<CallPage />} />
 				</Routes>
 			</Router>
 		</div>
