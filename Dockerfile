@@ -16,4 +16,6 @@ FROM nginx:1.23.3
 
 COPY --from=build /zalo-app/frontend/build /usr/share/nginx/html
 
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
