@@ -21,6 +21,7 @@ import ChatImage from '../../assets/images/chat_image.jpg';
 import LikeEmoji from '../../assets/images/like_emoji.svg';
 import useListenMessage from '../../hooks/useListenMessage';
 import MessageItem from './MessageItem';
+import callApi from '../../api/callApi';
 
 const ChatBoxStyled = styled.div`
 	width: calc(100% - 21.5rem);
@@ -467,6 +468,98 @@ const ChatBox = () => {
 		xhr.send()
 	}
 
+	const handleCallVoiceClick = async () => {
+		if(conversationSelected?.participantIds?.length === 2) {
+			const dateNow = Date.now();
+			const conversationId = conversationSelected?.conversationId;
+			const senderId = user?.userID;
+			const recipientId = conversationSelected?.membersInfo?.find(
+				(member) => member.userID !== user?.userID
+			)?.userID
+			const callUrl = `${window.location.origin}/voice-call-one/${conversationId}-${dateNow}?senderId=${senderId}&recipientId=${recipientId}`;
+	
+			window.open(callUrl, '_blank');
+	
+			try {
+				const res = await callApi.makeACallOne({senderInfo: user, recipientId, callUrl, conversationId, callType: 'voice'})
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.savedMessage] : [res.savedMessage]
+				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected?.conversationId, message: res.savedMessage}])
+			} catch (error) {
+				console.log(error)
+			}
+		} else {
+			const dateNow = Date.now();
+			const conversationId = conversationSelected?.conversationId;
+			const senderId = user?.userID;
+			const recipients = conversationSelected?.membersInfo?.filter(
+				(member) => member.userID !== user?.userID
+			)
+
+			const recipientIds = recipients.map((item) => item.userID)
+			const callUrl = `${window.location.origin}/voice-call-group/${conversationId}-${dateNow}?senderId=${senderId}`;
+	
+			window.open(callUrl, '_blank');
+	
+			try {
+				const res = await callApi.makeACallGroup({senderInfo: user, recipientIds, callUrl, conversationInfo: conversationSelected, callType: 'voice'})
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.savedMessage] : [res.savedMessage]
+				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected?.conversationId, message: res.savedMessage}])
+			} catch (error) {
+				console.log(error)
+			}
+		}
+	};
+
+	const handleCallVideoClick = async () => {
+		if(conversationSelected?.participantIds?.length === 2) {
+			const dateNow = Date.now();
+			const conversationId = conversationSelected?.conversationId;
+			const senderId = user?.userID;
+			const recipientId = conversationSelected?.membersInfo?.find(
+				(member) => member.userID !== user?.userID
+			)?.userID
+			const callUrl = `${window.location.origin}/video-call-one/${conversationId}-${dateNow}?senderId=${senderId}&recipientId=${recipientId}`;
+	
+			window.open(callUrl, '_blank');
+	
+			try {
+				const res = await callApi.makeACallOne({senderInfo: user, recipientId, callUrl, conversationId, callType: 'video'})
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.savedMessage] : [res.savedMessage]
+				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected?.conversationId, message: res.savedMessage}])
+			} catch (error) {
+				console.log(error)
+			}
+		} else {
+			const dateNow = Date.now();
+			const conversationId = conversationSelected?.conversationId;
+			const senderId = user?.userID;
+			const recipients = conversationSelected?.membersInfo?.filter(
+				(member) => member.userID !== user?.userID
+			)
+
+			const recipientIds = recipients.map((item) => item.userID)
+			const callUrl = `${window.location.origin}/video-call-group/${conversationId}-${dateNow}?senderId=${senderId}`;
+	
+			window.open(callUrl, '_blank');
+	
+			try {
+				const res = await callApi.makeACallGroup({senderInfo: user, recipientIds, callUrl, conversationInfo: conversationSelected, callType: 'video'})
+				setMessages((prevMessages) =>
+					prevMessages ? [...prevMessages, res.savedMessage] : [res.savedMessage]
+				);
+				setHaveNewMessageConversations([{conversationId: conversationSelected?.conversationId, message: res.savedMessage}])
+			} catch (error) {
+				console.log(error)
+			}
+		}
+	};
+
 	const callApiUpdateSeenUsersOfMessages = async () => {
 		const unseenMessages = messages?.filter(message => {
 			return !message?.seenUserIds || !message?.seenUserIds?.includes(user.userID)
@@ -518,8 +611,8 @@ const ChatBox = () => {
 						</UserInfoHeaderChatStyled>
 						<ActionHeaderChatStyled>
 							{conversationSelected.participantIds.length > 2 && <AiOutlineUsergroupAdd className='action-header-chat-icon add-friend-into-group-icon'/>}
-							<IoCallOutline className='action-header-chat-icon'/>
-							<GoDeviceCameraVideo className='action-header-chat-icon'/>
+							<IoCallOutline className='action-header-chat-icon' onClick={() => handleCallVoiceClick()}/>
+							<GoDeviceCameraVideo className='action-header-chat-icon' onClick={() => handleCallVideoClick()}/>
 							{toggleConversationInfo?.toggle ? (
 								<PiSquareHalfFill className='action-header-chat-icon toggle-icon on-toggle-icon' onClick={() => setToggleConversationInfo({toggle: false, level: 0})}/>
 							) : (

@@ -6,8 +6,15 @@ import PrivateRoute from './routes/PrivateRoute';
 import DefaultLayout from './layout/DefaultLayout';
 import useListenFriend from './hooks/useListenFriend';
 
+import VoiceCallOne from './pages/CallPage/VoiceCallOne';
+import VideoCallOne from './pages/CallPage/VideoCallOne';
+import VoiceCallGroup from './pages/CallPage/VoiceCallGroup';
+import VideoCallGroup from './pages/CallPage/VideoCallGroup';
+import useListenCall from './hooks/useListenCall';
+
 function App() {
 	useListenFriend()
+	useListenCall()
 	return (
 		<div className="App">
 			<Router>
@@ -40,6 +47,10 @@ function App() {
 							/>
 						);
 					})}
+					<Route path="/voice-call-one/:callId" element={<VoiceCallOne />} />
+					<Route path="/video-call-one/:callId" element={<VideoCallOne />} />
+					<Route path="/voice-call-group/:callId" element={<VoiceCallGroup />} />
+					<Route path="/video-call-group/:callId" element={<VideoCallGroup />} />
 				</Routes>
 			</Router>
 		</div>

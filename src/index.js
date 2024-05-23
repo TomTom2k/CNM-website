@@ -10,13 +10,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import AuthProvide from './context/AuthToken';
 import GlobalStyle from './components/GlobalStyle';
 import { SocketProvider } from './context/SocketContext';
+import CallProvider from './context/CallProvider';
+import IncomingCallModal from './components/modals/IncomingCallModal';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<AuthProvide>
 		<SocketProvider>
-			<GlobalStyle />
-			<App />
+			<CallProvider>
+				<GlobalStyle />
+				<App />
+				<IncomingCallModal/>
+			</CallProvider>
 		</SocketProvider>
 	</AuthProvide>
 );

@@ -4,7 +4,7 @@ import { IoMdShareAlt } from "react-icons/io";
 import Tippy from '@tippyjs/react/headless';
 import { SlReload } from "react-icons/sl";
 import { FiTrash } from "react-icons/fi";
-import { MdOutlineContentCopy } from "react-icons/md";
+import { MdOutlineContentCopy, MdCall, MdVideocam  } from "react-icons/md";
 import { PiShareFatLight } from "react-icons/pi";
 import { copyImageToClipboard } from 'copy-image-clipboard'
 import ShareMessageModal from '../modals/ShareMessageModal';
@@ -44,6 +44,22 @@ const MessageItemStyled = styled.div`
         &.self {
             align-self: center;
             background: hsla(0, 0%, 100%, 0.5);
+        }
+    }
+
+    &:has(.voice-call-item) {
+        &:hover {
+            .message-action {
+              display: none;
+            }  
+        }
+    }
+
+    &:has(.video-call-item) {
+        &:hover {
+            .message-action {
+              display: none;
+            }  
         }
     }
 
@@ -355,6 +371,19 @@ const NotificationStyled = styled.div`
     }
 `
 
+const CallStyled = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem;
+
+    .call-icon{
+        font-size: 1.2rem;
+        margin-right: 0.3rem;
+    }
+
+`
+
 const MessageItem = ({user, message, index, arr, elementShowTippy, setElementShowTippy, hideEmojiPicker, setMessages, messages, setHaveNewMessageConversations}) => {
     const MENU_ITEMS = [
         {
@@ -654,6 +683,24 @@ const MessageItem = ({user, message, index, arr, elementShowTippy, setElementSho
                                                 {message.content}
                                             </span>
                                         </NotificationStyled>
+                                    );
+                                } else if (message.type === "voice-call") {
+                                    return (
+                                        <CallStyled className='voice-call-item'>
+                                            <MdCall className='call-icon'/>
+                                            <span className='call-content'>
+                                                {message.content}
+                                            </span>
+                                        </CallStyled>
+                                    );
+                                } else if (message.type === "video-call") {
+                                    return (
+                                        <CallStyled className='video-call-item'>
+                                            <MdVideocam className='call-icon' />
+                                            <span className='call-content'>
+                                                {message.content}
+                                            </span>
+                                        </CallStyled>       
                                     );
                                 }
                             })()}
