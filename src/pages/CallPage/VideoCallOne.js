@@ -26,7 +26,7 @@ const VideoCallPage = () => {
         });
     }
 
-
+    //
     return <div>
         <div id="meeting" style={{width: "100%", height: "100vh"}} ref={myMeeting}></div>
     </div>
